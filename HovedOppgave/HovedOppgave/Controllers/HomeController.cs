@@ -47,6 +47,9 @@ namespace HovedOppgave.Controllers
 
         public ActionResult SearchEngine(string searchString)
         {
+            User user = new User();
+            if(searchString.Equals(user.FirstName))
+                return null;
 
             return null;
         }
