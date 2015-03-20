@@ -3,13 +3,10 @@
 
 <h2>Bruker Oversikt</h2>
 <br />
-
+<script type="text/javascript" src="~/Scripts/jquery-latest.js"></script>
+<script type="text/javascript" src="~/Scripts/jquery.tablesorter.js"></script>
 <script type="text/javascript">
     var asc1 = 1, asc2 = 1, asc3 = 1;
-
-    window.onload = function () {
-        var item = document.getElementById("tbody");
-    }
 
     function sortTable(tbody, colnumber, asc) {
         var rows = tbody.rows,
@@ -31,6 +28,9 @@
             rows[i].innerHTML = "<td>" + arr[i].join("</td><td>") + "</td>";
         }
     }
+    $(document).ready(function () {
+        $("table").tablesorter();
+    });
 </script>
 <script type="text/javascript">
     var th, tb;
@@ -64,7 +64,8 @@
         }
     }
 
-    function hideColumn(colNumber) {
+    function hideColumn() {
+        var colNumber = event.path[1].id;
         var childTH = th.children[0];
         var hideTH = childTH.children[colNumber];
         if (hideTH.hidden) {
@@ -102,6 +103,7 @@
         };
     });
 </script>
+
 <div class="row">
     <div class="col-lg-offset-4">
         <div class="input-group">
@@ -119,11 +121,12 @@
             Gjem Kolonner
             <span class="caret"></span>
         </button> 
-        <ul class="dropdown-menu" role="menu" aria-labelledby="menu" id="ddm"  onclick="checkColName()"></ul>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="menu" id="ddm"  onclick="checkColName()">
+        </ul>
     </div>
 </div>
 <br />
-<table class="table">
+<table class="tablesorter" cellspacing="1" id="table">
     <thead id="thead">
         <tr>
             <th>
