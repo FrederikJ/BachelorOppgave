@@ -11,10 +11,12 @@ namespace HovedOppgave.Models
         public string FirstName { get; set; }
         public string SurName { get; set; }
         public string Email { get; set; }
+        public string Password { get; set; }
         public string PhoneNumber { get; set; }
         public string Adress { get; set; }
         public string Postalcode { get; set; }
         public string PostalPlace { get; set; }
+        public string Salt { get; set; }
 
         public User()
         {
@@ -26,10 +28,12 @@ namespace HovedOppgave.Models
             this.FirstName = user.FirstName;
             this.SurName = user.SurName;
             this.Email = user.Email;
+            this.Password = user.Password;
             this.PhoneNumber = user.PhoneNumber;
             this.Adress = user.Adress;
             this.Postalcode = user.Postalcode;
             this.PostalPlace = user.PostalPlace;
+            this.Salt = user.Salt;
         }
 
         public User(string firstName, string surName, string email, string phoneNumber, string adress, string postalcode, string postalPlace)

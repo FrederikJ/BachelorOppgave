@@ -9,6 +9,8 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
 using HovedOppgave.Models;
+using System.Net.Mail;
+using HovedOppgave.Classes;
 
 namespace HovedOppgave.Controllers
 {
@@ -87,6 +89,59 @@ namespace HovedOppgave.Controllers
                 }
                 else
                 {
+                    AddErrors(result);
+                }
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+        //
+        // GET: /Account/LostPassword
+        [AllowAnonymous]
+        public ActionResult LostPassword()
+        {
+            return View();
+        }
+
+        //
+        // POST: /Account/LostPassword
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> LostPassword(LostPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                MailMessage msg = new MailMessage();
+                SendEmail sendMsg = null;
+                string newPassword;
+                var user = new ApplicationUser() { Email = model.Email };
+                var result = await UserManager.CreateAsync(user);
+                if (result.Succeeded)
+                {
+                    newPassword = CreatRandomPassword.CreatePassword(10);
+                    string email = user.Email;
+                    msg.Subject = "Tilsendt nytt passord";
+                    msg.Body = "Hei " + user.UserName + "!\n" + "Her har du et nytt passord for din bruker: " + newPassword + "\nVi vil anbefale deg å å skifte passord når du får logget deg inn til noe som er mer personlig";
+                    if(UpdatePassword.updatePassword(email, newPassword))
+                    {
+                        sendMsg.SendEpost(email, msg.Body, msg.Subject);
+                        Session["flashMessage"] = "Du har nu fått en epost om ditt nye passord";
+                        Session["flashStatus"] = Classes.Constants.NotificationType.success.ToString();
+                        return RedirectToAction("Login", "Account");
+                    }
+                    else
+                    {
+                        Session["flashMessage"] = "Ville ikke oppdateres i databasen";
+                        Session["flashStatus"] = Classes.Constants.NotificationType.danger.ToString();
+                    }
+                }
+                else
+                {
+                    Session["flashMessage"] = "Eposten eksisterer ikke!";
+                    Session["flashStatus"] = Classes.Constants.NotificationType.danger.ToString();
                     AddErrors(result);
                 }
             }

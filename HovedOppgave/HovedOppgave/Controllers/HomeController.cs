@@ -12,7 +12,9 @@ namespace HovedOppgave.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            var view = View();
+            //view.MasterName = "_GuestLayout";
+            return view;
         }
 
         public ActionResult Contact()
