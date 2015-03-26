@@ -8,43 +8,26 @@ namespace HovedOppgave.Models
     public class User
     {
         public string Id { get; set; }
-        public string FirstName { get; set; }
-        public string SurName { get; set; }
+        public string Name { get; set; }
+        public int AccessLevel { get; set; }
         public string Email { get; set; }
-        public string Password { get; set; }
-        public string PhoneNumber { get; set; }
-        public string Adress { get; set; }
-        public string Postalcode { get; set; }
-        public string PostalPlace { get; set; }
-        public string Salt { get; set; }
-
-        public User()
-        {
-
-        }
+        public string PassHash { get; set; }
+        public string PassSalt { get; set; }
 
         public User(User user)
         {
-            this.FirstName = user.FirstName;
-            this.SurName = user.SurName;
+            this.Name = user.Name;
+            this.AccessLevel = user.AccessLevel;
             this.Email = user.Email;
-            this.Password = user.Password;
-            this.PhoneNumber = user.PhoneNumber;
-            this.Adress = user.Adress;
-            this.Postalcode = user.Postalcode;
-            this.PostalPlace = user.PostalPlace;
-            this.Salt = user.Salt;
+            this.PassHash = user.PassHash;
+            this.PassSalt = user.PassSalt;
         }
 
-        public User(string firstName, string surName, string email, string phoneNumber, string adress, string postalcode, string postalPlace)
+        public User(string name, string email, int accessLevel)
         {
-            this.FirstName = firstName;
-            this.SurName = surName;
+            this.Name = name;
+            this.AccessLevel = accessLevel;
             this.Email = email;
-            this.PhoneNumber = phoneNumber;
-            this.Adress = adress;
-            this.Postalcode = postalcode;
-            this.PostalPlace = postalPlace;
         }
     }
 }

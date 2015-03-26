@@ -36,9 +36,9 @@ namespace HovedOppgave.Controllers
 
         public ActionResult ListUsers()
         {
-            User method = new User("Frederik", "Johnsen", "Heia@hin.no", "48864032", "Heiaveien 34", "8515", "Narvik");
-            User method1 = new User("Kjartan", "Horpestad", "Ohla@hin.no", "65349532", "Ohlaveien 24", "8516", "Larvik");
-            User method2 = new User("Vladimir", "Putin", "Dracula@hin.no", "58368532", "Draculaveien 24", "8514", "Karvik");
+            User method = new User("Frederik Johnsen", "Heia@hin.no", 1);
+            User method1 = new User("Kjartan Horpestad", "Ohla@hin.no", 1);
+            User method2 = new User("Vladimir Putin", "Dracula@hin.no", 3);
 
             List<User> list = new List<User>();
             list.Add(method);
@@ -49,10 +49,6 @@ namespace HovedOppgave.Controllers
 
         public ActionResult SearchEngine(string searchString)
         {
-            User user = new User();
-            if(searchString.Equals(user.FirstName))
-                return null;
-
             return null;
         }
     }

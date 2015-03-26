@@ -30,8 +30,8 @@ namespace HovedOppgave.Classes
                 {
                     User user = context.Brukere.Where(b => b.Epost == email).FirstOrDefault();
                     Hashtable table = Hash.GetHashAndSalt(password);
-                    user.Password = table["hash"].ToString();
-                    user.Salt = table["salt"].ToString();
+                    user.PassHash = table["hash"].ToString();
+                    user.PassSalt = table["salt"].ToString();
 
                     context.SaveChanges();
                     return true;

@@ -5,9 +5,9 @@ using System.Web;
 
 namespace HovedOppgave.Models
 {
-    public class Rights
+    public class PostCode
     {
-        public int RightsID { get; set; }
-        public string RightsName { get; set; }
+        public int PostCodeID { get; set; }
+        public string City { get; set; }
     }
 }
