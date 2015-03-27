@@ -37,7 +37,7 @@ namespace HovedOppgave.Controllers
         public ActionResult ListUsers()
         {
             User method = new User("Frederik Johnsen", "Heia@hin.no", 1);
-            User method1 = new User("Kjartan Horpestad", "Ohla@hin.no", 1);
+            User method1 = new User("Kjartan Horpestad", "Ohla@hin.no", 2);
             User method2 = new User("Vladimir Putin", "Dracula@hin.no", 3);
 
             List<User> list = new List<User>();

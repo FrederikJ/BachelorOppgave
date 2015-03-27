@@ -52,11 +52,11 @@ namespace HovedOppgave.Classes
             string master = "";
 
 
-            if (rights.RightsName == Constants.Rights.Administrator.ToString())
+            if (rights.Name == Constants.Rights.Administrator.ToString())
                 master = "~/Views/Shared/_AdminLayout";
-            else if (rights.RightsName == Constants.Rights.User.ToString())
+            else if (rights.Name == Constants.Rights.User.ToString())
                 master = "~/Views/Shared/_UserLayout";
-            else if (rights.RightsName == Constants.Rights.Guest.ToString())
+            else if (rights.Name == Constants.Rights.Guest.ToString())
                 master = "~/Views/Shared/_GuestLayout";
 
             return master;
@@ -67,9 +67,8 @@ namespace HovedOppgave.Classes
             HttpContext http = HttpContext.Current;
             http.Session["UserID"] = null;
             http.Session["User"] = null;
-            http.Session["FirstName"] = null;
-            http.Session["UserName"] = null;
-            http.Session["loggedIn"] = null;
+            http.Session["Name"] = null;
+            http.Session["LoggedIn"] = null;
             http.Session["flashMessage"] = "Du har ikke korrekte rettighet for aksessere siden du prøvde å nå";
             http.Session["flashStatus"] = Constants.NotificationType.danger.ToString();
             http.Response.Redirect(("~/Login.aspx"), true);

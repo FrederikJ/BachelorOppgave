@@ -13,8 +13,8 @@ namespace HovedOppgave.Models
         public int StrandNum { get; set; }
 
         //Foreignkeys
-        public virtual int ConnectorID { get; set; }
-        public virtual int ConnectorID { get; set; }
+        public virtual int ConnectorID1 { get; set; }
+        public virtual int ConnectorID2 { get; set; }
         public virtual int CableID { get; set; }
     }
 }

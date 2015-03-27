@@ -7,7 +7,7 @@ namespace HovedOppgave.Models
 {
     public class User
     {
-        public string Id { get; set; }
+        public int UserId { get; set; }
         public string Name { get; set; }
         public int AccessLevel { get; set; }
         public string Email { get; set; }

@@ -1,0 +1,217 @@
+﻿@model IEnumerable<HovedOppgave.Models.Device>
+
+@{
+    ViewBag.Title = "Kalibrerings oversikt";
+}
+
+<h2>ViewBag.Title</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+
+<div class="col-lg-offset-5">
+    <div class="dropdown">
+        <button class="btn btn-default dropdown-toggle" onclick="getColName()" type="button" id="menu" data-toggle="dropdown">
+            Gjem Kolonner
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="menu" id="ddm" onclick="checkColName()"></ul>
+    </div>
+</div>
+<br />
+<div class="form-control">
+    <div class="col-lg-offset-5">
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-default" id="1" onclick="">Registrer ny enhet</button>
+            <button type="button" class="btn btn-default" id="2" onclick="">Logg</button>
+            <button type="button" class="btn btn-default" id="3" onclick="">Sertifikat</button>
+            <button type="button" class="btn btn-default" id="4" onclick="">Importering</button>
+            <button type="button" class="btn btn-default" id="5" onclick="">Kassert</button>
+        </div>
+    </div>
+</div>
+<br />
+<table class="table">
+    <thead id="thead">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 0, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+                    <span class="glyphicon glyphicon-arrow-down"></span>
+                </button>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 1, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+                    <span class="glyphicon glyphicon-arrow-down"></span>
+                </button>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SerialNum)
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 2, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+                    <span class="glyphicon glyphicon-arrow-down"></span>
+                </button>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Height)
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 3, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+                    <span class="glyphicon glyphicon-arrow-down"></span>
+                </button>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Weight)
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 4, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+                    <span class="glyphicon glyphicon-arrow-down"></span>
+                </button>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsRackMountable)
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 5, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+                    <span class="glyphicon glyphicon-arrow-down"></span>
+                </button>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Model)
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 6, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+                    <span class="glyphicon glyphicon-arrow-down"></span>
+                </button>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Brand)
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 7, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+                    <span class="glyphicon glyphicon-arrow-down"></span>
+                </button>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InputVoltage)
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 8, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+                    <span class="glyphicon glyphicon-arrow-down"></span>
+                </button>
+            </th>
+        </tr>
+    </thead>
+    <tbody id="tbody">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SerialNum)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Height)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Weight)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsRackMountable)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Model)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Brand)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.InputVoltage)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.DeviceID }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.DeviceID }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.DeviceID })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<script type="text/javascript">
+    var asc1 = 1, asc2 = 1, asc3 = 1;
+
+    function sortTable(tbody, colnumber, asc) {
+        var rows = tbody.rows,
+            rlength = rows.length,
+            arr = new Array(),
+            i, j, cells, clen;
+        for (i = 0; i < rlength; i++) {
+            cells = rows[i].cells;
+            clen = cells.length;
+            arr[i] = new Array();
+            for (j = 0; j < clen; j++) {
+                arr[i][j] = cells[j].innerHTML;
+            }
+        }
+        arr.sort(function (a, b) {
+            return (a[colnumber] == b[colnumber]) ? 0 : ((a[colnumber] > b[colnumber]) ? asc : -1 * asc);
+        });
+        for (i = 0; i < rlength; i++) {
+            rows[i].innerHTML = "<td>" + arr[i].join("</td><td>") + "</td>";
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    var th, tb;
+    window.onload = function () {
+        th = document.getElementById("thead");
+        tb = document.getElementById("tbody");
+    }
+    function getColName() {
+        var numberOfCol = 7;
+        var ddl = document.getElementById("ddm");
+        ddl.innerHTML = "";
+        var child = th.children[0];
+        for (var i = 0; i < numberOfCol; i++) {
+            if (child.children[i].hidden) {
+                ddl.innerHTML += "<li id='" + i + "'><a><input type='checkbox'/>" + child.children[i].textContent; + "</a></li>";
+            }
+            else {
+                ddl.innerHTML += "<li id='" + i + "'><a><input type='checkbox'checked='checked'/>" + child.children[i].textContent; + "</a></li>";
+            }
+        }
+    }
+
+    function checkColName() {
+        var numberOfCol = 7;
+        for (var i = 0; i < numberOfCol; i++) {
+            var el = document.getElementById(i);
+            var checkInput = el.getElementsByTagName('input');
+            if (checkInput[0].type === 'checkbox') {
+                checkInput[0].onchange = hideColumn(i);
+            }
+        }
+    }
+
+    function hideColumn() {
+        var colNumber = event.path[1].id;
+        var childTH = th.children[0];
+        var hideTH = childTH.children[colNumber];
+        if (hideTH.hidden) {
+            hideTH.hidden = false;
+        }
+        else {
+            hideTH.hidden = true;
+        }
+        var length = tb.children.length, i;
+        for (i = 0; i < length; i++) {
+            var childTB = tb.children[i];
+            var hideCol = childTB.children[colNumber];
+            if (hideTH.hidden) {
+                hideCol.hidden = true;
+            }
+            else {
+                hideCol.hidden = false;
+            }
+        }
+    }
+</script>
+<script type="text/javascript">
+</script>

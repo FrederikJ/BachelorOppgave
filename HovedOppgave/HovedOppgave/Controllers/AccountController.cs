@@ -50,6 +50,12 @@ namespace HovedOppgave.Controllers
                 var user = await UserManager.FindAsync(model.UserName, model.Password);
                 if (user != null)
                 {
+                    IRepository myRepository = new Repository();
+                    User dbUser = myRepository.GetUser(Validator.ConvertToNumbers(user.Id));
+                    Session["UserID"] = dbUser.UserId;
+                    Session["User"] = dbUser;
+                    Session["Name"] = dbUser.Name;
+                    Session["LoggedIn"] = true;
                     await SignInAsync(user, model.RememberMe);
                     return RedirectToLocal(returnUrl);
                 }

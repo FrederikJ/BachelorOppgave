@@ -202,6 +202,7 @@
     <Compile Include="Classes\Validator.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\KalibreringController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -228,6 +229,7 @@
     <Compile Include="Models\NerworkInfo.cs" />
     <Compile Include="Models\Pin.cs" />
     <Compile Include="Models\PostCode.cs" />
+    <Compile Include="Models\Rights.cs" />
     <Compile Include="Models\Room.cs" />
     <Compile Include="Models\SignalStandard.cs" />
     <Compile Include="Models\User.cs" />
@@ -296,6 +298,8 @@
     <Content Include="Views\Shared\_GuestLayout.cshtml" />
     <Content Include="Views\Shared\_AdminLayout.cshtml" />
     <Content Include="Views\Account\LostPassword.cshtml" />
+    <Content Include="Views\Kalibrering\Overview.cshtml" />
+    <Content Include="Views\Kalibrering\Details.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
