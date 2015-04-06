@@ -26,7 +26,7 @@ namespace HovedOppgave.Classes
         {
             if (email != null)
             {
-                using (var context = new Context())
+                /*using (var context = new Context())
                 {
                     User user = context.Brukere.Where(b => b.Epost == email).FirstOrDefault();
                     Hashtable table = Hash.GetHashAndSalt(password);
@@ -35,7 +35,7 @@ namespace HovedOppgave.Classes
 
                     context.SaveChanges();
                     return true;
-                }
+                }*/
             }
             return false;
         }

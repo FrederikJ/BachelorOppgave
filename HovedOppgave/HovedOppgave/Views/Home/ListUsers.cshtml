@@ -1,14 +1,78 @@
 ﻿@model IEnumerable<HovedOppgave.Models.User>
 
+@{
+    ViewBag.Title = "Bruker oversikt";
+}
 
-<h2>Bruker Oversikt</h2>
+<h2>Bruker oversikt</h2>
 <br />
-<script type="text/javascript" src="~/Scripts/jquery-latest.js"></script>
-<script type="text/javascript" src="~/Scripts/jquery.tablesorter.js"></script>
+<div class="col-lg-offset-4">
+    <div class="dropdown">
+        <button class="btn btn-default dropdown-toggle" onclick="getColName()" type="button" id="menu" data-toggle="dropdown">
+            Gjem Kolonner
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="menu" id="ddm" onclick="checkColName()"></ul>
+        <button type="button" class="btn btn-default" onclick="Register()">Registrer ny person</button>
+    </div>
+</div>
+<br />
+<table class="table">
+    <thead id="thead">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="SortTable(tbody, 0, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+                    <span class="glyphicon glyphicon-arrow-down"></span>
+                </button>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AccessLevel)
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="SortTable(tbody, 1, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+                    <span class="glyphicon glyphicon-arrow-down"></span>
+                </button>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="SortTable(tbody, 2, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+                    <span class="glyphicon glyphicon-arrow-down"></span>
+                </button>
+            </th>
+        </tr>
+    </thead>
+    <tbody id="tbody">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AccessLevel)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.UserId }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.UserId }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.UserId })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
 <script type="text/javascript">
+    var th, tb;
     var asc1 = 1, asc2 = 1, asc3 = 1;
 
-    function sortTable(tbody, colnumber, asc) {
+    window.onload = function () {
+        th = document.getElementById("thead");
+        tb = document.getElementById("tbody");
+    }
+
+    function SortTable(tbody, colnumber, asc) {
         var rows = tbody.rows,
             rlength = rows.length,
             arr = new Array(),
@@ -22,22 +86,19 @@
             }
         }
         arr.sort(function (a, b) {
+            var glyph = th.children[0].children[colnumber].children[0].children[0];
+            if (glyph.className === "glyphicon glyphicon-arrow-up")
+                glyph.className = "glyphicon glyphicon-arrow-down";
+            else
+                glyph.className = "glyphicon glyphicon-arrow-up";
+
             return (a[colnumber] == b[colnumber]) ? 0 : ((a[colnumber] > b[colnumber]) ? asc : -1 * asc);
         });
         for (i = 0; i < rlength; i++) {
             rows[i].innerHTML = "<td>" + arr[i].join("</td><td>") + "</td>";
         }
     }
-    $(document).ready(function () {
-        $("table").tablesorter();
-    });
-</script>
-<script type="text/javascript">
-    var th, tb;
-    window.onload = function () {
-        th = document.getElementById("thead");
-        tb = document.getElementById("tbody");
-    }
+
     function getColName() {
         var numberOfCol = 7;
         var ddl = document.getElementById("ddm");
@@ -52,7 +113,7 @@
             }
         }
     }
-    
+
     function checkColName() {
         var numberOfCol = 7;
         for (var i = 0; i < numberOfCol; i++) {
@@ -86,88 +147,8 @@
             }
         }
     }
-</script>
-<script type="text/javascript" src="~/Scripts/jquery-2.1.3.min.js"></script>
-<script type="text/javascript">
-    $(document).ready(function () {
-        function search(callback) {
-            var searchstr = searchString.textContent;
-            $.ajax({
-                url: "~/Home/SearchEngine/" + searchstr,
-                data: {},
-                type: "GET",
-                contentType: "application/json;charset=utf-8",
-            }).then(function (Posts) {
-                callback(Posts);
-            });
-        };
-    });
-</script>
 
-<div class="row">
-    <div class="col-lg-offset-4">
-        <div class="input-group">
-            <span class="input-group-btn">
-                <button class="btn btn-default" type="button">Søk</button>
-            </span>
-            <input type="text" class="form-control" placeholder="Søk for..." id="searchString" onkeypress="search()" />
-        </div><!-- /input-group -->
-    </div><!-- /.col-lg-4 -->
-</div><!-- /.row -->
-<br /><br />
-<div class="col-lg-offset-5">
-    <div class="dropdown">
-        <button class="btn btn-default dropdown-toggle" onclick="getColName()" type="button" id="menu" data-toggle="dropdown">
-            Gjem Kolonner
-            <span class="caret"></span>
-        </button> 
-        <ul class="dropdown-menu" role="menu" aria-labelledby="menu" id="ddm"  onclick="checkColName()">
-        </ul>
-    </div>
-</div>
-<br />
-<table class="tablesorter" cellspacing="1" id="table">
-    <thead id="thead">
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 0, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AccessLevel)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 1, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 2, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-        </tr>
-    </thead>
-    <tbody id="tbody">
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.AccessLevel)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Email)
-                </td>
-                <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = item.UserId }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.UserId }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.UserId })
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    function Register() {
+        @Html.ActionLink("Create New", "Create")
+    }
+</script>

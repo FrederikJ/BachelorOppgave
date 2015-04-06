@@ -59,3 +59,6 @@ C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\H
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\obj\Debug\HovedOppgave.csprojResolveAssemblyReference.cache
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\obj\Debug\HovedOppgave.dll
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\obj\Debug\HovedOppgave.pdb
+C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\bin\MySql.Data.Entity.EF5.dll
+C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\bin\MySql.Data.Entity.EF6.dll
+C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\bin\MySql.Fabric.Plugin.dll

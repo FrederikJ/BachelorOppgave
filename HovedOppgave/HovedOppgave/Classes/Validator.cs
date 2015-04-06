@@ -1,6 +1,7 @@
 ﻿using HovedOppgave.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -54,6 +55,40 @@ namespace HovedOppgave.Classes
                 return null;
             else
                 return "Du har skrevet inn ugyldige tegn";
+        }
+
+        public static bool IsValidFile(HttpPostedFileBase file, double maxFileSize)
+        {
+            HttpContext http = HttpContext.Current;
+            if(file == null)
+            {
+                http.Session["flashMessage"] = "Filen eksisterer ikke";
+                http.Session["flashStatus"] = Constants.NotificationType.danger.ToString();
+                return false;
+            }
+
+            //parametere man setter for max fil størrelse i MB. 
+            var max = maxFileSize * 1024 * 1024;
+
+            if (file.ContentLength > max)
+            {
+                http.Session["flashMessage"] = "Filstørrelse er for stor";
+                http.Session["flashStatus"] = Constants.NotificationType.danger.ToString();
+                return false;
+            }
+
+            var format = Path.GetExtension(file.FileName);
+
+            var validExtensions = new [] { ".csv", ".pdf" };
+
+            if (!validExtensions.Contains(format.ToLower()))
+            {
+                http.Session["flashMessage"] = "Filformatet er ikke gyldig";
+                http.Session["flashStatus"] = Constants.NotificationType.danger.ToString();
+                return false;
+            }  
+            else
+                return true;
         }
     }
 }

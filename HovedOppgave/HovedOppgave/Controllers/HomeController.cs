@@ -13,7 +13,7 @@ namespace HovedOppgave.Controllers
         public ActionResult Index()
         {
             var view = View();
-            //view.MasterName = "_GuestLayout";
+            //view.MasterNam e= "_GuestLayout";
             return view;
         }
 

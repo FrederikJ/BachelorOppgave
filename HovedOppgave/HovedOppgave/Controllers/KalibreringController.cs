@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.IO;
 
 namespace HovedOppgave.Controllers
 {
@@ -115,6 +116,49 @@ namespace HovedOppgave.Controllers
             {
                 return View();
             }
+        }
+
+        // GET: Kalibrering/Import
+        public ActionResult Import()
+        {
+            return View();
+        }
+
+        // POST: Kalibrering/Import
+        [HttpPost]
+        public ActionResult Import(HttpPostedFileBase file)
+        {
+            try
+            {
+                if (Validator.IsValidFile(file, 5))
+                {
+                    return RedirectToAction("Overview");
+                }
+                return RedirectToAction("Import");
+                
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        public FileStreamResult DisplayFile(string fileName)
+        {
+            var path = "C:/Users/Frederik/Documents/Bachelor Oppgave/info fra kunden/Fabrikantsertifikat_eks_1.pdf";
+            FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read);
+            return File(fs, "application/pdf");
+            
+            /*if (Validator.IsValidFile(file, 5))
+            {
+                var extension = Path.GetExtension(file.FileName);
+                if (extension == ".pdf")
+                    return File(fs, "application/pdf");
+                else
+                    return File(fs, "application/csv");
+            }
+            else
+                return null;*/
         }
     }
 }
