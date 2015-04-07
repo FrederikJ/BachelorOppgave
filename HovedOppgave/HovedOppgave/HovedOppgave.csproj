@@ -302,7 +302,6 @@
     <Content Include="Views\Account\Manage.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
-    <Content Include="Views\User\AddUser.cshtml" />
     <Content Include="Views\Shared\_UserLayout.cshtml" />
     <Content Include="Views\Shared\_GuestLayout.cshtml" />
     <Content Include="Views\Shared\_AdminLayout.cshtml" />
@@ -310,12 +309,11 @@
     <Content Include="Views\Kalibrering\Overview.cshtml" />
     <Content Include="Views\User\Create.cshtml" />
     <Content Include="Views\User\List.cshtml" />
-    <Content Include="Views\Home\ListUsers.cshtml" />
     <Content Include="Views\Kalibrering\Create.cshtml" />
     <Content Include="Views\Kalibrering\Import.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
+    <Folder Include="App_Data\Sertifikat\" />
     <Folder Include="Views\GlobalViews\" />
   </ItemGroup>
   <ItemGroup>

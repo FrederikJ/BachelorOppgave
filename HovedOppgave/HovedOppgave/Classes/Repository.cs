@@ -3,11 +3,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using MySql.Data.MySqlClient;
 
 namespace HovedOppgave.Models
 {
     public class Repository : IRepository
     {
+        MySqlConnection conn;
+
+        public Repository()
+        {
+            conn = new MySqlConnection();
+            string myConnectionString = "server=82.164.4.64;user id=boppg;persistsecurityinfo=True;database=mydb;port=3300";
+            try
+            {
+                conn,
+            }
+        }
+        
         #region Building Queries
         #endregion
         #region Cable Queries
@@ -57,6 +70,7 @@ namespace HovedOppgave.Models
         #region User Queries
         public User GetUserWithRights(int userID, Constants.Rights rights)
         {
+            
             return null;
         }
 

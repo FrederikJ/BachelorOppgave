@@ -5,7 +5,17 @@
 }
 
 <h2>Create</h2>
-
+<br />
+<div class="col-lg-offset-3">
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default" id="1" onclick="Oversikt()">Oversikt</button>
+        <button type="button" class="btn btn-default" id="2" onclick="Register()">Registrer ny enhet</button>
+        <button type="button" class="btn btn-default" id="3" onclick="">Logg</button>
+        <button type="button" class="btn btn-default" id="4" onclick="">Sertifikat</button>
+        <button type="button" class="btn btn-default" id="5" onclick="">Kassert</button>
+    </div>
+</div>
+<br />
 
 @using (Html.BeginForm()) 
 {
@@ -96,10 +106,6 @@
         </div>
     </div>
 }
-
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")

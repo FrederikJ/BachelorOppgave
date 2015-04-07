@@ -38,23 +38,43 @@
                 @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
             </div>
         </div>
+        <h3>Rettigheter</h3>
+        <div class="col-md-offset-1">
+            <label class="checkbox">
+                <input type="checkbox"> Administrator
+            </label>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.PassHash, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.PassHash, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.PassHash, "", new { @class = "text-danger" })
+            <br />
+            <label class="radio">
+                <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
+                Administrator
+            </label>
+            <label class="radio">
+                <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                Bruker
+            </label>
+            <label class="radio">
+                <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3">
+                Gjest
+            </label>
+            <br />
+            <div class="dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" id="menu" data-toggle="dropdown">
+                    Kolonner
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="menu" id="ddm">
+                    <li><a><input type="checkbox" checked="checked">Admin</a></li>
+                </ul>
             </div>
+            <br />
+            <select class="form-control">
+                <option>Administrator</option>
+                <option>Bruker</option>
+                <option>Gjest</option>
+            </select>
         </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.PassSalt, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.PassSalt, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.PassSalt, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
+        <br /><br />
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Create" class="btn btn-default" />

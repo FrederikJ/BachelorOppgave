@@ -24,19 +24,6 @@ namespace HovedOppgave.Controllers
             return View(list);
         }
 
-        public ActionResult ListUsers()
-        {
-            User method = new User("Frederik Johnsen", "Heia@hin.no", 1);
-            User method1 = new User("Kjartan Horpestad", "Ohla@hin.no", 2);
-            User method2 = new User("Vladimir Putin", "Dracula@hin.no", 3);
-
-            List<User> list = new List<User>();
-            list.Add(method);
-            list.Add(method1);
-            list.Add(method2);
-            return View(list);
-        }
-
         // GET: User/Details/5
         public ActionResult Details(int id)
         {
@@ -57,7 +44,7 @@ namespace HovedOppgave.Controllers
             {
                 User method = new User(user);
 
-                return RedirectToAction("Index");
+                return RedirectToAction("List");
             }
             catch
             {
@@ -79,7 +66,7 @@ namespace HovedOppgave.Controllers
             {
                 // TODO: Add update logic here
 
-                return RedirectToAction("Index");
+                return RedirectToAction("List");
             }
             catch
             {
@@ -101,7 +88,7 @@ namespace HovedOppgave.Controllers
             {
                 // TODO: Add delete logic here
 
-                return RedirectToAction("Index");
+                return RedirectToAction("List");
             }
             catch
             {

@@ -6,6 +6,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.IO;
+using System.Threading.Tasks;
+using System.Net;
 
 namespace HovedOppgave.Controllers
 {
@@ -160,5 +162,32 @@ namespace HovedOppgave.Controllers
             else
                 return null;*/
         }
+        /*
+        [HttpPost]
+        public async Task<JsonResult> TempSaveFIle()
+        {
+            try
+            {
+                foreach(string file in Request.Files)
+                {
+                    var fileContent = Request.Files[file];
+                    if(fileContent != null && fileContent.ContentLength > 0)
+                    {
+                        var stream = fileContent.InputStream;
+                        var fileName = Path.GetFileName(file);
+                        var path = Path.Combine(Server.MapPath("~/App_Data/Sertifikat"), fileName);
+                        using(var fileStream = File.Create(path))
+                        {
+                            stream.CopyTo(fileStream);
+                        }
+                    }
+                }
+            }
+            catch (Exception) {
+                Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return Json("Upload failed");
+            }
+            return Json("File uploaded successfully");
+        }*/
     }
 }
