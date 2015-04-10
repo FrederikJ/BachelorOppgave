@@ -47,7 +47,7 @@ namespace HovedOppgave.Classes
             HttpContext http = HttpContext.Current;
             CheckForUserID();
             int UserID = Validator.ConvertToNumbers(http.Session["UserID"].ToString());
-            Rights rights = queries.GetRights(UserID);
+            Rights rights = queries.GetRightToUser(UserID);
 
             string master = "";
 

@@ -27,7 +27,7 @@
                 </button>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AccessLevel)
+                @Html.DisplayNameFor(model => model.RightsID)
                 <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 1, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
                     <span class="glyphicon glyphicon-arrow-down"></span>
                 </button>
@@ -48,7 +48,7 @@
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.AccessLevel)
+                    @Html.DisplayFor(modelItem => item.RightsID)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Email)

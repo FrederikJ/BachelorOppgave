@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace HovedOppgave.Models
 {
@@ -43,22 +44,32 @@ namespace HovedOppgave.Models
         public bool RememberMe { get; set; }
     }
 
-    public class RegisterViewModel
+    public class CreatUserViewModel
     {
         [Required]
-        [Display(Name = "User name")]
-        public string UserName { get; set; }
+        [Display(Name = "Navn")]
+        public string Name { get; set; }
 
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
+        [Display(Name = "Passord")]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
+        [Display(Name = "Gjenta passord")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+        [Required]
+        [DataType(DataType.EmailAddress)]
+        [Display(Name = "Epost")]
+        public string Email { get; set; }
+
+        [Required]
+        [Display(Name = "Rettigheter")]
+        public IEnumerable<string> SelectedRight { get; set; }
+        public IEnumerable<System.Web.Mvc.SelectListItem> Rights { get; set; }
     }
 
     public class LostPasswordViewModel
@@ -67,5 +78,19 @@ namespace HovedOppgave.Models
         [DataType(DataType.EmailAddress)]
         [Display(Name = "Email Address")]
         public string Email { get; set; }
+    }
+
+    public class CreateCalibrationViewModel
+    {
+        public Device Device { get; set; }
+        public LogEvent LogEvent { get; set; }
+        public IEnumerable<string> SelectedDevice { get; set; }
+        public IEnumerable<string> SelectedEventType { get; set; }
+        public IEnumerable<string> SelectedRoom { get; set; }
+        public IEnumerable<string> SelectedContact { get; set; }
+        public IEnumerable<System.Web.Mvc.SelectListItem> ListDevice { get; set; }
+        public IEnumerable<System.Web.Mvc.SelectListItem> ListEventType { get; set; }
+        public IEnumerable<System.Web.Mvc.SelectListItem> ListRoom { get; set; }
+        public IEnumerable<System.Web.Mvc.SelectListItem> ListContact { get; set; }
     }
 }

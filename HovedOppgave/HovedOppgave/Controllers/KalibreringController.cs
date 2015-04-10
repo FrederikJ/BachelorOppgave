@@ -13,7 +13,7 @@ namespace HovedOppgave.Controllers
 {
     public class KalibreringController : Controller
     {
-        IRepository myRepository = new Repository();
+        IRepository myrep = new Repository();
 
         // GET: Kalibrering
         public ActionResult Overview()
@@ -35,7 +35,57 @@ namespace HovedOppgave.Controllers
         // GET: Kalibrering/Create
         public ActionResult Create()
         {
-            return View();
+            List<SelectListItem> deviceList = new List<SelectListItem>();
+            List<SelectListItem> roomList = new List<SelectListItem>();
+            List<SelectListItem> eventTypeList = new List<SelectListItem>();
+            List<SelectListItem> contactList = new List<SelectListItem>();
+
+            foreach (Device item in myrep.GetAllDevices())
+            {
+                SelectListItem selectlist = new SelectListItem()
+                {
+                    Text = item.Name,
+                    Value = item.DeviceID.ToString()
+                };
+                deviceList.Add(selectlist);
+            }
+            foreach (Room item in myrep.GetAllRooms())
+            {
+                SelectListItem selectlist = new SelectListItem()
+                {
+                    Text = item.Name,
+                    Value = item.RoomID.ToString()
+                };
+                roomList.Add(selectlist);
+            }
+            foreach (EventType item in myrep.GetAllEventTypes())
+            {
+                SelectListItem selectlist = new SelectListItem()
+                {
+                    Text = item.Name,
+                    Value = item.EventTypeID.ToString()
+                };
+                eventTypeList.Add(selectlist);
+            }
+            foreach (Contact item in myrep.GetAllContacts())
+            {
+                SelectListItem selectlist = new SelectListItem()
+                {
+                    Text = item.FirstName + item.LastName,
+                    Value = item.ContactID.ToString()
+                };
+                contactList.Add(selectlist);
+            }
+
+            CreateCalibrationViewModel model = new CreateCalibrationViewModel()
+            {
+                ListDevice = deviceList,
+                ListContact = contactList,
+                ListEventType = eventTypeList,
+                ListRoom = roomList
+            };
+
+            return View(model);
         }
 
         // POST: Kalibrering/Create
@@ -144,13 +194,13 @@ namespace HovedOppgave.Controllers
                 return View();
             }
         }
-
-        public FileStreamResult DisplayFile(string fileName)
+        
+        public FileStreamResult DisplayFile()
         {
-            var path = "C:/Users/Frederik/Documents/Bachelor Oppgave/info fra kunden/Fabrikantsertifikat_eks_1.pdf";
+            var path = "C:/Users/Frederik/Documents/Bachelor Oppgave/info fra kunden/Dok_konnektorer_mottaker.pdf";
             FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read);
             return File(fs, "application/pdf");
-            
+
             /*if (Validator.IsValidFile(file, 5))
             {
                 var extension = Path.GetExtension(file.FileName);
@@ -162,6 +212,38 @@ namespace HovedOppgave.Controllers
             else
                 return null;*/
         }
+
+        public ActionResult License()
+        {
+            string[] pathOfFiles = Directory.GetFiles(@"C:\Users\Frederik\AppData\Sertifikat", "*.pdf");
+            
+
+            foreach(string pathOfFile in pathOfFiles)
+            {
+                FileStream stream = new FileStream(pathOfFile, FileMode.Create);
+                
+                
+                
+            }
+            
+            
+
+            return View();
+        }
+
+        // GET: Kalibrering/Import
+        public ActionResult History()
+        {
+            return View();
+        }
+
+        // POST: Kalibrering/Import
+        [HttpPost]
+        public ActionResult History(string file)
+        {
+            return null;
+        }
+
         /*
         [HttpPost]
         public async Task<JsonResult> TempSaveFIle()

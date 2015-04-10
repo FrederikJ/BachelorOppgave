@@ -24,18 +24,21 @@ namespace HovedOppgave.Models
         #region ConnectorTypeHasPin Queries
         #endregion
         #region Contact Queries
+        List<Contact> GetAllContacts();
         #endregion
         #region ContactInfo Queries
         #endregion
         #region ContactInfoType Queries
         #endregion
         #region Device Queries
+        List<Device> GetAllDevices();
         #endregion
         #region DeviceConnector Queries
         #endregion
         #region DeviceType Queries
         #endregion
         #region EventType Queries
+        List<EventType> GetAllEventTypes();
         #endregion
         #region LogEvent Queries
         #endregion
@@ -46,15 +49,18 @@ namespace HovedOppgave.Models
         #region PostCode Queries
         #endregion
         #region Rights Queries
-        Rights GetRights(int userID);
+        Rights GetRightToUser(int userID);
+        List<Rights> GetAllRights();
         #endregion
         #region Room Queries
+        List<Room> GetAllRooms();
         #endregion
         #region SignalStandard Queries
         #endregion
         #region User Queries
         User GetUserWithRights(int userID, Constants.Rights rights);
         User GetUser(int UserID);
+        void CreateUser(User user);
         #endregion
     }
 }

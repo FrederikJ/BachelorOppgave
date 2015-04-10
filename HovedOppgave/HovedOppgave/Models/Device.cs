@@ -22,6 +22,9 @@ namespace HovedOppgave.Models
         public virtual int DeviceTypeID { get; set; }
         public virtual int RoomID { get; set; }
 
+        public Device()
+        { }
+
         public Device(string name, string description, string serialNum, int height, int weight,
             bool isRackMountable, string model, string brand, decimal inputVoltage)
         {

@@ -7,11 +7,11 @@
 <br />
 <div class="col-lg-offset-3">
     <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default" id="1" onclick="Oversikt()">Oversikt</button>
-        <button type="button" class="btn btn-default" id="2" onclick="Register()">Registrer ny enhet</button>
-        <button type="button" class="btn btn-default" id="3" onclick="">Logg</button>
-        <button type="button" class="btn btn-default" id="4" onclick="">Sertifikat</button>
-        <button type="button" class="btn btn-default" id="5" onclick="">Kassert</button>
+        <button type="button" class="btn btn-default" id="1" onclick="Overview()">Oversikt</button>
+        <button type="button" class="btn btn-default" id="2" onclick="Create()">Registrer ny enhet</button>
+        <button type="button" class="btn btn-default" id="3" onclick="History()">Logg</button>
+        <button type="button" class="btn btn-default" id="4" onclick="License()">Sertifikat</button>
+        <button type="button" class="btn btn-default" id="5" onclick="Discarded()">Kassert</button>
     </div>
 </div>
 <br />
@@ -37,9 +37,9 @@
         for (var i = files.length - 1; i < files.length; i++) {
             file = files[i];
         }
-        var blob = new Blob([file], { type: 'application/pdf' });
-        var fileview = document.getElementById('fileView');
-        var iframe = document.getElementById('iFrame');
+        //var blob = new Blob([file], { type: 'application/pdf' });
+        //var fileview = document.getElementById('fileView');
+        //var iframe = document.getElementById('iFrame');
         //DisplayFile(file);
         //var pdf = document.createElement("pdf");
         //pdf.classList.add("obj");
@@ -49,17 +49,17 @@
         //var reader = new FileReader();
         //reader.onload = (function (aPdf) { return function (e) { aPdf.dataset = e.target.result; }; })(pdf);
         //reader.readAsDataURL(file);
-        var objUrl = window.URL.createObjectURL(blob);  
-        iframe.setAttribute('src', objUrl);
-        window.URL.revokeObjectURL(objUrl);
+        //var objUrl = window.URL.createObjectURL(blob);  
+        //iframe.setAttribute('src', objUrl);
+        //window.URL.revokeObjectURL(objUrl);
         //var url = "/Kalibrering/DisplayFile/" + files;
         //HER --> i url får jeg ikke sendt over filen (files) med url til /Kalibrering/DisplayFIle.
-        //fileView.data = "@Url.Action("DisplayFile")";
+        fileView.data = "@Url.Action("DisplayFile")";
         //fileView.data = open(url);
         save.hidden = false;
         edit.hidden = false;
-        iFrame.hidden = false;
-        //fileView.hidden = false;
+        //iFrame.hidden = false;
+        fileView.hidden = false;
     }
 
     function DisplayFile(file) {
@@ -73,12 +73,24 @@
         reader.readAsDataURL(file);
     }
 
-    function Register() {
+    function Create() {
         window.location.replace("/Kalibrering/Create");
     };
 
-    function Oversikt() {
+    function Overview() {
         window.location.replace("/Kalibrering/Overview");
+    };
+
+    function License() {
+        window.location.replace("/Kalibrering/License");
+    };
+
+    function Discarded() {
+        window.location.replace("/Kalibrering/Discarded");
+    };
+
+    function History() {
+        window.location.replace("/Kalibrering/History");
     };
 
     $('uploadedF').on('change', function (e) {

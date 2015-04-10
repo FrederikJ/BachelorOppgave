@@ -1,18 +1,18 @@
-﻿@model HovedOppgave.Models.Device
+﻿@model HovedOppgave.Models.CreateCalibrationViewModel
 
 @{
-    ViewBag.Title = "Create";
+    ViewBag.Title = "Opprett utstyrsenhet";
 }
 
-<h2>Create</h2>
+<h2>Opprett utstyrsenhet</h2>
 <br />
 <div class="col-lg-offset-3">
     <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default" id="1" onclick="Oversikt()">Oversikt</button>
-        <button type="button" class="btn btn-default" id="2" onclick="Register()">Registrer ny enhet</button>
-        <button type="button" class="btn btn-default" id="3" onclick="">Logg</button>
-        <button type="button" class="btn btn-default" id="4" onclick="">Sertifikat</button>
-        <button type="button" class="btn btn-default" id="5" onclick="">Kassert</button>
+        <button type="button" class="btn btn-default" id="1" onclick="Overview()">Oversikt</button>
+        <button type="button" class="btn btn-default" id="3" onclick="History()">Logg</button>
+        <button type="button" class="btn btn-default" id="4" onclick="License()">Sertifikat</button>
+        <button type="button" class="btn btn-default" id="4" onclick="Import()">Importering</button>
+        <button type="button" class="btn btn-default" id="5" onclick="Discarded()">Kassert</button>
     </div>
 </div>
 <br />
@@ -21,91 +21,120 @@
 {
     @Html.AntiForgeryToken()
     
+    
+    
     <div class="form-horizontal">
-        <h4>Device</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
-            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.ListDevice, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                @Html.ListBoxFor(model => model.SelectedDevice, Model.ListDevice, new { size = 3, htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ListDevice, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.LogEvent.StartDate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.LogEvent.StartDate, new { size = 3, htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.LogEvent.StartDate, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.SerialNum, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.LogEvent.EndDate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.SerialNum, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.SerialNum, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.LogEvent.EndDate, new { size = 3, htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.LogEvent.EndDate, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.Height, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.LogEvent.DataFilePath, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Height, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Height, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.LogEvent.DataFilePath, new { size = 3, htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.LogEvent.DataFilePath, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.Weight, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.LogEvent.Data1, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Weight, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Weight, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.LogEvent.Data1, new { size = 3, htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.LogEvent.Data1, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.IsRackMountable, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.LogEvent.Data2, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <div class="checkbox">
-                    @Html.EditorFor(model => model.IsRackMountable)
-                    @Html.ValidationMessageFor(model => model.IsRackMountable, "", new { @class = "text-danger" })
-                </div>
+                @Html.EditorFor(model => model.LogEvent.Data2, new { size = 3, htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.LogEvent.Data2, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.Model, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.LogEvent.RegisteredDate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Model, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Model, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.LogEvent.RegisteredDate, new { size = 3, htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.LogEvent.RegisteredDate, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.Brand, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.ListEventType, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Brand, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Brand, "", new { @class = "text-danger" })
+                @Html.ListBoxFor(model => model.SelectedEventType, Model.ListEventType, new { size = 3, htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ListEventType, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.InputVoltage, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.ListContact, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.InputVoltage, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.InputVoltage, "", new { @class = "text-danger" })
+                @Html.ListBoxFor(model => model.SelectedContact, Model.ListContact, new { size = 3, htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ListContact, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ListRoom, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.ListBoxFor(model => model.SelectedRoom, Model.ListRoom, new { size = 3, htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ListRoom, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input type="submit" value="Opprett" class="btn btn-default" />
             </div>
         </div>
     </div>
 }
+
+<script type="text/javascript">
+    function Import() {
+        window.location.replace("/Kalibrering/Import");
+    };
+
+    function Overview() {
+        window.location.replace("/Kalibrering/Overview");
+    };
+
+    function License() {
+        window.location.replace("/Kalibrering/License");
+    };
+
+    function Discarded() {
+        window.location.replace("/Kalibrering/Discarded");
+    };
+
+    function History() {
+        window.location.replace("/Kalibrering/History");
+    };
+</script>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
