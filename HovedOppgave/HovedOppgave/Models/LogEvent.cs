@@ -20,5 +20,6 @@ namespace HovedOppgave.Models
         public virtual int DeviceID { get; set; }
         public virtual int RoomID { get; set; }
         public virtual int ContactID { get; set; }
+        public virtual int FileID { get; set; }
     }
 }

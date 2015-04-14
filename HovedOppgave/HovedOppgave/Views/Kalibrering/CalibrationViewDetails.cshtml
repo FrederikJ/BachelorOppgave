@@ -1,0 +1,136 @@
+﻿@model HovedOppgave.Models.CalibrationViews
+
+@{
+    ViewBag.Title = "Kalibrering logg detaljer";
+}
+
+<h2>Kalibrering logg detaljer</h2>
+
+<br />
+<div class="col-lg-offset-2">
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default" id="1" onclick="Overview()">Oversikt</button>
+        <button type="button" class="btn btn-default" id="2" onclick="Create()">Registrer ny enhet</button>
+        <button type="button" class="btn btn-default" id="3" onclick="History()">Logg</button>
+        <button type="button" class="btn btn-default" id="4" onclick="License()">Sertifikat</button>
+        <button type="button" class="btn btn-default" id="5" onclick="Import()">Importering</button>
+    </div>
+</div>
+<br />
+
+<div class="col-lg-12">
+    <h4>Kalibrering</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.LogEvent.RegisteredDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LogEvent.RegisteredDate.Date)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.LogEvent.StartDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LogEvent.StartDate.Date)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.LogEvent.EndDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LogEvent.EndDate.Date)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.LogEvent.DataFilePath)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LogEvent.DataFilePath)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.LogEvent.Data1)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LogEvent.Data1)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.LogEvent.Data2)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LogEvent.Data2)
+        </dd>
+    </dl>
+</div>
+
+<div class="col-lg-12">
+    <h4>Event type</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.EventType.Name)
+        </dt>
+        <dd>
+            @Html.ActionLink(Model.EventType.Name, "EventType", "Global", new { id = Model.EventType.EventTypeID }, null)
+        </dd>
+    </dl>
+</div>
+
+<div class="col-lg-12">
+    <h4>Utstyrsenhet</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Device.Name)
+        </dt>
+        <dd>
+            @Html.ActionLink(Model.Device.Name, "Device", "Global", new { id = Model.Device.DeviceID }, null)
+        </dd>
+    </dl>
+</div>
+
+<div class="col-lg-12">
+    <h4>Kontakt</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Contact.Name)
+        </dt>
+        <dd>
+            @Html.ActionLink(Model.Contact.Name, "Contact", "Global", new { id = Model.Contact.CompanyID }, null)
+        </dd>
+    </dl>
+</div>
+
+<div class="col-lg-12">
+    <h4>Rom</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Room.Name)
+        </dt>
+        <dd>
+            @Html.ActionLink(Model.Room.Name, "Room", "Global", new { id = Model.Room.RoomID }, null)
+        </dd>
+    </dl>
+</div>
+
+<script type="text/javascript">
+    function Overview() {
+        window.location.replace("/Kalibrering/Overview");
+    };
+
+    function Create() {
+        window.location.replace("/Kalibrering/Create");
+    };
+
+    function Import() {
+        window.location.replace("/Kalibrering/Import");
+    };
+
+    function History() {
+        window.location.replace("/Kalibrering/History");
+    };
+
+    function License() {
+        window.location.replace("/Kalibrering/License");
+    };
+</script>

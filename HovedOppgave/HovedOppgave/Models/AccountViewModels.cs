@@ -68,7 +68,7 @@ namespace HovedOppgave.Models
 
         [Required]
         [Display(Name = "Rettigheter")]
-        public IEnumerable<string> SelectedRight { get; set; }
+        public IEnumerable<int> SelectedRight { get; set; }
         public IEnumerable<System.Web.Mvc.SelectListItem> Rights { get; set; }
     }
 
@@ -82,15 +82,24 @@ namespace HovedOppgave.Models
 
     public class CreateCalibrationViewModel
     {
-        public Device Device { get; set; }
+        public Files File { get; set; }
         public LogEvent LogEvent { get; set; }
-        public IEnumerable<string> SelectedDevice { get; set; }
-        public IEnumerable<string> SelectedEventType { get; set; }
-        public IEnumerable<string> SelectedRoom { get; set; }
-        public IEnumerable<string> SelectedContact { get; set; }
-        public IEnumerable<System.Web.Mvc.SelectListItem> ListDevice { get; set; }
-        public IEnumerable<System.Web.Mvc.SelectListItem> ListEventType { get; set; }
-        public IEnumerable<System.Web.Mvc.SelectListItem> ListRoom { get; set; }
-        public IEnumerable<System.Web.Mvc.SelectListItem> ListContact { get; set; }
+        public IEnumerable<int> SelectedRoom { get; set; }
+        public IEnumerable<int> SelectedDevice { get; set; }
+        public IEnumerable<int> SelectedContact { get; set; }
+        public IEnumerable<int> SelectedEventType { get; set; }
+        public IEnumerable<System.Web.Mvc.SelectListItem> Room { get; set; }
+        public IEnumerable<System.Web.Mvc.SelectListItem> Device { get; set; }
+        public IEnumerable<System.Web.Mvc.SelectListItem> Contact { get; set; }
+        public IEnumerable<System.Web.Mvc.SelectListItem> EventType { get; set; }
+    }
+
+    public class CalibrationViews
+    {
+        public Room Room { get; set; }
+        public Device Device { get; set; }
+        public Contact Contact { get; set; }
+        public LogEvent LogEvent { get; set; }
+        public EventType EventType { get; set; }
     }
 }

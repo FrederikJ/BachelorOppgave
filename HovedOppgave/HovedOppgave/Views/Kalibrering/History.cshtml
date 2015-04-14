@@ -1,27 +1,27 @@
 ﻿@model IEnumerable<HovedOppgave.Models.CalibrationViews>
 
 @{
-    ViewBag.Title = "Kalibrerings oversikt";
+    ViewBag.Title = "Kalibrering logg";
 }
 
-<h2>Kalibrerings oversikt</h2>
+<h2>Kalibrering logg</h2>
+
 <br />
-<div class="col-lg-offset-2">
-    <div class="dropdown">
-        <button class="btn btn-default dropdown-toggle" onclick="getColName()" type="button" id="menu" data-toggle="dropdown">
+<div class="col-lg-offset-3">
+    <div class="btn-group" role="group">
+        <button class="btn btn-default dropdown-toggle" onclick="getColName()" id="menu" data-toggle="dropdown">
             Gjem Kolonner
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" role="menu" aria-labelledby="menu" id="ddm" onclick="checkColName()"></ul>
-        <div class="btn-group" role="group">
-            <button type="button" class="btn btn-default" id="1" onclick="Create()">Registrer ny enhet</button>
-            <button type="button" class="btn btn-default" id="2" onclick="History()">Logg</button>
-            <button type="button" class="btn btn-default" id="3" onclick="License()">Sertifikat</button>
-            <button type="button" class="btn btn-default" id="4" onclick="Import()">Importering</button>
-        </div>
+        <button type="button" class="btn btn-default" onclick="Overview()">Oversikt</button>
+        <button type="button" class="btn btn-default" onclick="Create()">Registrer ny enhet</button>
+        <button type="button" class="btn btn-default" onclick="License()">Sertifikat</button>
+        <button type="button" class="btn btn-default" onclick="Import()">Importering</button>
     </div>
 </div>
 <br />
+
 <table class="table">
     <thead id="thead">
         <tr>
@@ -81,7 +81,7 @@
             </th>
             <th hidden="hidden">
                 @Html.DisplayNameFor(model => model.Room.Name)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 8, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 9, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
                     <span class="glyphicon glyphicon-arrow-down"></span>
                 </button>
             </th>
@@ -122,7 +122,6 @@
                     @Html.DisplayFor(modelItem => item.Room.Name)
                 </td>
                 <td>
-                    @Html.ActionLink("Rediger enhet", "EditCalibration", new { id = item.LogEvent.LogEventID }) |
                     @Html.ActionLink("Detaljer", "CalibrationViewDetails", new { id = item.LogEvent.LogEventID })
                 </td>
             </tr>
@@ -164,10 +163,18 @@
         for (i = 0; i < rlength; i++) {
             rows[i].innerHTML = "<td>" + arr[i].join("</td><td>") + "</td>";
         }
+        for (i = 0; i < rlength; i++) {
+            var test = th.rows[i].children;
+            var item = rows[i].children;
+            for (j = 0; i < item.length - 1; i++) {
+                if (test[j].hidden)
+                    item[j].hidden = true;
+            }
+        }
     }
 
     function getColName() {
-        var numberOfCol = 7;
+        var numberOfCol = 10;
         var ddl = document.getElementById("ddm");
         ddl.innerHTML = "";
         var child = th.children[0];
@@ -182,7 +189,7 @@
     }
 
     function checkColName() {
-        var numberOfCol = 7;
+        var numberOfCol = 10;
         for (var i = 0; i < numberOfCol; i++) {
             var el = document.getElementById(i);
             var checkInput = el.getElementsByTagName('input');
@@ -214,20 +221,20 @@
             }
         }
     }
-   
+
     function Create() {
         window.location.replace("/Kalibrering/Create");
     };
-    
-    function Import() {
-        window.location.replace("/Kalibrering/Import");
-    };
 
-    function History() {
-        window.location.replace("/Kalibrering/History");
+    function Overview() {
+        window.location.replace("/Kalibrering/Overview");
     };
 
     function License() {
         window.location.replace("/Kalibrering/License");
+    };
+
+    function Import() {
+        window.location.replace("/Kalibrering/Import");
     };
 </script>

@@ -35,31 +35,14 @@ namespace HovedOppgave.Controllers
         // GET: User/Create
         public ActionResult Create()
         {
-            List<SelectListItem> list = new List<SelectListItem>();
-
-            foreach(Rights item in myrep.GetAllRights())
-            {
-                SelectListItem selectlist = new SelectListItem()
-                {
-                    Text = item.Name,
-                    Value = item.RightsID.ToString()
-                };
-                list.Add(selectlist);
-            }
-
-            CreatUserViewModel model = new CreatUserViewModel()
-            {
-                Rights = list
-            };
-
+            CreatUserViewModel model = this.CreateUserView();
             return View(model);
         }
 
         // POST: User/Create
         [HttpPost]
-        public ActionResult Create(CreatUserViewModel user, IEnumerable<string> SelectedRight)
+        public ActionResult Create(CreatUserViewModel user, IEnumerable<int> SelectedRight)
         {
-            List<Rights> list = myrep.GetAllRights();
             User createUser = new User();
 
             if(user.Password.Equals(user.ConfirmPassword))
@@ -69,22 +52,23 @@ namespace HovedOppgave.Controllers
                 createUser.PassSalt = (string)table["salt"];
                 createUser.Name = user.Name;
                 createUser.Email = user.Email;
+                createUser.RightsID = SelectedRight.FirstOrDefault();
 
-                for (int i = 0; i < list.Count; i++)
+                try
                 {
-                    if (list[i].Equals(SelectedRight))
-                        createUser.RightsID = list[i].RightsID;
+                    myrep.CreateUser(createUser);
+                    return RedirectToAction("List");
+                }
+                catch
+                {
+                    CreatUserViewModel model = this.CreateUserView();
+                    return View(model);
                 }
             }
-
-            try
+            else
             {
-                myrep.CreateUser(createUser);
-                return RedirectToAction("List");
-            }
-            catch
-            {
-                return View();
+                CreatUserViewModel model = this.CreateUserView();
+                return View(model);
             }
         }
 
@@ -131,5 +115,29 @@ namespace HovedOppgave.Controllers
                 return View();
             }
         }
+
+        #region Create user view
+        public CreatUserViewModel CreateUserView()
+        {
+            List<SelectListItem> list = new List<SelectListItem>();
+
+            foreach (Rights item in myrep.GetAllRights())
+            {
+                SelectListItem selectlist = new SelectListItem()
+                {
+                    Text = item.Name,
+                    Value = item.RightsID.ToString()
+                };
+                list.Add(selectlist);
+            }
+
+            CreatUserViewModel model = new CreatUserViewModel()
+            {
+                Rights = list
+            };
+
+            return model;
+        }
+        #endregion
     }
 }

@@ -21,22 +21,5 @@ namespace HovedOppgave.Models
         //Foreignkeys
         public virtual int DeviceTypeID { get; set; }
         public virtual int RoomID { get; set; }
-
-        public Device()
-        { }
-
-        public Device(string name, string description, string serialNum, int height, int weight,
-            bool isRackMountable, string model, string brand, decimal inputVoltage)
-        {
-            this.Name = name;
-            this.Description = description;
-            this.SerialNum = serialNum;
-            this.Height = height;
-            this.Weight = weight;
-            this.IsRackMountable = isRackMountable;
-            this.Model = model;
-            this.Brand = brand;
-            this.InputVoltage = inputVoltage;
-        }
     }
 }

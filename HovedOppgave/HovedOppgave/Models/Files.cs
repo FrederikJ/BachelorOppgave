@@ -11,5 +11,6 @@ namespace HovedOppgave.Models
         public string FileName { get; set; }
         public string FilePath { get; set; }
         public int FileSize { get; set; }
+        public DateTime Date { get; set; }
     }
 }

@@ -8,8 +8,7 @@ namespace HovedOppgave.Models
     public class Contact
     {
         public int ContactID { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public string Name { get; set; }
         public string Title { get; set; }
 
         //Foreignkeys
