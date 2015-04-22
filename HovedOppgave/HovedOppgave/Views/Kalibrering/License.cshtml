@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<HovedOppgave.Models.CalibrationViews>
 
 @{
-    ViewBag.Title = "Kalibrering logg";
+    ViewBag.Title = "Kalibrering sertifikat";
 }
 
-<h2>Kalibrering logg</h2>
+<h2>Kalibrering sertifikat</h2>
 
 <br />
 <div class="col-lg-offset-3">
@@ -16,78 +16,44 @@
         <ul class="dropdown-menu" role="menu" aria-labelledby="menu" id="ddm" onclick="checkColName()"></ul>
         <button type="button" class="btn btn-default" onclick="Overview()">Oversikt</button>
         <button type="button" class="btn btn-default" onclick="Create()">Registrer ny enhet</button>
-        <button type="button" class="btn btn-default" onclick="License()">Sertifikat</button>
+        <button type="button" class="btn btn-default" onclick="History()">Logg</button>
         <button type="button" class="btn btn-default" onclick="Import()">Importering</button>
     </div>
 </div>
 <br />
-
+<h4>Fil plassering</h4>
+<hr />
+<div class="col-lg-12">
+    @foreach (var item in Model)
+    {
+        @Html.DisplayFor(modelItem => item.FilePath)
+    }
+</div>
+<br /><br />
 <table class="table">
     <thead id="thead">
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.LogEvent.RegisteredDate)
+                @Html.DisplayNameFor(model => model.File.FileName)
                 <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 0, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
                     <span class="glyphicon glyphicon-arrow-down"></span>
                 </button>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LogEvent.StartDate)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 1, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LogEvent.EndDate)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 2, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.File.FileName)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 3, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th hidden="hidden">
                 @Html.DisplayNameFor(model => model.File.FileType)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 4, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.LogEvent.Data1)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 4, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.LogEvent.Data2)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 5, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.EventType.Name)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 6, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 0, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
                     <span class="glyphicon glyphicon-arrow-down"></span>
                 </button>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Device.Name)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 7, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+                @Html.DisplayNameFor(model => model.File.FileSize)
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 0, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
                     <span class="glyphicon glyphicon-arrow-down"></span>
                 </button>
             </th>
-            <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.Contact.Name)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 8, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.Room.Name)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 9, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+            <th>
+                @Html.DisplayNameFor(model => model.File.Date)
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 0, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
                     <span class="glyphicon glyphicon-arrow-down"></span>
                 </button>
             </th>
@@ -98,40 +64,21 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.LogEvent.RegisteredDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LogEvent.StartDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LogEvent.EndDate)
-                </td>
-                <td>
                     @Html.DisplayFor(modelItem => item.File.FileName)
                 </td>
-                <td hidden="hidden">
+                <td>
                     @Html.DisplayFor(modelItem => item.File.FileType)
                 </td>
-                <td hidden="hidden">
-                    @Html.DisplayFor(modelItem => item.LogEvent.Data1)
-                </td>
-                <td hidden="hidden">
-                    @Html.DisplayFor(modelItem => item.LogEvent.Data2)
-                </td>
-                <td hidden="hidden">
-                    @Html.DisplayFor(modelItem => item.EventType.Name)
+                <td>
+                    @Html.DisplayFor(modelItem => item.File.FileSize)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Device.Name)
-                </td>
-                <td hidden="hidden">
-                    @Html.DisplayFor(modelItem => item.Contact.Name)
-                </td>
-                <td hidden="hidden">
-                    @Html.DisplayFor(modelItem => item.Room.Name)
+                    @Html.DisplayFor(modelItem => item.File.Date)
                 </td>
                 <td>
-                    @Html.ActionLink("Detaljer", "CalibrationViewDetails", new { id = item.LogEvent.LogEventID })
+                    @Html.ActionLink("Vis filen", "Showfile", new { id=item.File.FileID }) |
+                    @Html.ActionLink("Detalje", "Detailsfile", new { id = item.File.FileID }) |
+                    @Html.ActionLink("Slett", "Deletefile", new { id = item.File.FileID })
                 </td>
             </tr>
         }
@@ -171,14 +118,6 @@
         });
         for (i = 0; i < rlength; i++) {
             rows[i].innerHTML = "<td>" + arr[i].join("</td><td>") + "</td>";
-        }
-        for (i = 0; i < rlength; i++) {
-            var test = th.rows[i].children;
-            var item = rows[i].children;
-            for (j = 0; i < item.length - 1; i++) {
-                if (test[j].hidden)
-                    item[j].hidden = true;
-            }
         }
     }
 
@@ -231,19 +170,19 @@
         }
     }
 
-    function Create() {
-        window.location.replace("/Kalibrering/Create");
-    };
-
     function Overview() {
         window.location.replace("/Kalibrering/Overview");
     };
 
-    function License() {
-        window.location.replace("/Kalibrering/License");
+    function Create() {
+        window.location.replace("/Kalibrering/Create");
     };
 
     function Import() {
         window.location.replace("/Kalibrering/Import");
+    };
+
+    function History() {
+        window.location.replace("/Kalibrering/History");
     };
 </script>

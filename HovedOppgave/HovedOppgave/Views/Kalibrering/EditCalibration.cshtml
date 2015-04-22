@@ -9,16 +9,16 @@
 <br />
 <div class="col-lg-offset-2">
     <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default" id="1" onclick="Overview()">Oversikt</button>
-        <button type="button" class="btn btn-default" id="2" onclick="Create()">Registrer ny enhet</button>
-        <button type="button" class="btn btn-default" id="3" onclick="History()">Logg</button>
-        <button type="button" class="btn btn-default" id="4" onclick="License()">Sertifikat</button>
-        <button type="button" class="btn btn-default" id="5" onclick="Import()">Importering</button>
+        <button type="button" class="btn btn-default" onclick="Overview()">Oversikt</button>
+        <button type="button" class="btn btn-default" onclick="Create()">Registrer ny enhet</button>
+        <button type="button" class="btn btn-default" onclick="History()">Logg</button>
+        <button type="button" class="btn btn-default" onclick="License()">Sertifikat</button>
+        <button type="button" class="btn btn-default" onclick="Import()">Importering</button>
     </div>
 </div>
 <br />
 
-@using (Html.BeginForm())
+@using (Html.BeginForm("EditCalibration", "Kalibrering", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
 
@@ -28,7 +28,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Device, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownListFor(model => model.SelectedDevice, Model.Device, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.DropDownListFor(model => model.SelectedDevice, Model.Device, new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.Device, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -45,7 +45,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.LogEvent.StartDate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.LogEvent.StartDate, new { htmlAttributes = new { @class = "form-control", placeholder = " eks: åååå.mm.dd", required = true } })
+                @Html.EditorFor(model => model.LogEvent.StartDate, new { htmlAttributes = new { @class = "form-control", placeholder = " eks: åååå.mm.dd" } })
                 @Html.ValidationMessageFor(model => model.LogEvent.StartDate, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -53,16 +53,8 @@
         <div class="form-group">
             @Html.LabelFor(model => model.LogEvent.EndDate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.LogEvent.EndDate, new { htmlAttributes = new { @class = "form-control", placeholder = " eks: åååå.mm.dd", required = true } })
+                @Html.EditorFor(model => model.LogEvent.EndDate, new { htmlAttributes = new { @class = "form-control", placeholder = " eks: åååå.mm.dd" } })
                 @Html.ValidationMessageFor(model => model.LogEvent.EndDate, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.LogEvent.DataFilePath, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.LogEvent.DataFilePath, new { htmlAttributes = new { @class = "form-control", placeholder = " eks: C:/Dokumenter" } })
-                @Html.ValidationMessageFor(model => model.LogEvent.DataFilePath, "", new { @class = "text-danger" })
             </div>
         </div>
 
@@ -85,7 +77,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.EventType, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownListFor(model => model.SelectedEventType, Model.EventType, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.DropDownListFor(model => model.SelectedEventType, Model.EventType, new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.EventType, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -93,7 +85,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Contact, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownListFor(model => model.SelectedContact, Model.Contact, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.DropDownListFor(model => model.SelectedContact, Model.Contact, new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.Contact, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -101,11 +93,20 @@
         <div class="form-group" id="room">
             @Html.LabelFor(model => model.Room, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownListFor(model => model.SelectedRoom, Model.Room, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.DropDownListFor(model => model.SelectedRoom, Model.Room, new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.Room, "", new { @class = "text-danger" })
             </div>
         </div>
 
+        <div class="form-group">
+            @Html.LabelFor(model => model.File, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.SelectedFile, Model.File, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.File, "", new { @class = "text-danger" })
+                <input type="file" class="btn btn-default" id="fileInput" name="file" />
+            </div>
+        </div>
+        <br />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">

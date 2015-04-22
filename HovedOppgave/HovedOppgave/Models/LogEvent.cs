@@ -11,7 +11,6 @@ namespace HovedOppgave.Models
         public DateTime RegisteredDate { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public string DataFilePath { get; set; }
         public string Data1 { get; set; }
         public string Data2 { get; set; }
         

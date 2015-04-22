@@ -1,4 +1,5 @@
-﻿
+﻿@model HovedOppgave.Models.ImportFiles
+
 @{
     ViewBag.Title = "Importer Sertifikat";
 }
@@ -7,70 +8,51 @@
 <br />
 <div class="col-lg-offset-3">
     <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default" id="1" onclick="Overview()">Oversikt</button>
-        <button type="button" class="btn btn-default" id="2" onclick="Create()">Registrer ny enhet</button>
-        <button type="button" class="btn btn-default" id="3" onclick="History()">Logg</button>
-        <button type="button" class="btn btn-default" id="4" onclick="License()">Sertifikat</button>
+        <button type="button" class="btn btn-default" onclick="Overview()">Oversikt</button>
+        <button type="button" class="btn btn-default" onclick="Create()">Registrer ny enhet</button>
+        <button type="button" class="btn btn-default" onclick="History()">Logg</button>
+        <button type="button" class="btn btn-default" onclick="License()">Sertifikat</button>
     </div>
 </div>
 <br />
 @using (Html.BeginForm("Import", "Kalibrering", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
-    <input type="file" class="btn btn-default" id="fileInput"/>
-    <input type="button" value="Vis fil" onclick="ShowFile()" class="btn btn-default" />
+    <input type="file" class="btn btn-default" id="fileInput" name="file"/>
+    <input type="button" value="Vis fil" class="btn btn-default" id="show"/>
     <br />
-    <iframe width="860" height="1070" id="iFrame" hidden="hidden"></iframe>
-    <object type="application/pdf" width="860" height="1070" id="fileView" hidden="hidden"></object>
-    <br />
-    <div class="btn-group">
-        <input type="button" value="Endre" hidden="hidden" id="edit" class="btn btn-default" />
-        <input type="submit" value="Lagre" hidden="hidden" id="save" class="btn btn-default" />
+    <div class="frameDiv">
+        <iframe width="860" height="1070" id="iFrame" hidden="hidden" src=""></iframe>
     </div>
+    <br />
+    <h4>Settes til hvilken enhet med kalibrering?</h4>
+    <div class="form-group">
+        @Html.LabelFor(model => model.Device, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10" id="device">
+            @Html.DropDownListFor(model => model.SelectedDevice, Model.Device, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Device, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <br /><br />
+    <input type="submit" value="Lagre" hidden="hidden" id="save" class="btn btn-default" />
 }
 <script type="text/javascript">
-
-    function ShowFile() {
-        var files = document.getElementById('fileInput');
-        var file;
-        //velger det siste valgte elementet i listen.
-        for (var i = files.length - 1; i < files.length; i++) {
-            file = files[i];
-        }
-        //var blob = new Blob([file], { type: 'application/pdf' });
-        //var fileview = document.getElementById('fileView');
-        //var iframe = document.getElementById('iFrame');
-        //DisplayFile(file);
-        //var pdf = document.createElement("pdf");
-        //pdf.classList.add("obj");
-        //pdf.dataset = file;
-        //fileView.appendChild(pdf);
-
-        //var reader = new FileReader();
-        //reader.onload = (function (aPdf) { return function (e) { aPdf.dataset = e.target.result; }; })(pdf);
-        //reader.readAsDataURL(file);
-        //var objUrl = window.URL.createObjectURL(blob);  
-        //iframe.setAttribute('src', objUrl);
-        //window.URL.revokeObjectURL(objUrl);
-        //var url = "/Kalibrering/DisplayFile/" + files;
-        //HER --> i url får jeg ikke sendt over filen (files) med url til /Kalibrering/DisplayFIle.
-        fileView.data = "@Url.Action("DisplayFile")";
-        //fileView.data = open(url);
-        save.hidden = false;
-        edit.hidden = false;
-        //iFrame.hidden = false;
-        fileView.hidden = false;
-    }
-
-    function DisplayFile(file) {
-        var pdf = document.createElement("pdf");
-        pdf.classList.add("obj");
-        pdf.dataset = file;
-        fileView.appendChild(pdf);
-
-        var reader = new FileReader();
-        reader.onload = (function (aPdf) { return function (e) { aPdf.srcElement = e.target.result; }; })(pdf);
-        reader.readAsDataURL(file);
-    }
+    $(document).ready(function () {
+        $('#show').click(function (e) {
+            var files = document.getElementById("fileInput");
+            var file;
+            for (i = files.files.length - 1; i < files.files.length; i++) {
+                    file = files.files[i];
+            }
+            var href = URL.createObjectURL(file);
+            e.preventDefault();
+            $('#iFrame').attr("src", href + "#view=VFit" + "&toolbar=0" + "&navpanes=0");
+            $('.frameDiv').show();
+            iFrame.hidden = false;
+            edit.hidden = false;
+            save.hidden = false;
+            URL.revokeObjectURL(file);
+        });
+    });
 
     function Create() {
         window.location.replace("/Kalibrering/Create");
@@ -87,36 +69,4 @@
     function History() {
         window.location.replace("/Kalibrering/History");
     };
-
-    $('uploadedF').on('change', function (e) {
-        var files = e.target.files;
-        if (files.length > 0) {
-            if (window.FormData !== undefined) {
-                var data = new FormData();
-                for (var x = 0; x < files.length; x++) {
-                    data.append("file" + x, files[x]);
-                }
-
-                $.ajax({
-                    type: "POST",
-                    url: 'Kalibrering/TempSaveFIle',
-                    contentType: false,
-                    processData: false,
-                    data: data,
-                    success: function (result) {
-                        console.log(result);
-                    },
-                    error: function (xhr, status, p3, p4) {
-                        var err = "Error " + " " + status + " " + p3 + " " + p4;
-                        if (xhr.responseText && xhr.responseText[0] == "") {
-                            err = JSON.parse(xhr.responseText).Message;
-                            console.log(err);
-                        }
-                    }
-                });
-            } else {
-                alert("This browser doesnt support HTML5 file uploads");
-            }
-        }
-    });
 </script>

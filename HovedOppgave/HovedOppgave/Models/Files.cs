@@ -10,6 +10,7 @@ namespace HovedOppgave.Models
         public int FileID { get; set; }
         public string FileName { get; set; }
         public string FilePath { get; set; }
+        public string FileType { get; set; }
         public int FileSize { get; set; }
         public DateTime Date { get; set; }
     }

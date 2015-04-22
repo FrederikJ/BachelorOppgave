@@ -1,0 +1,49 @@
+﻿@model HovedOppgave.Models.Files
+@{
+    ViewBag.Title = "Vis filen";
+}
+
+<h2>Grafisk visning av filen</h2>
+
+<br />
+<div class="col-lg-offset-3">
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default" onclick="Overview()">Oversikt</button>
+        <button type="button" class="btn btn-default" onclick="Create()">Registrer ny enhet</button>
+        <button type="button" class="btn btn-default" onclick="History()">Logg</button>
+        <button type="button" class="btn btn-default" onclick="License()">Sertifikat</button>
+        <button type="button" class="btn btn-default" onclick="Import()">Importering</button>
+    </div>
+</div>
+<br />
+<div class="frameDiv">
+    <iframe width="860" height="1070" id="iFrame" src="" ></iframe>
+</div>
+
+<script type="text/javascript">
+
+    window.onload = function () {
+        var file = "file://localhost/@Model.FilePath";
+        iFrame.src = file;
+    }
+
+    function Create() {
+        window.location.replace("/Kalibrering/Create");
+    };
+
+    function Overview() {
+        window.location.replace("/Kalibrering/Overview");
+    };
+
+    function License() {
+        window.location.replace("/Kalibrering/License");
+    };
+
+    function History() {
+        window.location.replace("/Kalibrering/History");
+    };
+
+    function Import() {
+        window.location.replace("/Kalibrering/Import");
+    };
+</script>

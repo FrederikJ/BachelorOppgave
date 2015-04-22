@@ -14,10 +14,10 @@
         </button>
         <ul class="dropdown-menu" role="menu" aria-labelledby="menu" id="ddm" onclick="checkColName()"></ul>
         <div class="btn-group" role="group">
-            <button type="button" class="btn btn-default" id="1" onclick="Create()">Registrer ny enhet</button>
-            <button type="button" class="btn btn-default" id="2" onclick="History()">Logg</button>
-            <button type="button" class="btn btn-default" id="3" onclick="License()">Sertifikat</button>
-            <button type="button" class="btn btn-default" id="4" onclick="Import()">Importering</button>
+            <button type="button" class="btn btn-default" onclick="Create()">Registrer ny enhet</button>
+            <button type="button" class="btn btn-default" onclick="History()">Logg</button>
+            <button type="button" class="btn btn-default" onclick="License()">Sertifikat</button>
+            <button type="button" class="btn btn-default" onclick="Import()">Importering</button>
         </div>
     </div>
 </div>
@@ -44,44 +44,50 @@
                 </button>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LogEvent.DataFilePath)
+                @Html.DisplayNameFor(model => model.File.FileName)
                 <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 3, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
                     <span class="glyphicon glyphicon-arrow-down"></span>
                 </button>
             </th>
             <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.LogEvent.Data1)
+                @Html.DisplayNameFor(model => model.File.FileType)
                 <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 4, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
                     <span class="glyphicon glyphicon-arrow-down"></span>
                 </button>
             </th>
             <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.LogEvent.Data2)
+                @Html.DisplayNameFor(model => model.LogEvent.Data1)
                 <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 5, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
                     <span class="glyphicon glyphicon-arrow-down"></span>
                 </button>
             </th>
             <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.EventType.Name)
+                @Html.DisplayNameFor(model => model.LogEvent.Data2)
                 <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 6, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+                    <span class="glyphicon glyphicon-arrow-down"></span>
+                </button>
+            </th>
+            <th hidden="hidden">
+                @Html.DisplayNameFor(model => model.EventType.Name)
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 7, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
                     <span class="glyphicon glyphicon-arrow-down"></span>
                 </button>
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Device.Name)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 7, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 8, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
                     <span class="glyphicon glyphicon-arrow-down"></span>
                 </button>
             </th>
             <th hidden="hidden">
                 @Html.DisplayNameFor(model => model.Contact.Name)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 8, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 9, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
                     <span class="glyphicon glyphicon-arrow-down"></span>
                 </button>
             </th>
             <th hidden="hidden">
                 @Html.DisplayNameFor(model => model.Room.Name)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 8, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
+                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 10, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
                     <span class="glyphicon glyphicon-arrow-down"></span>
                 </button>
             </th>
@@ -101,7 +107,10 @@
                     @Html.DisplayFor(modelItem => item.LogEvent.EndDate)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.LogEvent.DataFilePath)
+                    @Html.DisplayFor(modelItem => item.File.FileName)
+                </td>
+                <td hidden="hidden">
+                    @Html.DisplayFor(modelItem => item.File.FileType)
                 </td>
                 <td hidden="hidden">
                     @Html.DisplayFor(modelItem => item.LogEvent.Data1)
@@ -167,7 +176,7 @@
     }
 
     function getColName() {
-        var numberOfCol = 7;
+        var numberOfCol = 11;
         var ddl = document.getElementById("ddm");
         ddl.innerHTML = "";
         var child = th.children[0];
@@ -182,7 +191,7 @@
     }
 
     function checkColName() {
-        var numberOfCol = 7;
+        var numberOfCol = 11;
         for (var i = 0; i < numberOfCol; i++) {
             var el = document.getElementById(i);
             var checkInput = el.getElementsByTagName('input');

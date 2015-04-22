@@ -386,10 +386,146 @@ namespace HovedOppgave.Models
             return eventType;
         }
         #endregion
+        #region FileQueries
+        public bool CreateFile(Files file)
+        {
+            string query = "Insert into files (filename, filepath, filetype, filesize, date) values('" + file.FileName + "','" + file.FilePath + "','" + file.FileType + "','" + file.FileSize + "','" + file.Date.ToString("yyyy-MM-dd HH:mm:ss") + "')";
+
+            if (this.OpenConnection())
+            {
+                //Lager en kommando med query og forbindelse
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                try
+                {
+                    //Execute query
+                    cmd.ExecuteReader();
+                    //close connection
+                    this.CloseConnection();
+                    return true;
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            return false;
+        }
+        public List<Files> GetAllFiles()
+        {
+            string query = "select * from files";
+            List<Files> list = new List<Files>();
+
+            //Sjekke for åpen connection mot db
+            if (this.OpenConnection())
+            {
+                //Lager en kommando
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                try
+                {
+                    //lage en data reader og utfører kommandoen
+                    MySqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        var id = reader["fileid"];
+                        var name = reader["filename"];
+                        var path = reader["filepath"];
+                        var type = reader["filetype"];
+                        var size = reader["filesize"];
+                        var date = reader["date"];
+
+                        var item = new Files();
+                        item.FileID = Convert.ToInt32(id);
+                        if (name != DBNull.Value)
+                            item.FileName = (string)name;
+                        item.FilePath = (string)path;
+                        if(type != DBNull.Value)
+                            item.FileType = (string)type;
+                        if (size != DBNull.Value)
+                            item.FileSize= Convert.ToInt32(size);
+                        item.Date = Convert.ToDateTime(date);
+                        
+                        list.Add(item);
+                    }
+                    reader.Close();
+                    //close connection
+                    this.CloseConnection();
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            return list;
+        }
+        public Files GetFile(int fileId)
+        {
+            string query = "select * from files where fileid = '" + fileId + "'";
+            Files file = new Files();
+
+            //Sjekke for åpen connection mot db
+            if (this.OpenConnection() == true)
+            {
+                //Lager en kommando
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                try
+                {
+                    //lage en data reader og utfører kommandoen
+                    MySqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        var id = reader["fileid"];
+                        var name = reader["filename"];
+                        var path = reader["filepath"];
+                        var type = reader["filetype"];
+                        var size = reader["filesize"];
+                        var date = reader["date"];
+
+                        file.FileID = Convert.ToInt32(id);
+                        if (name != DBNull.Value)
+                            file.FileName = (string)name;
+                        file.FilePath = (string)path;
+                        if (type != DBNull.Value)
+                            file.FileType = (string)type;
+                        if (size != DBNull.Value)
+                            file.FileSize = Convert.ToInt32(size);
+                        file.Date = Convert.ToDateTime(date);
+                    }
+                    reader.Close();
+                    //close connection
+                    this.CloseConnection();
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            return file;
+        }
+        public bool DeleteFile(Files file)
+        {
+            string query = "DELETE FROM files WHERE fileid='" + file.FileID + "'";
+
+            if (this.OpenConnection())
+            {
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.ExecuteNonQuery();
+                this.CloseConnection();
+                return true;
+            }
+            this.CloseConnection();
+            return false;
+        }
+        #endregion
         #region LogEvent Queries
         public void CreateKalibreringLogEvent(LogEvent logEvent)
         {
-            string query = "Insert into log_event (event_type, device_id, event_registered_date, event_start_date, event_end_date, data_file_path, event_data1, event_data2, event_contact, event_location) values('" + logEvent.EventTypeID + "','" + logEvent.DeviceID + "','" + logEvent.RegisteredDate.ToString("yyyy-MM-dd HH:mm:ss") + "','" + logEvent.StartDate.ToString("yyyy-MM-dd HH:mm:ss") + "','" + logEvent.EndDate.ToString("yyyy-MM-dd HH:mm:ss") + "','" + logEvent.DataFilePath + "','" + logEvent.Data1 + "','" + logEvent.Data2 + "','" + logEvent.ContactID + "','" + logEvent.RoomID + "')";
+            string query = "Insert into log_event (event_type, device_id, event_registered_date, event_start_date, event_end_date, data_file, event_data1, event_data2, event_contact, event_location) values('" + logEvent.EventTypeID + "','" + logEvent.DeviceID + "','" + logEvent.RegisteredDate.ToString("yyyy-MM-dd HH:mm:ss") + "','" + logEvent.StartDate.ToString("yyyy-MM-dd HH:mm:ss") + "','" + logEvent.EndDate.ToString("yyyy-MM-dd HH:mm:ss") + "','" + logEvent.FileID + "','" + logEvent.Data1 + "','" + logEvent.Data2 + "','" + logEvent.ContactID + "','" + logEvent.RoomID + "')";
 
             if (this.OpenConnection())
             {
@@ -432,10 +568,10 @@ namespace HovedOppgave.Models
                         var deviceId = reader["device_id"];
                         var eventLocationId = reader["event_location"];
                         var eventContactId = reader["event_contact"];
+                        var fileId = reader["data_file"];
                         var registeredDate = reader["event_registered_date"];
                         var startDate = reader["event_start_date"];
                         var endDate = reader["event_end_date"];
-                        var filePath = reader["data_file_path"];
                         var data1 = reader["event_data1"];
                         var data2 = reader["event_data2"];
 
@@ -446,12 +582,12 @@ namespace HovedOppgave.Models
                         item.ContactID = Convert.ToInt32(eventContactId);
                         item.DeviceID = Convert.ToInt32(deviceId);
                         item.RegisteredDate = Convert.ToDateTime(registeredDate);
+                        if(fileId != DBNull.Value)
+                            item.FileID = Convert.ToInt32(fileId);
                         if (startDate != DBNull.Value)
                             item.StartDate = Convert.ToDateTime(startDate);
                         if (endDate != DBNull.Value)
                             item.EndDate = Convert.ToDateTime(endDate);
-                        if (filePath != DBNull.Value)
-                            item.DataFilePath = (string)filePath;
                         if (data1 != DBNull.Value)
                             item.Data1 = (string)data1;
                         if (data2 != DBNull.Value)
@@ -492,10 +628,10 @@ namespace HovedOppgave.Models
                         var deviceId = reader["device_id"];
                         var eventLocationId = reader["event_location"];
                         var eventContactId = reader["event_contact"];
+                        var fileId = reader["data_file"];
                         var registeredDate = reader["event_registered_date"];
                         var startDate = reader["event_start_date"];
                         var endDate = reader["event_end_date"];
-                        var filePath = reader["data_file_path"];
                         var data1 = reader["event_data1"];
                         var data2 = reader["event_data2"];
 
@@ -509,8 +645,8 @@ namespace HovedOppgave.Models
                             logEvent.StartDate = Convert.ToDateTime(startDate);
                         if (endDate != DBNull.Value)
                             logEvent.EndDate = Convert.ToDateTime(endDate);
-                        if (filePath != DBNull.Value)
-                            logEvent.DataFilePath = (string)filePath;
+                        if (fileId != DBNull.Value)
+                            logEvent.FileID = Convert.ToInt32(fileId);
                         if (data1 != DBNull.Value)
                             logEvent.Data1 = (string)data1;
                         if (data2 != DBNull.Value)
@@ -530,7 +666,7 @@ namespace HovedOppgave.Models
         }
         public bool EditLogEvent(LogEvent logEvent)
         {
-            string query = "UPDATE log_event SET event_type='" + logEvent.EventTypeID + "', device_id='" + logEvent.DeviceID + "', event_contact='" + logEvent.ContactID + "', event_location='" + logEvent.RoomID + "', event_registered_date='" + logEvent.RegisteredDate.Date.ToString("yyyy-MM-dd") + "', event_start_date='" + logEvent.StartDate.Date.ToString("yyyy-MM-dd") + "', event_end_date='" + logEvent.EndDate.Date.ToString("yyyy-MM-dd") + "', data_file_path='" + logEvent.DataFilePath + "', event_data1='" + logEvent.Data1 + "', event_data2='" + logEvent.Data2 + "' WHERE event_id='" + logEvent.LogEventID + "'";
+            string query = "UPDATE log_event SET event_type='" + logEvent.EventTypeID + "', device_id='" + logEvent.DeviceID + "', event_contact='" + logEvent.ContactID + "', event_location='" + logEvent.RoomID + "', event_registered_date='" + logEvent.RegisteredDate.Date.ToString("yyyy-MM-dd") + "', event_start_date='" + logEvent.StartDate.Date.ToString("yyyy-MM-dd") + "', event_end_date='" + logEvent.EndDate.Date.ToString("yyyy-MM-dd") + "', data_file='" + logEvent.FileID + "', event_data1='" + logEvent.Data1 + "', event_data2='" + logEvent.Data2 + "' WHERE event_id='" + logEvent.LogEventID + "'";
 
             //Open connection
             if (this.OpenConnection())
@@ -553,6 +689,134 @@ namespace HovedOppgave.Models
                 }
             }
             return false;
+        }
+        public LogEvent GetLastEventForDevice(int deviceID)
+        {
+            string query = "select * from log_event where device_id = '" + deviceID + "'";
+            LogEvent logEvent = new LogEvent();
+            List<LogEvent> list = new List<LogEvent>();
+            //Sjekke for åpen connection mot db
+            if (this.OpenConnection())
+            {
+                //Lager en kommando
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                try
+                {
+                    //lage en data reader og utfører kommandoen
+                    MySqlDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        var id = reader["event_id"];
+                        var eventTypeId = reader["event_type"];
+                        var deviceId = reader["device_id"];
+                        var eventLocationId = reader["event_location"];
+                        var eventContactId = reader["event_contact"];
+                        var fileId = reader["data_file"];
+                        var registeredDate = reader["event_registered_date"];
+                        var startDate = reader["event_start_date"];
+                        var endDate = reader["event_end_date"];
+                        var data1 = reader["event_data1"];
+                        var data2 = reader["event_data2"];
+
+                        var item = new LogEvent();
+                        item.LogEventID = Convert.ToInt32(id);
+                        item.EventTypeID = Convert.ToInt32(eventTypeId);
+                        item.RoomID = Convert.ToInt32(eventLocationId);
+                        item.ContactID = Convert.ToInt32(eventContactId);
+                        item.DeviceID = Convert.ToInt32(deviceId);
+                        item.RegisteredDate = Convert.ToDateTime(registeredDate);
+                        if (startDate != DBNull.Value)
+                            item.StartDate = Convert.ToDateTime(startDate);
+                        if (endDate != DBNull.Value)
+                            item.EndDate = Convert.ToDateTime(endDate);
+                        if (fileId != DBNull.Value)
+                            item.FileID = Convert.ToInt32(fileId);
+                        if (data1 != DBNull.Value)
+                            item.Data1 = (string)data1;
+                        if (data2 != DBNull.Value)
+                            logEvent.Data2 = (string)data2;
+
+                        list.Add(item);
+                    }
+                    reader.Close();
+                    //close connection
+                    this.CloseConnection();
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            list.GroupBy(x => x.EndDate);
+            list.Reverse();
+            for (int i = 0; i < list.Count; i++)
+                logEvent = list[0];
+
+            return logEvent;
+        }
+        public LogEvent GetLogEventByFileId(int fileId)
+        {
+            string query = "select * from log_event where data_file = '" + fileId + "'";
+            LogEvent logEvent = new LogEvent();
+            List<LogEvent> list = new List<LogEvent>();
+            //Sjekke for åpen connection mot db
+            if (this.OpenConnection())
+            {
+                //Lager en kommando
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                try
+                {
+                    //lage en data reader og utfører kommandoen
+                    MySqlDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        var id = reader["event_id"];
+                        var eventTypeId = reader["event_type"];
+                        var deviceId = reader["device_id"];
+                        var eventLocationId = reader["event_location"];
+                        var eventContactId = reader["event_contact"];
+                        var fileID = reader["data_file"];
+                        var registeredDate = reader["event_registered_date"];
+                        var startDate = reader["event_start_date"];
+                        var endDate = reader["event_end_date"];
+                        var data1 = reader["event_data1"];
+                        var data2 = reader["event_data2"];
+
+                        var item = new LogEvent();
+                        item.LogEventID = Convert.ToInt32(id);
+                        item.EventTypeID = Convert.ToInt32(eventTypeId);
+                        item.RoomID = Convert.ToInt32(eventLocationId);
+                        item.ContactID = Convert.ToInt32(eventContactId);
+                        item.DeviceID = Convert.ToInt32(deviceId);
+                        item.RegisteredDate = Convert.ToDateTime(registeredDate);
+                        if (startDate != DBNull.Value)
+                            item.StartDate = Convert.ToDateTime(startDate);
+                        if (endDate != DBNull.Value)
+                            item.EndDate = Convert.ToDateTime(endDate);
+                        if (fileID != DBNull.Value)
+                            item.FileID = Convert.ToInt32(fileID);
+                        if (data1 != DBNull.Value)
+                            item.Data1 = (string)data1;
+                        if (data2 != DBNull.Value)
+                            logEvent.Data2 = (string)data2;
+
+                        list.Add(item);
+                    }
+                    reader.Close();
+                    //close connection
+                    this.CloseConnection();
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            list.Reverse();
+            logEvent = list.FirstOrDefault();
+
+            return logEvent;
         }
         #endregion
         #region NetworkInfo Queries

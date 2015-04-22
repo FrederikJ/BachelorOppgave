@@ -83,6 +83,7 @@ namespace HovedOppgave.Models
     public class CreateCalibrationViewModel
     {
         public Files File { get; set; }
+        public List<Files> Files { get; set; }
         public LogEvent LogEvent { get; set; }
         public IEnumerable<int> SelectedRoom { get; set; }
         public IEnumerable<int> SelectedDevice { get; set; }
@@ -97,9 +98,17 @@ namespace HovedOppgave.Models
     public class CalibrationViews
     {
         public Room Room { get; set; }
+        public Files File { get; set; }
         public Device Device { get; set; }
+        public string FilePath { get; set; }
         public Contact Contact { get; set; }
         public LogEvent LogEvent { get; set; }
         public EventType EventType { get; set; }
+    }
+
+    public class ImportFiles
+    {
+        public IEnumerable<int> SelectedDevice { get; set; }
+        public IEnumerable<System.Web.Mvc.SelectListItem> Device { get; set; }
     }
 }
