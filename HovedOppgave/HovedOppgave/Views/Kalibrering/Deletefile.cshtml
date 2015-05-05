@@ -20,102 +20,111 @@
 
 <h3>Sikker på at du vil slette denne filen?</h3>
 
-<div>
-    @using (Html.BeginForm("Deletefile", "Kalibrering", FormMethod.Post))
-    {
-        @Html.AntiForgeryToken()
-        <div class="col-lg-12">
-            <h4>Fil</h4>
-            <hr />
-            <dl class="dl-horizontal">
-                <dt>
-                    @Html.DisplayNameFor(model => model.File.FileName)
-                </dt>
-                <dd>
-                    @Html.DisplayFor(model => model.File.FileName)
-                </dd>
-                <dt>
-                    @Html.DisplayNameFor(model => model.FilePath)
-                </dt>
-                <dd>
-                    @Html.DisplayFor(model => model.FilePath)
-                </dd>
-                <dt>
-                    @Html.DisplayNameFor(model => model.File.FileSize)
-                </dt>
-                <dd>
-                    @Html.DisplayFor(model => model.File.FileSize)
-                </dd>
-                <dt>
-                    @Html.DisplayNameFor(model => model.File.FileType)
-                </dt>
-                <dd>
-                    @Html.DisplayFor(model => model.File.FileType)
-                </dd>
-                <dt>
-                    @Html.DisplayNameFor(model => model.File.Date)
-                </dt>
-                <dd>
-                    @Html.DisplayFor(model => model.File.Date)
-                </dd>
-            </dl>
-        </div>
+@using (Html.BeginForm("Deletefile", "Kalibrering", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <div class="col-lg-12">
+        <h4>Sertifikat</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayName("Fil navn")
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.File.FileName)
+            </dd>
+            <dt>
+                @Html.DisplayName("Fil plassering")
+            </dt>
+            <dd id="filePath"></dd>
+            <dt>
+                @Html.DisplayName("Fil type")
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.File.FileType)
+            </dd>
+            <dt>
+                @Html.DisplayName("Fil størrelse")
+            </dt>
+            <dd id="fileSize"></dd>
+            <dt>
+                @Html.DisplayName("Dato lagt inn")
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.File.Date)
+            </dd>
+        </dl>
+    </div>
 
-        <div class="col-lg-12">
-            <h4>Kalibrering</h4>
-            <hr />
-            <dl class="dl-horizontal">
-                <dt>
-                    @Html.DisplayNameFor(model => model.LogEvent.RegisteredDate)
-                </dt>
-                <dd>
-                    @Html.DisplayFor(model => model.LogEvent.RegisteredDate)
-                </dd>
-                <dt>
-                    @Html.DisplayNameFor(model => model.LogEvent.StartDate)
-                </dt>
-                <dd>
-                    @Html.DisplayFor(model => model.LogEvent.StartDate)
-                </dd>
-                <dt>
-                    @Html.DisplayNameFor(model => model.LogEvent.EndDate)
-                </dt>
-                <dd>
-                    @Html.DisplayFor(model => model.LogEvent.EndDate)
-                </dd>
-            </dl>
-        </div>
+    <div class="col-lg-12">
+        <h4>Kalibrering</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayName("Planlagt dato")
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.LogEvent.StartDate.Date)
+            </dd>
+            <dt id="endDate"></dt>
+            <dd>
+                @Html.DisplayFor(model => model.LogEvent.EndDate.Date)
+            </dd>
+            <dt>
+                @Html.DisplayName("Event type")
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.EventType.Name)
+            </dd>
+        </dl>
+    </div>
 
-        <div class="col-lg-12">
-            <h4>Utstyrsenhet</h4>
-            <hr />
-            <dl class="dl-horizontal">
-                <dt>
-                    @Html.DisplayNameFor(model => model.Device.Name)
-                </dt>
-                <dd>
-                    @Html.ActionLink(Model.Device.Name, "Device", "Global", new { id = Model.Device.DeviceID }, null)
-                </dd>
-            </dl>
-        </div>
+    <div class="col-lg-12">
+        <h4>Utstyrsenhet</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayName("Enhet")
+            </dt>
+            <dd id="device"></dd>
+        </dl>
+    </div>
 
-        <div class="form-actions no-color">
-            <input type="submit" value="Slett" class="btn btn-default" />
-        </div>
-    }
-</div>
-
+    <div class="col-lg-12">
+        <h4>Organisasjon</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayName("Kalibreres av")
+            </dt>
+            <dd id="company"></dd>
+        </dl>
+    </div>
+    <br />
+    <div class="form-actions no-color">
+        <input type="submit" value="Slett" class="btn btn-default" />
+    </div>
+}
 <script type="text/javascript">
+    $(document).ready(function () {
+        var filePath = @Html.Raw(Json.Encode(Model.FilePath));
+        var file = @Html.Raw(Json.Encode(Model.File));
+        var device = @Html.Raw(Json.Encode(Model.Device));
+        var company = @Html.Raw(Json.Encode(Model.Company));
+
+        FileDetailsDelete(device, company, file, filePath);
+    });
+
     function Overview() {
         window.location.replace("/Kalibrering/Overview");
     };
 
     function Create() {
-        window.location.replace("/Kalibrering/Create");
+        window.location.replace("/Kalibrering/Create/" + 0);
     };
 
     function Import() {
-        window.location.replace("/Kalibrering/Import");
+        window.location.replace("/Kalibrering/Import/" + 0);
     };
 
     function History() {

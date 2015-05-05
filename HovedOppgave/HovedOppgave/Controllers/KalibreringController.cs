@@ -16,517 +16,311 @@ namespace HovedOppgave.Controllers
         IRepository myrep = new Repository();
 
         // GET: Kalibrering
+        /// <summary>
+        /// SETT INN WINDOWS.LOCATION.REPLACE VERDI FOR DETALJE KNAPPEN I "KAN KALIBRERES" KNAPPEN
+        /// detalje om enheten
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Overview()
         {
-            List<CalibrationViews> modelList = new List<CalibrationViews>();
-            List<LogEvent> logEventList = myrep.GetAllLogEvent();
+            CalibrationViews model = new CalibrationViews();
+            //Har kodet inn id til kalibrering event type
+            List<LogEvent> logEvents = myrep.GetAllLogEventToEventType(11);
+            List<DeviceType> deviceTypes = myrep.GetAllDeviceTypes();
+            List<Device> devices = myrep.GetAllDevices();
+            List<Room> rooms = myrep.GetAllRooms();
+            List<Company> companies = myrep.GetAllCompanys();
+            List<EventType> eventTypes = myrep.GetAllEventTypes();
+            List<Files> files = myrep.GetAllFiles();
+            logEvents.Sort((x, y) => DateTime.Compare(x.StartDate, y.StartDate));
+            logEvents.Reverse();
+            
+            model.DeviceTypes = deviceTypes;
+            model.Companys = companies;
+            model.Devices = devices;
+            model.Rooms = rooms;
+            model.EventTypes = eventTypes;
+            model.LogEvents = logEvents;
+            if (files.Count != 0)
+                model.Files = files;
 
-            foreach (var item in logEventList)
-            {
-                if (item.EndDate.Date >= DateTime.Now.Date)
-                {
-                    var device = myrep.GetDevice(item.DeviceID);
-                    var room = myrep.GetRoom(item.RoomID);
-                    var eventType = myrep.GetEventType(item.EventTypeID);
-                    var contact = myrep.GetContact(item.ContactID);
-                    var file = myrep.GetFile(item.FileID);
-
-                    CalibrationViews model = new CalibrationViews();
-                    model.Contact = contact;
-                    model.Device = device;
-                    model.EventType = eventType;
-                    model.LogEvent = item;
-                    model.Room = room;
-                    model.File = file;
-
-                    modelList.Add(model);
-                }
-            }
-            return View(modelList);
-        }
-
-        // GET: Kalibrering/Create
-        public ActionResult Create()
-        {
-            CreateCalibrationViewModel model = this.CreateCalibrationView();
             return View(model);
         }
-
-        [HttpPost]
-        public JsonResult GetFile(Files item)
+        #region funker
+        // GET: Kalibrering/Create
+        public ActionResult Create(int id)
         {
-            return Json(item);
+            CalibrationViews model = this.CreateCalibrationView();
+            if (id != 0)
+            {
+                var device = myrep.GetDevice(id);
+                var eventType = myrep.GetEventType(11);
+                model.Device = device;
+                model.EventType = eventType;
+            }
+            return View(model);
         }
 
         // POST: Kalibrering/Create
         [HttpPost]
-        public ActionResult Create(CreateCalibrationViewModel model,
-            IEnumerable<int> SelectedDevice, IEnumerable<int> SelectedEventType,
-            IEnumerable<int> SelectedRoom, IEnumerable<int> SelectedContact, 
-            IEnumerable<int> SelectedFile, HttpPostedFileBase file)
+        public ActionResult Create(CalibrationViews model, HttpPostedFileBase file)
         {
-            LogEvent calibration = new LogEvent();
-            Files test = model.File;
-            //Sjekker om dem har skrevet inn feil dato. Feil dato forekommer standar verdien 01.01.0001
-            if (model.LogEvent.RegisteredDate.Year == 1)
+            LogEvent calibration = CreatEditFillLogEvent(model, file);
+
+            if (calibration == null)
+                return View(model);
+
+            try
             {
-                CreateCalibrationViewModel newmodel = this.CreateCalibrationView();
-                return View(newmodel);
+                myrep.CreateLogEvent(calibration);
+                return RedirectToAction("Overview");
             }
-            else
+            catch
             {
-                if (model.LogEvent.EndDate >= model.LogEvent.RegisteredDate && model.LogEvent.EndDate >= model.LogEvent.StartDate)
-                {
-                    //Fyller inn i log event som skal inn i db
-                    calibration.RegisteredDate = model.LogEvent.RegisteredDate;
-                    calibration.ContactID = SelectedContact.FirstOrDefault();
-                    calibration.DeviceID = SelectedDevice.FirstOrDefault();
-                    calibration.EventTypeID = SelectedEventType.FirstOrDefault();
-                    calibration.RoomID = SelectedRoom.FirstOrDefault();
-                    if (SelectedFile.FirstOrDefault() != 0)
-                        calibration.FileID = SelectedFile.FirstOrDefault();
-                    if (model.LogEvent.StartDate.Year == 1)
-                        calibration.StartDate = model.LogEvent.StartDate;
-                    if (model.LogEvent.EndDate.Year == 1)
-                        calibration.EndDate = model.LogEvent.EndDate;
-                    if (model.LogEvent.Data1 != null)
-                        calibration.Data1 = model.LogEvent.Data1;
-                    if (model.LogEvent.Data2 != null)
-                        calibration.Data2 = model.LogEvent.Data2;
-
-                    try
-                    {
-                        if(file != null)
-                            if (Validator.IsValidFile(file, 5))
-                            {
-                                string path = Path.Combine(Server.MapPath("~/App_Data/Sertifikat"), file.FileName);
-                                file.SaveAs(path);
-                                Files dbFile = new Files()
-                                {
-                                    FileName = file.FileName,
-                                    FilePath = path,
-                                    FileSize = file.ContentLength,
-                                    FileType = file.ContentType,
-                                    Date = DateTime.Now
-                                };
-
-                                if (myrep.CreateFile(dbFile))
-                                {
-                                    var files = myrep.GetAllFiles();
-                                    files.GroupBy(x => x.Date);
-                                    files.Reverse();
-
-                                    var temp = new Files();
-                                    for (int i = 0; i < files.Count; i++)
-                                        temp = files[0];
-
-                                    calibration.FileID = temp.FileID;
-                                    
-                                }
-                            }
-
-                        myrep.CreateKalibreringLogEvent(calibration);
-                        return RedirectToAction("Overview");
-                    }
-                    catch
-                    {
-                        CreateCalibrationViewModel newmodel = this.CreateCalibrationView();
-                        return View(newmodel);
-                    }
-                }
-                model = this.CreateCalibrationView();
                 return View(model);
             }
         }
-
+        
         // GET: Kalibrering/Edit/5
         public ActionResult EditCalibration(int id)
         {
-            LogEvent logEvent = myrep.GetLogEvent(id);
-            CreateCalibrationViewModel model = this.CreateCalibrationView();
-            model.LogEvent = logEvent;
+            CalibrationViews model = this.CalibrationViews(id);
+            CalibrationViews model1 = this.CreateCalibrationView();
+            model.Devices = model1.Devices;
+            model.EventTypes = model1.EventTypes;
+            model.Rooms = model1.Rooms;
+            model.Files = model1.Files;
+            model.Companys = model1.Companys;
             return View(model);
         }
 
         // POST: Kalibrering/Edit/5
         [HttpPost]
-        public ActionResult EditCalibration(CreateCalibrationViewModel model,
-            IEnumerable<int> SelectedDevice, IEnumerable<int> SelectedEventType,
-            IEnumerable<int> SelectedRoom, IEnumerable<int> SelectedFile, 
-            IEnumerable<int> SelectedContact, HttpPostedFileBase file)
+        public ActionResult EditCalibration(CalibrationViews model, HttpPostedFileBase file)
         {
-            LogEvent calibration = new LogEvent();
-            CreateCalibrationViewModel newmodel;
-            LogEvent logEvent;
+            LogEvent calibration = CreatEditFillLogEvent(model, file);
 
-            //Sjekker om dem har skrevet inn feil dato. Feil dato forekommer standar verdien 01.01.0001
-            if (model.LogEvent.RegisteredDate.Year == 1)
+            if (calibration != null)
+                return View(model);
+
+            //siden man evt skifter filen sjekke om det filnavnet ligger i systemet, viss ikke
+            //slettes filen
+            if (file != null)
             {
-                logEvent = myrep.GetLogEvent(model.LogEvent.LogEventID);
-                newmodel = this.CreateCalibrationView();
-                newmodel.LogEvent = logEvent;
-                return View(newmodel);
+                var tempFile = myrep.GetLastInsertedFile();
+                if(tempFile.FileID != model.LogEvent.FileID)
+                    this.DeleteFileFromDirectory(tempFile);
+                //Skal kassere filen og settes opp et log event
             }
-            else
+            else if(model.File != null)
             {
-                if (model.LogEvent.EndDate >= model.LogEvent.RegisteredDate && model.LogEvent.EndDate >= model.LogEvent.StartDate)
+                if (model.File.FileID != model.LogEvent.FileID)
                 {
-                    //Fyller inn i log event som skal inn i db
-                    calibration.RegisteredDate = model.LogEvent.RegisteredDate;
-                    calibration.StartDate = model.LogEvent.StartDate;
-                    calibration.EndDate = model.LogEvent.EndDate;
-                    calibration.ContactID = SelectedContact.FirstOrDefault();
-                    calibration.DeviceID = SelectedDevice.FirstOrDefault();
-                    calibration.EventTypeID = SelectedEventType.FirstOrDefault();
-                    calibration.RoomID = SelectedRoom.FirstOrDefault();
-                    if (SelectedFile.FirstOrDefault() != 0)
-                        calibration.FileID = SelectedFile.FirstOrDefault();
-                    if (model.LogEvent.StartDate.Year == 1)
-                        calibration.StartDate = model.LogEvent.StartDate;
-                    if (model.LogEvent.EndDate.Year == 1)
-                        calibration.EndDate = model.LogEvent.EndDate;
-                    if (model.LogEvent.Data1 != null)
-                        calibration.Data1 = model.LogEvent.Data1;
-                    if (model.LogEvent.Data2 != null)
-                        calibration.Data2 = model.LogEvent.Data2;
-                    
-                    try
-                    {
-                        if(file != null)
-                            if (Validator.IsValidFile(file, 5))
-                            {
-                                string path = Path.Combine(Server.MapPath("~/App_Data/Sertifikat"), file.FileName);
-                                file.SaveAs(path);
-                                Files dbFile = new Files()
-                                {
-                                    FileName = file.FileName,
-                                    FilePath = path,
-                                    FileSize = file.ContentLength,
-                                    FileType = file.ContentType,
-                                    Date = DateTime.Now
-                                };
-
-                                if (myrep.CreateFile(dbFile))
-                                {
-                                    var files = myrep.GetAllFiles();
-                                    files.GroupBy(x => x.Date);
-                                    files.Reverse();
-
-                                    var temp = new Files();
-                                    for (int i = 0; i < files.Count; i++)
-                                        temp = files[0];
-
-                                    calibration.FileID = temp.FileID;
-
-                                }
-                            }
-                        if(myrep.EditLogEvent(calibration))
-                            return RedirectToAction("Overview");
-                    }
-                    catch
-                    {
-                        
-                    }
+                    var tempFile = myrep.GetFile(model.File.FileID);
+                    if (tempFile.FileID != model.LogEvent.FileID)
+                        this.DeleteFileFromDirectory(tempFile);
+                    //Skal kassere filen og settes opp et log event
                 }
             }
-            logEvent = myrep.GetLogEvent(model.LogEvent.LogEventID);
-            newmodel = this.CreateCalibrationView();
-            newmodel.LogEvent = logEvent;
-            return View(newmodel);
+
+            try
+            {
+                myrep.EditLogEvent(calibration);
+                return RedirectToAction("Overview");
+            }
+            catch
+            {
+                return View(model);
+            }
         }
-
+        
         // GET: Kalibrering/Import
-        public ActionResult Import()
+        public ActionResult Import(int id)
         {
-            List<SelectListItem> devices = new List<SelectListItem>();
-            List<LogEvent> logEvents = myrep.GetAllLogEvent();
-            SelectListItem selectlist = new SelectListItem()
+            CalibrationViews model = new CalibrationViews();
+            //Hard kodet inn id for kalibrering
+            List<LogEvent> logEvents = myrep.GetAllLogEventToEventType(11);
+            logEvents = logEvents.GroupBy(t => t.DeviceID).Select(g => g.Last()).ToList();
+            List<Device> devices = new List<Device>();
+            List<Company> companies = new List<Company>();
+            List<Room> rooms = new List<Room>();
+            foreach (var item in logEvents)
             {
-                Text = "",
-                Value = "0"
-            };
-            devices.Add(selectlist);
-            foreach (Device item in myrep.GetAllDevices())
-                for(var i = 0; i < logEvents.Count; i++)
-                    if(logEvents[i].DeviceID.Equals(item.DeviceID) && logEvents[i].EndDate >= DateTime.Now)
-                    {
-                        selectlist = new SelectListItem()
-                        {
-                            Text = item.Name,
-                            Value = item.DeviceID.ToString()
-                        };
-                        devices.Add(selectlist);
-                    }
-
-            ImportFiles model = new ImportFiles()
+                var device = myrep.GetDevice(item.DeviceID);
+                var company = myrep.GetCompany(item.CompanyID);
+                var room = myrep.GetRoom(item.RoomID);
+                
+                devices.Add(device);
+                companies.Add(company);
+                rooms.Add(room);
+            }
+            //Device id
+            if (id != 0)
             {
-                Device = devices
-            };
+                Device deviceModel = myrep.GetDevice(id);
+                LogEvent logEvent = myrep.GetLastEventForDevice(id);
+                Room room = myrep.GetRoom(logEvent.RoomID);
+                Company company = myrep.GetCompany(logEvent.CompanyID);
+                model.Device = deviceModel;
+                model.LogEvent = logEvent;
+                model.Room = room;
+                model.Company = company;
+            }
+            
+            model.Companys = companies;
+            model.LogEvents = logEvents;
+            model.Devices = devices;
+            model.Rooms = rooms;
+            
             return View(model);
         }
 
         // POST: Kalibrering/Import
         [HttpPost]
-        public ActionResult Import(HttpPostedFileBase file, IEnumerable<int> SelectedDevice)
+        public ActionResult Import(HttpPostedFileBase file, CalibrationViews model)
         {
-            string path = Path.Combine(Server.MapPath("~/App_Data/Sertifikat"), file.FileName);
-            
+            int id = this.SaveFileToDirectoryAndDB(file);
+
             try
             {
-                if (Validator.IsValidFile(file, 5))
+                if (model.LogEvent.LogEventID != 0)
                 {
-                    file.SaveAs(path);
-                    Files dbFile = new Files()
+                    LogEvent logEvent = myrep.GetLogEvent(model.LogEvent.LogEventID);
+                    if (logEvent.FileID != 0)
                     {
-                        FileName = file.FileName,
-                        FilePath = path,
-                        FileSize = file.ContentLength,
-                        FileType = file.ContentType,
-                        Date = DateTime.Now
-                    };
-                    if (SelectedDevice.FirstOrDefault() != 0)
-                    {
-                        LogEvent logEvent = myrep.GetLastEventForDevice(SelectedDevice.FirstOrDefault());
-                        if (logEvent.FileID > 0)
-                        {
-                            List<Files> files = myrep.GetAllFiles();
-                            Files tempFile = myrep.GetFile(logEvent.FileID);
-                            var tempList = new List<Files>();
-                            for (int i = 0; i < files.Count; i++)
-                                if (files[i].FileName.Equals(tempFile.FileName))
-                                    tempList.Add(files[i]);
-
-                            if (tempList.Count == 1)
-                            {
-                                DirectoryInfo myDir = new DirectoryInfo(Server.MapPath("~/App_Data/Sertifikat"));
-                                foreach (FileInfo fil in myDir.GetFiles())
-                                    if (fil.Name.Equals(tempFile.FileName))
-                                        fil.Delete();
-                            }
-                            myrep.DeleteFile(tempFile);
-                        }
-
-                        if (myrep.CreateFile(dbFile))
-                        {
-                            var files = myrep.GetAllFiles();
-                            files.GroupBy(x => x.Date);
-                            files.Reverse();
-
-                            var temp = new Files();
-                            for (int i = 0; i < files.Count; i++)
-                                temp = files[0];
-
-                            logEvent.FileID = temp.FileID;
-
-                            if (myrep.EditLogEvent(logEvent))
-                                return RedirectToAction("License");
-                        }
+                        Files tempFile = myrep.GetFile(logEvent.FileID);
+                        this.DeleteFileFromDirectory(tempFile);
+                        myrep.DeleteFile(tempFile);
                     }
-                    else
-                        if (myrep.CreateFile(dbFile))
-                            return RedirectToAction("License");
+                    logEvent.FileID = id;
+
+                    myrep.EditLogEvent(logEvent);
+                    return RedirectToAction("License");
                 }
-                return RedirectToAction("Import");
+                else if(id != null)
+                    return RedirectToAction("License");
+                else
+                    return View(model);
             }
             catch
             {
-                return RedirectToAction("Import");
+                return View(model);
             }
         }
 
         // GET: Kalibrering/License
         public ActionResult License()
         {
-            //string[] pathOfFiles = Directory.GetFiles(@"C:\Users\Frederik\AppData\Sertifikat", "*.pdf");
             List<Files> list = myrep.GetAllFiles();
-            List<CalibrationViews> model = new List<CalibrationViews>();
+            CalibrationViews model = new CalibrationViews();
+            model.FilePath = Server.MapPath("~/App_Data/Sertifikat");
+            model.Files = list;
             
-            for (int i = 0; i < list.Count; i++)
-            {
-                var temp = new CalibrationViews();
-                temp.File = list[i];
-                if(i == 0)
-                    temp.FilePath = Server.MapPath("~/App_Data/Sertifikat");
-                model.Add(temp);
-            }
             return View(model);
         }
 
         // GET: Kalibrering/History
         public ActionResult History()
         {
-            List<CalibrationViews> modelList = new List<CalibrationViews>();
-            List<LogEvent> logEventList = myrep.GetAllLogEvent();
             CalibrationViews model = new CalibrationViews();
+            List<LogEvent> logEvents = myrep.GetAllLogEvent();
+            List<Device> devices = myrep.GetAllDevices();
+            List<Room> rooms = myrep.GetAllRooms();
+            List<Company> companies = myrep.GetAllCompanys();
+            List<EventType> eventTypes = myrep.GetAllEventTypes();
+            List<Files> files = myrep.GetAllFiles();
 
-            foreach (var item in logEventList)
-            {
-                if (item.EndDate.Date <= DateTime.Now.Date)
-                {
-                    var device = myrep.GetDevice(item.DeviceID);
-                    var room = myrep.GetRoom(item.RoomID);
-                    var eventType = myrep.GetEventType(item.EventTypeID);
-                    var contact = myrep.GetContact(item.ContactID);
-                    if (item.FileID != 0)
-                    {
-                        var file = myrep.GetFile(item.FileID);
-                        model.File = file;
-                    }
-                    
-                    model.Contact = contact;
-                    model.Device = device;
-                    model.EventType = eventType;
-                    model.LogEvent = item;
-                    model.Room = room;
+            model.Companys = companies;
+            model.Devices = devices;
+            model.Rooms = rooms;
+            model.EventTypes = eventTypes;
+            model.LogEvents = logEvents;
+            if (files.Count != 0)
+                model.Files = files;
 
-                    modelList.Add(model);
-                }
-            }
-            return View(modelList);
+            return View(model);
         }
-
+        
         // GET: Kalibrering/CalibrationViewDetails
         public ActionResult CalibrationViewDetails(int id)
         {
             CalibrationViews model = this.CalibrationViews(id);
             return View(model);
         }
-
+        #endregion
+        #region skal ha?
         // GET: Kalibrering/Showfile
         public ActionResult Showfile(int id)
         {
             Files file = myrep.GetFile(id);
             string path = Path.Combine(Server.MapPath("~/App_Data/Sertifikat"), file.FileName);
             file.FilePath = path;
+            CalibrationViews model = new CalibrationViews();
+            model.File = file;
 
-            return View(file);
+            return View(model);
         }
-
+        #endregion
+        #region funker
         // GET: Kalibrering/Detailsfile
         public ActionResult Detailsfile(int id)
         {
-            Files file = myrep.GetFile(id);
-            LogEvent logEvent = myrep.GetLogEventByFileId(id);
-            CalibrationViews model = new CalibrationViews();
-            if(logEvent != null)
-            {
-                Device device = myrep.GetDevice(logEvent.DeviceID);
-                model.Device = device;
-                model.LogEvent = logEvent;
-            }
-            model.File = file;
-            model.FilePath = Server.MapPath("~/App_Data/Sertifikat");
+            CalibrationViews model = this.DeleteDetailsFile(id);
             return View(model);
         }
-
+        
         // GET: Kalibrering/Deletefile
         public ActionResult Deletefile(int id)
         {
-            Files file = myrep.GetFile(id);
-            LogEvent logEvent = myrep.GetLogEventByFileId(id);
-            CalibrationViews model = new CalibrationViews();
-            if (logEvent != null)
-            {
-                Device device = myrep.GetDevice(logEvent.DeviceID);
-                model.Device = device;
-                model.LogEvent = logEvent;
-            }
-            model.File = file;
-            model.FilePath = Server.MapPath("~/App_Data/Sertifikat");
+            CalibrationViews model = this.DeleteDetailsFile(id);
             return View(model);
         }
-
+        #endregion
+        //settes opp et log event og kassere filen
         // POST: Kalibrering/Deletefile
         [HttpPost]
         public ActionResult Deletefile(int? id)
         {
             Files file = myrep.GetFile((int)id);
-
-            //Går igjennom alle logevents vi har, sjekker om det er flere med fil id
-            List<Files> files = myrep.GetAllFiles();
-            var tempList = new List<Files>();
-            for (int i = 0; i < files.Count; i++)
-                if (files[i].FileName.Equals(file.FileName))
-                    tempList.Add(files[i]);
+            file.Kassert = true;
+            LogEvent calibration = myrep.GetLogEventByFileId((int)id);
+            LogEvent logevent = new LogEvent();
+            logevent.CompanyID = calibration.CompanyID;
+            logevent.DeviceID = calibration.DeviceID;
+            logevent.EventTypeID = 12;
+            logevent.FileID = (int)id;
+            logevent.RegisteredDate = DateTime.Now;
+            logevent.RoomID = calibration.RoomID;
 
             try
             {
-                //count vil være 1 vis det ikke er flere med samme id så man kan slette filen
-                // fra directory. for når man lagre filen, så lagre den ikke om det er en fil med samme navnet fra før av.
-                if(tempList.Count == 1)
-                {
-                    DirectoryInfo myDir = new DirectoryInfo(Server.MapPath("~/App_Data/Sertifikat"));
-                    foreach(FileInfo fil in myDir.GetFiles())
-                        if (fil.Name.Equals(file.FileName))
-                            fil.Delete();
-
-                }
-                if (myrep.DeleteFile(file))
-                    return RedirectToAction("License");
+                this.DeleteFileFromDirectory(file);
+                myrep.EditFile(file);
+                myrep.CreateLogEvent(logevent);
+                return RedirectToAction("License");
             }
-            catch { }
-            LogEvent logEvent = myrep.GetLogEventByFileId((int)id);
-            Device device = myrep.GetDevice(logEvent.DeviceID);
-            CalibrationViews model = new CalibrationViews();
-            model.File = file;
-            model.Device = device;
-            model.LogEvent = logEvent;
-            model.FilePath = Server.MapPath("~/App_Data/Sertifikat");
-            return View(model);
+            catch 
+            {
+                CalibrationViews model = this.DeleteDetailsFile((int)id);
+                return View(model);
+            }
         }
-
+        
         #region Create Calibration view method
-        public CreateCalibrationViewModel CreateCalibrationView()
+        public CalibrationViews CreateCalibrationView()
         {
-            List<SelectListItem> deviceList = new List<SelectListItem>();
-            List<SelectListItem> roomList = new List<SelectListItem>();
-            List<SelectListItem> eventTypeList = new List<SelectListItem>();
-            List<SelectListItem> contactList = new List<SelectListItem>();
+            List<Device> deviceList = myrep.GetAllDevices();
+            List<Room> roomList = myrep.GetAllRooms();
+            List<EventType> eventTypeList = myrep.GetAllEventTypes();
+            List<Company> companyList = myrep.GetAllCompanys();
             List<Files> files = myrep.GetAllFiles();
 
-            foreach (Device item in myrep.GetAllDevices())
+            CalibrationViews model = new CalibrationViews()
             {
-                SelectListItem selectlist = new SelectListItem()
-                {
-                    Text = item.Name,
-                    Value = item.DeviceID.ToString()
-                };
-                deviceList.Add(selectlist);
-            }
-            foreach (Room item in myrep.GetAllRooms())
-            {
-                SelectListItem selectlist = new SelectListItem()
-                {
-                    Text = item.Name,
-                    Value = item.RoomID.ToString()
-                };
-                roomList.Add(selectlist);
-            }
-            foreach (EventType item in myrep.GetAllEventTypes())
-            {
-                SelectListItem selectlist = new SelectListItem()
-                {
-                    Text = item.Name,
-                    Value = item.EventTypeID.ToString()
-                };
-                eventTypeList.Add(selectlist);
-            }
-            foreach (Contact item in myrep.GetAllContacts())
-            {
-                SelectListItem selectlist = new SelectListItem()
-                {
-                    Text = item.Name,
-                    Value = item.ContactID.ToString()
-                };
-                contactList.Add(selectlist);
-            }
-
-            CreateCalibrationViewModel model = new CreateCalibrationViewModel()
-            {
-                Device = deviceList,
-                Contact = contactList,
-                EventType = eventTypeList,
-                Room = roomList,
+                Devices = deviceList,
+                Companys = companyList,
+                EventTypes = eventTypeList,
+                Rooms = roomList,
                 Files = files
             };
 
@@ -540,19 +334,125 @@ namespace HovedOppgave.Controllers
             var device = myrep.GetDevice(logEvent.DeviceID);
             var room = myrep.GetRoom(logEvent.RoomID);
             var eventType = myrep.GetEventType(logEvent.EventTypeID);
-            var contact = myrep.GetContact(logEvent.ContactID);
+            var Company = myrep.GetCompany(logEvent.CompanyID);
             var file = myrep.GetFile(logEvent.FileID);
 
             CalibrationViews model = new CalibrationViews();
             model.LogEvent = logEvent;
             model.Room = room;
             model.Device = device;
-            model.Contact = contact;
+            model.Company = Company;
             model.EventType = eventType;
             model.File = file;
 
             return model;
         }
         #endregion
+
+        public LogEvent CreatEditFillLogEvent(CalibrationViews model, HttpPostedFileBase file)
+        {
+            LogEvent calibration = new LogEvent();
+            //Sjekker om dem har skrevet inn feil dato. Feil dato forekommer standar verdien 01.01.0001
+            if (model.LogEvent.RegisteredDate.Year == 1)
+                return null;
+            else
+            {
+                //Fyller inn i log event som skal inn i db
+                calibration.RegisteredDate = model.LogEvent.RegisteredDate;
+                calibration.CompanyID = model.Company.CompanyID;
+                calibration.DeviceID = model.Device.DeviceID;
+                calibration.EventTypeID = model.EventType.EventTypeID;
+                calibration.RoomID = model.Room.RoomID;
+                if (model.File != null)
+                    calibration.FileID = model.File.FileID;
+                if (model.LogEvent.StartDate.Year != 1 || model.LogEvent.EndDate.Year != 1)
+                {
+                    calibration.StartDate = model.LogEvent.StartDate;
+                    calibration.EndDate = model.LogEvent.EndDate;
+                    if (model.LogEvent.StartDate.Year != 1 && model.LogEvent.EndDate.Year != 1 && model.LogEvent.EndDate < model.LogEvent.StartDate)
+                        return null;
+                }
+                if (model.LogEvent.Data1 != null)
+                    calibration.Data1 = model.LogEvent.Data1;
+                if (model.LogEvent.Data2 != null)
+                    calibration.Data2 = model.LogEvent.Data2;
+                try
+                {
+                    calibration.FileID = this.SaveFileToDirectoryAndDB(file);
+                    return calibration;
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+        }
+
+        public void DeleteFileFromDirectory(Files file)
+        {
+            //Går igjennom alle filer vi har, sjekker om det er flere med samme fil navn
+            List<Files> files = myrep.GetAllFiles();
+            var tempList = new List<Files>();
+            for (int i = 0; i < files.Count; i++)
+                if (files[i].FileName.Equals(file.FileName))
+                    tempList.Add(files[i]);
+
+            //count vil være 1 vis det ikke er flere med samme navn så man kan slette filen
+            // fra directory. for når man lagre filen, så lagre den ikke om det er en fil med samme navnet fra før av.
+            if (tempList.Count == 1)
+            {
+                DirectoryInfo myDir = new DirectoryInfo(Server.MapPath("~/App_Data/Sertifikat"));
+                foreach (FileInfo fil in myDir.GetFiles())
+                    if (fil.Name.Equals(file.FileName))
+                        fil.Delete();
+            }
+        }
+
+        public int SaveFileToDirectoryAndDB(HttpPostedFileBase file)
+        {
+            if (file != null)
+            {
+                if (Validator.IsValidFile(file, 5))
+                {
+                    string path = Path.Combine(Server.MapPath("~/App_Data/Sertifikat"), file.FileName);
+                    file.SaveAs(path);
+                    Files dbFile = new Files()
+                    {
+                        FileName = file.FileName,
+                        FilePath = path,
+                        FileSize = file.ContentLength,
+                        FileType = file.ContentType,
+                        Date = DateTime.Now
+                    };
+                    int fileId = myrep.CreateFile(dbFile);
+                    return fileId;
+                }
+                else
+                    return 0;
+            }
+            else
+                return 0;
+        }
+
+        public CalibrationViews DeleteDetailsFile(int id)
+        {
+            Files file = myrep.GetFile(id);
+            LogEvent logEvent = myrep.GetLogEventByFileId(id);
+            CalibrationViews model = new CalibrationViews();
+            if (logEvent != null)
+            {
+                Device device = myrep.GetDevice(logEvent.DeviceID);
+                Company company = myrep.GetCompany(logEvent.CompanyID);
+                EventType eventType = myrep.GetEventType(logEvent.EventTypeID);
+                model.EventType = eventType;
+                model.Company = company;
+                model.Device = device;
+                model.LogEvent = logEvent;
+            }
+            model.File = file;
+            model.FilePath = Server.MapPath("~/App_Data/Sertifikat");
+
+            return model;
+        }
     }
 }

@@ -1,7 +1,7 @@
-﻿@model IEnumerable<HovedOppgave.Models.CalibrationViews>
+﻿@model HovedOppgave.Models.CalibrationViews
 
 @{
-    ViewBag.Title = "Kalibrering sertifikat";
+    ViewBag.Title = "Kalibrerings sertifikat";
 }
 
 <h2>Kalibrering sertifikat</h2>
@@ -21,165 +21,124 @@
     </div>
 </div>
 <br />
-<h4>Fil plassering</h4>
-<hr />
-<div class="col-lg-12">
-    @foreach (var item in Model)
-    {
-        @Html.DisplayFor(modelItem => item.FilePath)
-    }
-</div>
-<br /><br />
-<table class="table">
-    <thead id="thead">
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.File.FileName)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 0, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.File.FileType)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 0, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.File.FileSize)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 0, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.File.Date)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 0, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-        </tr>
-    </thead>
-    <tbody id="tbody">
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.File.FileName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.File.FileType)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.File.FileSize)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.File.Date)
-                </td>
-                <td>
-                    @Html.ActionLink("Vis filen", "Showfile", new { id=item.File.FileID }) |
-                    @Html.ActionLink("Detalje", "Detailsfile", new { id = item.File.FileID }) |
-                    @Html.ActionLink("Slett", "Deletefile", new { id = item.File.FileID })
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
+<div id="tableContainer"></div>
+<a class="fancybox" id="showFile" data-fancybox-type="iframe" href="~/App_Data/Sertifikat/Fabrikantsertifikat_eks_1.pdf">hei</a>
 <script type="text/javascript">
     var th, tb;
     var asc1 = 1, asc2 = 1, asc3 = 1;
 
-    window.onload = function () {
-        th = document.getElementById("thead");
-        tb = document.getElementById("tbody");
-    }
+    $(document).ready(function () {
+        $(".fancybox").fancybox();
 
-    function sortTable(tbody, colnumber, asc) {
-        var rows = tbody.rows,
-            rlength = rows.length,
-            arr = new Array(),
-            i, j, cells, clen;
-        for (i = 0; i < rlength; i++) {
-            cells = rows[i].cells;
-            clen = cells.length;
-            arr[i] = new Array();
-            for (j = 0; j < clen; j++) {
-                arr[i][j] = cells[j].innerHTML;
-            }
-        }
-        arr.sort(function (a, b) {
-            var glyph = th.children[0].children[colnumber].children[0].children[0];
-            if (glyph.className === "glyphicon glyphicon-arrow-up")
-                glyph.className = "glyphicon glyphicon-arrow-down";
-            else
-                glyph.className = "glyphicon glyphicon-arrow-up";
+        var h4 = document.createElement("h4");
+        h4.textContent = "Fil plassering";
+        var hr = document.createElement("hr");
+        var div = document.createElement("div");
+        div.className = "col-lg-12";
+        var lable = document.createElement("lable");
+        var filePath = @Html.Raw(Json.Encode(Model.FilePath));
+        lable.textContent = filePath;
+        div.appendChild(lable);
 
-            return (a[colnumber] == b[colnumber]) ? 0 : ((a[colnumber] > b[colnumber]) ? asc : -1 * asc);
+        var br = document.createElement("br");
+        var brr = document.createElement("br");
+
+        var table = document.createElement("table");
+        table.className = "table";
+        var thead = document.createElement("thead");
+        thead.setAttribute("id", "thead");
+        var tbody = document.createElement("tbody");
+        tbody.setAttribute("id", "tbody");
+
+        FillTableHead(thead, "file");
+
+        var fileList = @Html.Raw(Json.Encode(Model.Files));
+        jQuery.each(fileList, function(i, file) {
+            tr = document.createElement("tr");
+
+            var td = document.createElement("td");
+            td.textContent = String(file["FileName"]);
+            tr.appendChild(td);
+
+            td = document.createElement("td");
+            td.textContent = String(file["FileType"]);
+            tr.appendChild(td);
+
+            td = document.createElement("td");
+            td.textContent = String(file["FileSize"]);
+            tr.appendChild(td);
+
+            td = document.createElement("td");
+            var date = new Date($.parseJSON(String(file["Date"]).substr(6, 13)));
+            var month = date.getMonth() + 1;
+            td.textContent = String(date.getDate() + "." + month + "." + date.getFullYear());
+            tr.appendChild(td);
+
+            var id = file["FileID"];
+            var td = document.createElement("td");
+
+            var inputShow = document.createElement("button");
+            inputShow.type = "button";
+            inputShow.className = "btn btn-success";
+            inputShow.textContent = "Vis fil";
+            inputShow.onclick = function() {
+                //showFile.hidden = false;
+                //$("#showFile").href= "@Model.FilePath" + "/" + file["FileName"];
+
+            };
+
+            var inputDet = document.createElement("button");
+            inputDet.type = "button";
+            inputDet.className = "btn btn-warning";
+            inputDet.textContent = "Detaljer";
+            inputDet.onclick = function(){
+                window.location.replace("/Kalibrering/Detailsfile/" + id);
+            };
+
+            var inputDel = document.createElement("button");
+            inputDel.type = "button";
+            inputDel.className = "btn btn-danger";
+            inputDel.textContent = "Slett fil";
+            inputDel.onclick = function() {
+                window.location.replace("/Kalibrering/Deletefile/" + id);
+            };
+
+            var group = document.createElement("div");
+            group.className = "btn-group";
+            group.appendChild(inputShow);
+            group.appendChild(inputDet);
+            group.appendChild(inputDel);
+
+            td.appendChild(group);
+            tr.appendChild(td);
+
+            tbody.appendChild(tr);
+
+            AddTableToContainer(thead, tbody, h4, table, hr, div, br, brr);
         });
-        for (i = 0; i < rlength; i++) {
-            rows[i].innerHTML = "<td>" + arr[i].join("</td><td>") + "</td>";
-        }
-    }
 
-    function getColName() {
-        var numberOfCol = 11;
-        var ddl = document.getElementById("ddm");
-        ddl.innerHTML = "";
-        var child = th.children[0];
-        for (var i = 0; i < numberOfCol; i++) {
-            if (child.children[i].hidden) {
-                ddl.innerHTML += "<li id='" + i + "'><a><input type='checkbox'/>" + child.children[i].textContent; + "</a></li>";
-            }
-            else {
-                ddl.innerHTML += "<li id='" + i + "'><a><input type='checkbox'checked='checked'/>" + child.children[i].textContent; + "</a></li>";
-            }
-        }
-    }
-
-    function checkColName() {
-        var numberOfCol = 11;
-        for (var i = 0; i < numberOfCol; i++) {
-            var el = document.getElementById(i);
+        $("#ddm").click(function() {
+            var colNumber = event.path[1].id;
+            var el = document.getElementById(colNumber);
             var checkInput = el.getElementsByTagName('input');
-            if (checkInput[0].type === 'checkbox') {
-                checkInput[0].onchange = hideColumn(i);
-            }
-        }
-    }
+            CheckColName(colNumber, th, tb, checkInput);
+        });
 
-    function hideColumn() {
-        var colNumber = event.path[1].id;
-        var childTH = th.children[0];
-        var hideTH = childTH.children[colNumber];
-        if (hideTH.hidden) {
-            hideTH.hidden = false;
-        }
-        else {
-            hideTH.hidden = true;
-        }
-        var length = tb.children.length, i;
-        for (i = 0; i < length; i++) {
-            var childTB = tb.children[i];
-            var hideCol = childTB.children[colNumber];
-            if (hideTH.hidden) {
-                hideCol.hidden = true;
-            }
-            else {
-                hideCol.hidden = false;
-            }
-        }
-    }
+        $("#menu").click(function() {
+            GetColName(th);
+        });
+    });
 
     function Overview() {
         window.location.replace("/Kalibrering/Overview");
     };
 
     function Create() {
-        window.location.replace("/Kalibrering/Create");
+        window.location.replace("/Kalibrering/Create/" + 0);
     };
 
     function Import() {
-        window.location.replace("/Kalibrering/Import");
+        window.location.replace("/Kalibrering/Import/" + 0);
     };
 
     function History() {

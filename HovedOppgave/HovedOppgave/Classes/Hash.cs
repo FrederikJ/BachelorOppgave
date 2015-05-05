@@ -23,7 +23,7 @@ namespace HovedOppgave.Classes
             // Create an array of random values.
             UnicodeEncoding utf16 = new UnicodeEncoding();
 
-            byte[] saltValue = new byte[Constants.SaltSize];
+            byte[] saltValue = new byte[Constant.SaltSize];
             randomGenerator.GetBytes(saltValue);
             string salt = utf16.GetString(saltValue);
             return salt;

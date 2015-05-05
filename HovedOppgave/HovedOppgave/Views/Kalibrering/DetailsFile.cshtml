@@ -19,35 +19,31 @@
 <br />
 
 <div class="col-lg-12">
-    <h4>Fil</h4>
+    <h4>Sertifikat</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.File.FileName)
+            @Html.DisplayName("Fil navn")
         </dt>
         <dd>
             @Html.DisplayFor(model => model.File.FileName)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.FilePath)
+            @Html.DisplayName("Fil plassering")
         </dt>
-        <dd>
-            @Html.DisplayFor(model => model.FilePath)
-        </dd>
+        <dd id="filePath"></dd>
         <dt>
-            @Html.DisplayNameFor(model => model.File.FileSize)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.File.FileSize)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.File.FileType)
+            @Html.DisplayName("Fil type")
         </dt>
         <dd>
             @Html.DisplayFor(model => model.File.FileType)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.File.Date)
+            @Html.DisplayName("Fil størrelse")
+        </dt>
+        <dd id="fileSize"></dd>
+        <dt>
+            @Html.DisplayName("Dato lagt inn")
         </dt>
         <dd>
             @Html.DisplayFor(model => model.File.Date)
@@ -60,22 +56,20 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.LogEvent.RegisteredDate)
+            @Html.DisplayName("Planlagt dato")
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.LogEvent.RegisteredDate)
+            @Html.DisplayFor(model => model.LogEvent.StartDate.Date)
+        </dd>
+        <dt id="endDate"></dt>
+        <dd>
+            @Html.DisplayFor(model => model.LogEvent.EndDate.Date)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.LogEvent.StartDate)
+            @Html.DisplayName("Event type")
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.LogEvent.StartDate)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.LogEvent.EndDate)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.LogEvent.EndDate)
+            @Html.DisplayFor(model => model.EventType.Name)
         </dd>
     </dl>
 </div>
@@ -85,25 +79,49 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.Device.Name)
+            @Html.DisplayName("Enhet")
         </dt>
-        <dd>
-            @Html.ActionLink(Model.Device.Name, "Device", "Global", new { id = Model.Device.DeviceID }, null)
-        </dd>
+        <dd id="device"></dd>
     </dl>
 </div>
 
+<div class="col-lg-12">
+    <h4>Organisasjon</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayName("Kalibreres av")
+        </dt>
+        <dd id="company"></dd>
+    </dl>
+</div>
+<br />
+<button class="btn btn-default" type="button" id="button">Endre fil til enhet</button>
+
 <script type="text/javascript">
+    $(document).ready(function () {
+        var filePath = @Html.Raw(Json.Encode(Model.FilePath));
+        var file = @Html.Raw(Json.Encode(Model.File));
+        var device = @Html.Raw(Json.Encode(Model.Device));
+        var company = @Html.Raw(Json.Encode(Model.Company));
+
+        FileDetailsDelete(device, company, file, filePath);
+
+        $("#button").click(function() {
+            window.location.replace("/Kalibrering/Import/" + @Model.Device.DeviceID);
+        });
+    });
+
     function Overview() {
         window.location.replace("/Kalibrering/Overview");
     };
 
     function Create() {
-        window.location.replace("/Kalibrering/Create");
+        window.location.replace("/Kalibrering/Create/" + 0);
     };
 
     function Import() {
-        window.location.replace("/Kalibrering/Import");
+        window.location.replace("/Kalibrering/Import/" + 0);
     };
 
     function History() {

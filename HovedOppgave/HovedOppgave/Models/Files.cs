@@ -13,5 +13,6 @@ namespace HovedOppgave.Models
         public string FileType { get; set; }
         public int FileSize { get; set; }
         public DateTime Date { get; set; }
+        public bool Kassert { get; set; }
     }
 }

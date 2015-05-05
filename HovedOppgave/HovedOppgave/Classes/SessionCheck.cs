@@ -15,18 +15,20 @@ namespace HovedOppgave.Classes
     
     public class SessionCheck : System.Web.HttpApplication
     {
+        static IRepository myrep = new Repository();
+
         public static void CheckForUserID()
         {
             HttpContext http = HttpContext.Current;
             if (http.Session["UserID"] == null)
             {
                 http.Session["flashMessage"] = "Du må logge deg inn";
-                http.Session["flashStatus"] = Constants.NotificationType.danger.ToString();
+                http.Session["flashStatus"] = Constant.NotificationType.danger.ToString();
                 http.Response.Redirect("~/login", true);
             }
         }
 
-        public static void CheckForRightsOnLogInUser(Constants.Rights rettighet)
+        public static void CheckForRightsOnLogInUser(Constant.Rights rettighet)
         {
             HttpContext http = HttpContext.Current;
             CheckForUserID();
@@ -35,7 +37,7 @@ namespace HovedOppgave.Classes
             if (!Validator.CheckRights(UserID, rettighet))
             {
                 http.Session["flashMessage"] = "Du har ikke korrekte rettighet for aksessere siden du prøvde å nå";
-                http.Session["flashStatus"] = Constants.NotificationType.danger.ToString();
+                http.Session["flashStatus"] = Constant.NotificationType.danger.ToString();
                 http.Response.Redirect(("~/Loggut"), true);
             }
         }
@@ -43,20 +45,18 @@ namespace HovedOppgave.Classes
         //sjekker hvilken masterpage den skal velge etter hvilken rettighet man har
         public static string FindMaster()
         {
-            IRepository queries = new Repository();
             HttpContext http = HttpContext.Current;
             CheckForUserID();
-            int UserID = Validator.ConvertToNumbers(http.Session["UserID"].ToString());
-            Rights rights = queries.GetRightToUser(UserID);
+            User user = myrep.GetUser(Validator.ConvertToNumbers(http.Session["UserID"].ToString()));
+            Rights rights = myrep.GetRightToUser(user);
 
             string master = "";
 
-
-            if (rights.Name == Constants.Rights.Administrator.ToString())
+            if (rights.Name == Constant.Rights.Administrator.ToString())
                 master = "~/Views/Shared/_AdminLayout";
-            else if (rights.Name == Constants.Rights.User.ToString())
+            else if (rights.Name == Constant.Rights.User.ToString())
                 master = "~/Views/Shared/_UserLayout";
-            else if (rights.Name == Constants.Rights.Guest.ToString())
+            else if (rights.Name == Constant.Rights.Guest.ToString())
                 master = "~/Views/Shared/_GuestLayout";
 
             return master;
@@ -70,7 +70,7 @@ namespace HovedOppgave.Classes
             http.Session["Name"] = null;
             http.Session["LoggedIn"] = null;
             http.Session["flashMessage"] = "Du har ikke korrekte rettighet for aksessere siden du prøvde å nå";
-            http.Session["flashStatus"] = Constants.NotificationType.danger.ToString();
+            http.Session["flashStatus"] = Constant.NotificationType.danger.ToString();
             http.Response.Redirect(("~/Login.aspx"), true);
         }
     }

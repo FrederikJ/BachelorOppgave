@@ -17,6 +17,8 @@ namespace HovedOppgave.Classes
 
     public class Validator
     {
+        static IRepository myrep = new Repository();
+
         public static int ConvertToNumbers(string tekst)
         {
             string onlyNumber = Regex.Replace(tekst, @"\D", "");
@@ -35,10 +37,10 @@ namespace HovedOppgave.Classes
             return convert;
         }
 
-        public static bool CheckRights(int UserID, Constants.Rights rights)
+        public static bool CheckRights(int UserID, Constant.Rights rights)
         {
-            IRepository queries = new Repository();
-            User user = queries.GetUserWithRights(UserID, rights);
+            UserRight user = myrep.GetUserWithRights(UserID, rights);
+            
             if (user == null)
                 return false;
             else
@@ -63,7 +65,7 @@ namespace HovedOppgave.Classes
             if(file == null)
             {
                 http.Session["flashMessage"] = "Filen eksisterer ikke";
-                http.Session["flashStatus"] = Constants.NotificationType.danger.ToString();
+                http.Session["flashStatus"] = Constant.NotificationType.danger.ToString();
                 return false;
             }
 
@@ -73,7 +75,7 @@ namespace HovedOppgave.Classes
             if (file.ContentLength > max)
             {
                 http.Session["flashMessage"] = "Filstørrelse er for stor";
-                http.Session["flashStatus"] = Constants.NotificationType.danger.ToString();
+                http.Session["flashStatus"] = Constant.NotificationType.danger.ToString();
                 return false;
             }
 
@@ -84,7 +86,7 @@ namespace HovedOppgave.Classes
             if (!validExtensions.Contains(format.ToLower()))
             {
                 http.Session["flashMessage"] = "Filformatet er ikke gyldig";
-                http.Session["flashStatus"] = Constants.NotificationType.danger.ToString();
+                http.Session["flashStatus"] = Constant.NotificationType.danger.ToString();
                 return false;
             }  
             else

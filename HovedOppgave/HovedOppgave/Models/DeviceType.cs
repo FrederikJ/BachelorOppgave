@@ -10,5 +10,7 @@ namespace HovedOppgave.Models
         public int DeviceTypeID { get; set; }
         public string Type { get; set; }
         public string Description { get; set; }
+
+        public virtual int CanCalibrateID { get; set; }
     }
 }

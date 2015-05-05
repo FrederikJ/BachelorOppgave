@@ -1,9 +1,11 @@
 ﻿using HovedOppgave.Classes;
+using HovedOppgave.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using MySql.Data.MySqlClient;
+using System.Data;
 
 //for info om skrive query - http://www.codeproject.com/Articles/43438/Connect-C-to-MySQL
 
@@ -39,11 +41,11 @@ namespace HovedOppgave.Models
                 {
                     case 0:
                         http.Session["flashMessage"] = "Kunne ikke åpne forbindelse";
-                        http.Session["flashStatus"] = Constants.NotificationType.danger.ToString();
+                        http.Session["flashStatus"] = Constant.NotificationType.danger.ToString();
                         break;
                     case 1045:
                         http.Session["flashMessage"] = "Feil brukernavn/passord, prøv igjen";
-                        http.Session["flashStatus"] = Constants.NotificationType.danger.ToString();
+                        http.Session["flashStatus"] = Constant.NotificationType.danger.ToString();
                         break;
                 }
                 return false;
@@ -59,7 +61,7 @@ namespace HovedOppgave.Models
             catch(MySqlException ex)
             {
                 http.Session["flashMessage"] = "Kunne ikke stenge forbindelse - " + ex.Message;
-                http.Session["flashStatus"] = Constants.NotificationType.danger.ToString();
+                http.Session["flashStatus"] = Constant.NotificationType.danger.ToString();
                 return false;
             }
         }
@@ -72,6 +74,79 @@ namespace HovedOppgave.Models
         #region CableType Queries
         #endregion
         #region Company Queries
+        public List<Company> GetAllCompanys()
+        {
+            string query = "select * from company";
+            List<Company> list = new List<Company>();
+
+            //Sjekke for åpen connection mot db
+            if (this.OpenConnection() == true)
+            {
+                //Lager en kommando
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                try
+                {
+                    //lage en data reader og utfører kommandoen
+                    MySqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        var item = new Company();
+                        item.CompanyID = Convert.ToInt32(reader["companyID"]);
+                        if (reader["org_num"] != DBNull.Value)
+                            item.OrganisationNum = Convert.ToInt32(reader["org_num"]);
+                        if (reader["name"] != DBNull.Value)
+                            item.Name = (string)reader["name"];
+
+                        list.Add(item);
+                    }
+                    reader.Close();
+                    //close connection
+                    this.CloseConnection();
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            return list;
+        }
+        public Company GetCompany(int companyId)
+        {
+            string query = "select * from company where companyID = '" + companyId + "'";
+            Company company = new Company();
+
+            //Sjekke for åpen connection mot db
+            if (this.OpenConnection() == true)
+            {
+                //Lager en kommando
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                try
+                {
+                    //lage en data reader og utfører kommandoen
+                    MySqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        company.CompanyID = Convert.ToInt32(reader["companyID"]);
+                        if (reader["name"] != DBNull.Value)
+                            company.Name = (string)reader["name"];
+                        if (reader["org_num"] != DBNull.Value)
+                            company.OrganisationNum = Convert.ToInt32(reader["org_num"]);
+                    }
+                    reader.Close();
+                    //close connection
+                    this.CloseConnection();
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            return company;
+        }
         #endregion
         #region Connection Queries
         #endregion
@@ -97,18 +172,13 @@ namespace HovedOppgave.Models
 
                     while (reader.Read())
                     {
-                        var id = reader["contactID"];
-                        var name = reader["name"];
-                        var title = reader["title"];
-                        var companyId = reader["company_companyID"];
-
                         var item = new Contact();
-                        item.ContactID = Convert.ToInt32(id);
-                        item.CompanyID = Convert.ToInt32(companyId);
-                        if (name != DBNull.Value)
-                            item.Name = (string)name;
-                        if (title != DBNull.Value)
-                            item.Title = (string)title;
+                        item.ContactID = Convert.ToInt32(reader["contactID"]);
+                        item.CompanyID = Convert.ToInt32(reader["company_companyID"]);
+                        if (reader["name"] != DBNull.Value)
+                            item.Name = (string)reader["name"];
+                        if (reader["title"] != DBNull.Value)
+                            item.Title = (string)reader["title"];
 
                         list.Add(item);
                     }
@@ -141,17 +211,12 @@ namespace HovedOppgave.Models
 
                     while (reader.Read())
                     {
-                        var id = reader["contactID"];
-                        var name = reader["name"];
-                        var title = reader["title"];
-                        var companyId = reader["company_companyID"];
-
-                        contact.ContactID = Convert.ToInt32(id);
-                        contact.CompanyID = Convert.ToInt32(companyId);
-                        if (name != DBNull.Value)
-                            contact.Name = (string)name;
-                        if (title != DBNull.Value)
-                            contact.Title = (string)title;
+                        contact.ContactID = Convert.ToInt32(reader["contactID"]);
+                        contact.CompanyID = Convert.ToInt32(reader["company_companyID"]);
+                        if (reader["name"] != DBNull.Value)
+                            contact.Name = (string)reader["name"];
+                        if (reader["title"] != DBNull.Value)
+                            contact.Title = (string)reader["title"];
                     }
                     reader.Close();
                     //close connection
@@ -188,41 +253,28 @@ namespace HovedOppgave.Models
 
                     while (reader.Read())
                     {
-                        var id = reader["idDevice"];
-                        var name = reader["name"];
-                        var roomId = reader["default_location"];
-                        var description = reader["description"];
-                        var deviceTypeId = reader["type"];
-                        var serialNum = reader["serial_num"];
-                        var height = reader["height"];
-                        var weigth = reader["weight"];
-                        var isRackMountable = reader["isRackMountable"];
-                        var model = reader["model"];
-                        var brand = reader["brand"];
-                        var inputVoltage = reader["input_voltage"];
-
                         var item = new Device();
-                        item.DeviceID = Convert.ToInt32(id);
-                        item.DeviceTypeID = Convert.ToInt32(deviceTypeId);
-                        item.RoomID = Convert.ToInt32(roomId);
-                        if (name != DBNull.Value)
-                            item.Name = (string)name;
-                        if (description != DBNull.Value)
-                            item.Description = (string)description;
-                        if (serialNum != DBNull.Value)
-                            item.SerialNum = (string)serialNum;
-                        if (height != DBNull.Value)
-                            item.Height = Convert.ToInt32(height);
-                        if (weigth != DBNull.Value)
-                            item.Weight = Convert.ToInt32(weigth);
-                        if (isRackMountable != DBNull.Value)
-                            item.IsRackMountable = (bool)isRackMountable;
-                        if (model != DBNull.Value)
-                            item.Model = (string)model;
-                        if (brand != DBNull.Value)
-                            item.Brand = (string)brand;
-                        if (inputVoltage != DBNull.Value)
-                            item.InputVoltage = (decimal)inputVoltage;
+                        item.DeviceID = Convert.ToInt32(reader["idDevice"]);
+                        item.DeviceTypeID = Convert.ToInt32(reader["type"]);
+                        item.RoomID = Convert.ToInt32(reader["default_location"]);
+                        if (reader["name"] != DBNull.Value)
+                            item.Name = (string)reader["name"];
+                        if (reader["description"] != DBNull.Value)
+                            item.Description = (string)reader["description"];
+                        if (reader["serial_num"] != DBNull.Value)
+                            item.SerialNum = (string)reader["serial_num"];
+                        if (reader["height"] != DBNull.Value)
+                            item.Height = Convert.ToInt32(reader["height"]);
+                        if (reader["weight"] != DBNull.Value)
+                            item.Weight = Convert.ToInt32(reader["weight"]);
+                        if (reader["isRackMountable"] != DBNull.Value)
+                            item.IsRackMountable = (bool)reader["isRackMountable"];
+                        if (reader["model"] != DBNull.Value)
+                            item.Model = (string)reader["model"];
+                        if (reader["brand"] != DBNull.Value)
+                            item.Brand = (string)reader["brand"];
+                        if (reader["input_voltage"] != DBNull.Value)
+                            item.InputVoltage = (decimal)reader["input_voltage"];
 
                         list.Add(item);
                     }
@@ -240,7 +292,8 @@ namespace HovedOppgave.Models
         }
         public Device GetDevice(int deviceId)
         {
-            string query = "select * from device where idDevice = '" + deviceId + "'";
+            //string query = "select * from device d where idDevice = '" + deviceId + "' and d.idDevice not in(select * from log_event l where l.device_id = '" + deviceId + "' and l.event_type = '12'";
+            string query = "select * from device d where idDevice = '" + deviceId + "'";
             Device device = new Device();
 
             //Sjekke for åpen connection mot db
@@ -255,40 +308,27 @@ namespace HovedOppgave.Models
 
                     while (reader.Read())
                     {
-                        var id = reader["idDevice"];
-                        var name = reader["name"];
-                        var roomId = reader["default_location"];
-                        var description = reader["description"];
-                        var deviceTypeId = reader["type"];
-                        var serialNum = reader["serial_num"];
-                        var height = reader["height"];
-                        var weigth = reader["weight"];
-                        var isRackMountable = reader["isRackMountable"];
-                        var model = reader["model"];
-                        var brand = reader["brand"];
-                        var inputVoltage = reader["input_voltage"];
-
-                        device.DeviceID = Convert.ToInt32(id);
-                        device.DeviceTypeID = Convert.ToInt32(deviceTypeId);
-                        device.RoomID = Convert.ToInt32(roomId);
-                        if (name != DBNull.Value)
-                            device.Name = (string)name;
-                        if (description != DBNull.Value)
-                            device.Description = (string)description;
-                        if (serialNum != DBNull.Value)
-                            device.SerialNum = (string)serialNum;
-                        if (height != DBNull.Value)
-                            device.Height = Convert.ToInt32(height);
-                        if (weigth != DBNull.Value)
-                            device.Weight = Convert.ToInt32(weigth);
-                        if (isRackMountable != DBNull.Value)
-                            device.IsRackMountable = (bool)isRackMountable;
-                        if (model != DBNull.Value)
-                            device.Model = (string)model;
-                        if (brand != DBNull.Value)
-                            device.Brand = (string)brand;
-                        if (inputVoltage != DBNull.Value)
-                            device.InputVoltage = (decimal)inputVoltage;
+                        device.DeviceID = Convert.ToInt32(reader["idDevice"]);
+                        device.DeviceTypeID = Convert.ToInt32(reader["type"]);
+                        device.RoomID = Convert.ToInt32(reader["default_location"]);
+                        if (reader["name"] != DBNull.Value)
+                            device.Name = (string)reader["name"];
+                        if (reader["description"] != DBNull.Value)
+                            device.Description = (string)reader["description"];
+                        if (reader["serial_num"] != DBNull.Value)
+                            device.SerialNum = (string)reader["serial_num"];
+                        if (reader["height"] != DBNull.Value)
+                            device.Height = Convert.ToInt32(reader["height"]);
+                        if (reader["weight"] != DBNull.Value)
+                            device.Weight = Convert.ToInt32(reader["weight"]);
+                        if (reader["isRackMountable"] != DBNull.Value)
+                            device.IsRackMountable = (bool)reader["isRackMountable"];
+                        if (reader["model"] != DBNull.Value)
+                            device.Model = (string)reader["model"];
+                        if (reader["brand"] != DBNull.Value)
+                            device.Brand = (string)reader["brand"];
+                        if (reader["input_voltage"] != DBNull.Value)
+                            device.InputVoltage = (decimal)reader["input_voltage"];
                     }
                     reader.Close();
                     //close connection
@@ -306,6 +346,81 @@ namespace HovedOppgave.Models
         #region DeviceConnector Queries
         #endregion
         #region DeviceType Queries
+        public List<DeviceType> GetAllDeviceTypes()
+        {
+            string query = "select * from device_type";
+            List<DeviceType> list = new List<DeviceType>();
+
+            //Sjekke for åpen connection mot db
+            if (this.OpenConnection() == true)
+            {
+                //Lager en kommando
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                try
+                {
+                    //lage en data reader og utfører kommandoen
+                    MySqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        var item = new DeviceType();
+                        item.DeviceTypeID = Convert.ToInt32(reader["iddevice_type"]);
+                        item.CanCalibrateID = Convert.ToInt32(reader["can_calibrate"]);
+                        if (reader["type"] != DBNull.Value)
+                            item.Type = (string)reader["type"];
+                        if (reader["description"] != DBNull.Value)
+                            item.Description = (string)reader["description"];
+
+                        list.Add(item);
+                    }
+                    reader.Close();
+                    //close connection
+                    this.CloseConnection();
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            return list;
+        }
+        public DeviceType GetDeviceType(int deviceTypeId)
+        {
+            string query = "select * from device where iddevice_type = '" + deviceTypeId + "'";
+            DeviceType deviceType = new DeviceType();
+
+            //Sjekke for åpen connection mot db
+            if (this.OpenConnection() == true)
+            {
+                //Lager en kommando
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                try
+                {
+                    //lage en data reader og utfører kommandoen
+                    MySqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        deviceType.DeviceTypeID = Convert.ToInt32(reader["iddevice_type"]);
+                        deviceType.CanCalibrateID = Convert.ToInt32(reader["can_calibrate"]);
+                        if (reader["type"] != DBNull.Value)
+                            deviceType.Type = (string)reader["type"];
+                        if (reader["description"] != DBNull.Value)
+                            deviceType.Description = (string)reader["description"];
+                    }
+                    reader.Close();
+                    //close connection
+                    this.CloseConnection();
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            return deviceType;
+        }
         #endregion
         #region EventType Queries
         public List<EventType> GetAllEventTypes()
@@ -387,9 +502,9 @@ namespace HovedOppgave.Models
         }
         #endregion
         #region FileQueries
-        public bool CreateFile(Files file)
+        public int CreateFile(Files file)
         {
-            string query = "Insert into files (filename, filepath, filetype, filesize, date) values('" + file.FileName + "','" + file.FilePath + "','" + file.FileType + "','" + file.FileSize + "','" + file.Date.ToString("yyyy-MM-dd HH:mm:ss") + "')";
+            string query = "Insert into files (filename, filepath, filetype, filesize, date) values('" + file.FileName + "','" + file.FilePath + "','" + file.FileType + "','" + file.FileSize + "','" + file.Date.ToString("yyyy-MM-dd HH:mm:ss") + "'); select last_insert_id();";
 
             if (this.OpenConnection())
             {
@@ -398,10 +513,13 @@ namespace HovedOppgave.Models
                 try
                 {
                     //Execute query
-                    cmd.ExecuteReader();
+                    IDataReader reader = cmd.ExecuteReader();
+                    int id = 0;
+                    while (reader != null && reader.Read())
+                        id = reader.GetInt32(0);
                     //close connection
                     this.CloseConnection();
-                    return true;
+                    return id;
                 }
                 catch
                 {
@@ -409,11 +527,11 @@ namespace HovedOppgave.Models
                     this.CloseConnection();
                 }
             }
-            return false;
+            return 0;
         }
         public List<Files> GetAllFiles()
         {
-            string query = "select * from files";
+            string query = "select * from files where deleted = '0'";
             List<Files> list = new List<Files>();
 
             //Sjekke for åpen connection mot db
@@ -429,24 +547,19 @@ namespace HovedOppgave.Models
 
                     while (reader.Read())
                     {
-                        var id = reader["fileid"];
-                        var name = reader["filename"];
-                        var path = reader["filepath"];
-                        var type = reader["filetype"];
-                        var size = reader["filesize"];
-                        var date = reader["date"];
-
                         var item = new Files();
-                        item.FileID = Convert.ToInt32(id);
-                        if (name != DBNull.Value)
-                            item.FileName = (string)name;
-                        item.FilePath = (string)path;
-                        if(type != DBNull.Value)
-                            item.FileType = (string)type;
-                        if (size != DBNull.Value)
-                            item.FileSize= Convert.ToInt32(size);
-                        item.Date = Convert.ToDateTime(date);
-                        
+                        item.FileID = Convert.ToInt32(reader["fileid"]);
+                        if (reader["filename"] != DBNull.Value)
+                            item.FileName = (string)reader["filename"];
+                        item.FilePath = (string)reader["filepath"];
+                        if (reader["filetype"] != DBNull.Value)
+                            item.FileType = (string)reader["filetype"];
+                        if (reader["filesize"] != DBNull.Value)
+                            item.FileSize = Convert.ToInt32(reader["filesize"]);
+                        item.Date = Convert.ToDateTime(reader["date"]);
+                        if ((reader["deleted"]) != null)
+                            item.Kassert = (bool)reader["deleted"];
+
                         list.Add(item);
                     }
                     reader.Close();
@@ -478,22 +591,17 @@ namespace HovedOppgave.Models
 
                     while (reader.Read())
                     {
-                        var id = reader["fileid"];
-                        var name = reader["filename"];
-                        var path = reader["filepath"];
-                        var type = reader["filetype"];
-                        var size = reader["filesize"];
-                        var date = reader["date"];
-
-                        file.FileID = Convert.ToInt32(id);
-                        if (name != DBNull.Value)
-                            file.FileName = (string)name;
-                        file.FilePath = (string)path;
-                        if (type != DBNull.Value)
-                            file.FileType = (string)type;
-                        if (size != DBNull.Value)
-                            file.FileSize = Convert.ToInt32(size);
-                        file.Date = Convert.ToDateTime(date);
+                        file.FileID = Convert.ToInt32(reader["fileid"]);
+                        if (reader["filename"] != DBNull.Value)
+                            file.FileName = (string)reader["filename"];
+                        file.FilePath = (string)reader["filepath"];
+                        if (reader["filetype"] != DBNull.Value)
+                            file.FileType = (string)reader["filetype"];
+                        if (reader["filesize"] != DBNull.Value)
+                            file.FileSize = Convert.ToInt32(reader["filesize"]);
+                        file.Date = Convert.ToDateTime(reader["date"]);
+                        if ((reader["deleted"]) != null)
+                            file.Kassert = (bool)reader["deleted"];
                     }
                     reader.Close();
                     //close connection
@@ -521,11 +629,81 @@ namespace HovedOppgave.Models
             this.CloseConnection();
             return false;
         }
+        public Files GetLastInsertedFile()
+        {
+            string query = "select * from files where fileid = select last_insert_id();";
+            Files file = new Files();
+
+            //Sjekke for åpen connection mot db
+            if (this.OpenConnection() == true)
+            {
+                //Lager en kommando
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                try
+                {
+                    //lage en data reader og utfører kommandoen
+                    MySqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        file.FileID = Convert.ToInt32(reader["fileid"]);
+                        if (reader["filename"] != DBNull.Value)
+                            file.FileName = (string)reader["filename"];
+                        file.FilePath = (string)reader["filepath"];
+                        if (reader["filetype"] != DBNull.Value)
+                            file.FileType = (string)reader["filetype"];
+                        if (reader["filesize"] != DBNull.Value)
+                            file.FileSize = Convert.ToInt32(reader["filesize"]);
+                        file.Date = Convert.ToDateTime(reader["date"]);
+                        if ((reader["deleted"]) != null)
+                            file.Kassert = (bool)reader["deleted"];
+                    }
+                    reader.Close();
+                    //close connection
+                    this.CloseConnection();
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            return file;
+        }
+        public bool EditFile(Files file)
+        {
+            string query = "UPDATE files SET filename='" + file.FileName + "', filepath='" + file.FilePath + "', filetype='" + file.FileType + "', filesize='" + file.FileSize + "', date='" + file.Date.ToString("yyyy-MM-dd") + "', deleted='" + file.Kassert + "'";
+
+            //Open connection
+            if (this.OpenConnection())
+            {
+                //create mysql command with cmdtext and connection
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                try
+                {
+                    //Execute query
+                    cmd.ExecuteNonQuery();
+                    //close connection
+                    this.CloseConnection();
+                    return true;
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            return false;
+        }
         #endregion
         #region LogEvent Queries
-        public void CreateKalibreringLogEvent(LogEvent logEvent)
+        public bool CreateLogEvent(LogEvent logEvent)
         {
-            string query = "Insert into log_event (event_type, device_id, event_registered_date, event_start_date, event_end_date, data_file, event_data1, event_data2, event_contact, event_location) values('" + logEvent.EventTypeID + "','" + logEvent.DeviceID + "','" + logEvent.RegisteredDate.ToString("yyyy-MM-dd HH:mm:ss") + "','" + logEvent.StartDate.ToString("yyyy-MM-dd HH:mm:ss") + "','" + logEvent.EndDate.ToString("yyyy-MM-dd HH:mm:ss") + "','" + logEvent.FileID + "','" + logEvent.Data1 + "','" + logEvent.Data2 + "','" + logEvent.ContactID + "','" + logEvent.RoomID + "')";
+            string query = null;
+            if(logEvent.FileID != 0)
+                query = "Insert into log_event (event_type, device_id, event_registered_date, event_start_date, event_end_date, data_file, event_data1, event_data2, event_company, event_location) values('" + logEvent.EventTypeID + "','" + logEvent.DeviceID + "','" + logEvent.RegisteredDate.ToString("yyyy-MM-dd HH:mm:ss") + "','" + logEvent.StartDate.ToString("yyyy-MM-dd HH:mm:ss") + "','" + logEvent.EndDate.ToString("yyyy-MM-dd HH:mm:ss") + "','" + logEvent.FileID + "','" + logEvent.Data1 + "','" + logEvent.Data2 + "','" + logEvent.CompanyID + "','" + logEvent.RoomID + "')";
+            else
+                query = "Insert into log_event (event_type, device_id, event_registered_date, event_start_date, event_end_date, event_data1, event_data2, event_company, event_location) values('" + logEvent.EventTypeID + "','" + logEvent.DeviceID + "','" + logEvent.RegisteredDate.ToString("yyyy-MM-dd HH:mm:ss") + "','" + logEvent.StartDate.ToString("yyyy-MM-dd HH:mm:ss") + "','" + logEvent.EndDate.ToString("yyyy-MM-dd HH:mm:ss") + "','" + logEvent.Data1 + "','" + logEvent.Data2 + "','" + logEvent.CompanyID + "','" + logEvent.RoomID + "')";
 
             if (this.OpenConnection())
             {
@@ -537,6 +715,7 @@ namespace HovedOppgave.Models
                     cmd.ExecuteReader();
                     //close connection
                     this.CloseConnection();
+                    return true;
                 }
                 catch
                 {
@@ -544,6 +723,7 @@ namespace HovedOppgave.Models
                     this.CloseConnection();
                 }
             }
+            return false;
         }
         public List<LogEvent> GetAllLogEvent()
         {
@@ -563,35 +743,23 @@ namespace HovedOppgave.Models
 
                     while (reader.Read())
                     {
-                        var id = reader["event_id"];
-                        var eventTypeId = reader["event_type"];
-                        var deviceId = reader["device_id"];
-                        var eventLocationId = reader["event_location"];
-                        var eventContactId = reader["event_contact"];
-                        var fileId = reader["data_file"];
-                        var registeredDate = reader["event_registered_date"];
-                        var startDate = reader["event_start_date"];
-                        var endDate = reader["event_end_date"];
-                        var data1 = reader["event_data1"];
-                        var data2 = reader["event_data2"];
-
                         var item = new LogEvent();
-                        item.LogEventID = Convert.ToInt32(id);
-                        item.EventTypeID = Convert.ToInt32(eventTypeId);
-                        item.RoomID = Convert.ToInt32(eventLocationId);
-                        item.ContactID = Convert.ToInt32(eventContactId);
-                        item.DeviceID = Convert.ToInt32(deviceId);
-                        item.RegisteredDate = Convert.ToDateTime(registeredDate);
-                        if(fileId != DBNull.Value)
-                            item.FileID = Convert.ToInt32(fileId);
-                        if (startDate != DBNull.Value)
-                            item.StartDate = Convert.ToDateTime(startDate);
-                        if (endDate != DBNull.Value)
-                            item.EndDate = Convert.ToDateTime(endDate);
-                        if (data1 != DBNull.Value)
-                            item.Data1 = (string)data1;
-                        if (data2 != DBNull.Value)
-                            item.Data2 = (string)data2;
+                        item.LogEventID = Convert.ToInt32(reader["event_id"]);
+                        item.EventTypeID = Convert.ToInt32(reader["event_type"]);
+                        item.RoomID = Convert.ToInt32(reader["event_location"]);
+                        item.CompanyID = Convert.ToInt32(reader["event_company"]);
+                        item.DeviceID = Convert.ToInt32(reader["device_id"]);
+                        item.RegisteredDate = Convert.ToDateTime(reader["event_registered_date"]);
+                        if(reader["data_file"] != DBNull.Value)
+                            item.FileID = Convert.ToInt32(reader["data_file"]);
+                        if (reader["event_start_date"] != DBNull.Value)
+                            item.StartDate = Convert.ToDateTime(reader["event_start_date"]);
+                        if (reader["event_end_date"] != DBNull.Value)
+                            item.EndDate = Convert.ToDateTime(reader["event_end_date"]);
+                        if (reader["event_data1"] != DBNull.Value)
+                            item.Data1 = (string)reader["event_data1"];
+                        if (reader["event_data2"] != DBNull.Value)
+                            item.Data2 = (string)reader["event_data2"];
 
                         list.Add(item);
                     }
@@ -623,34 +791,22 @@ namespace HovedOppgave.Models
                     MySqlDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
-                        var id = reader["event_id"];
-                        var eventTypeId = reader["event_type"];
-                        var deviceId = reader["device_id"];
-                        var eventLocationId = reader["event_location"];
-                        var eventContactId = reader["event_contact"];
-                        var fileId = reader["data_file"];
-                        var registeredDate = reader["event_registered_date"];
-                        var startDate = reader["event_start_date"];
-                        var endDate = reader["event_end_date"];
-                        var data1 = reader["event_data1"];
-                        var data2 = reader["event_data2"];
-
-                        logEvent.LogEventID = Convert.ToInt32(id);
-                        logEvent.EventTypeID = Convert.ToInt32(eventTypeId);
-                        logEvent.RoomID = Convert.ToInt32(eventLocationId);
-                        logEvent.ContactID = Convert.ToInt32(eventContactId);
-                        logEvent.DeviceID = Convert.ToInt32(deviceId);
-                        logEvent.RegisteredDate = Convert.ToDateTime(registeredDate);
-                        if (startDate != DBNull.Value)
-                            logEvent.StartDate = Convert.ToDateTime(startDate);
-                        if (endDate != DBNull.Value)
-                            logEvent.EndDate = Convert.ToDateTime(endDate);
-                        if (fileId != DBNull.Value)
-                            logEvent.FileID = Convert.ToInt32(fileId);
-                        if (data1 != DBNull.Value)
-                            logEvent.Data1 = (string)data1;
-                        if (data2 != DBNull.Value)
-                            logEvent.Data2 = (string)data2;
+                        logEvent.LogEventID = Convert.ToInt32(reader["event_id"]);
+                        logEvent.EventTypeID = Convert.ToInt32(reader["event_type"]);
+                        logEvent.RoomID = Convert.ToInt32(reader["event_location"]);
+                        logEvent.CompanyID = Convert.ToInt32(reader["event_company"]);
+                        logEvent.DeviceID = Convert.ToInt32(reader["device_id"]);
+                        logEvent.RegisteredDate = Convert.ToDateTime(reader["event_registered_date"]);
+                        if (reader["data_file"] != DBNull.Value)
+                            logEvent.FileID = Convert.ToInt32(reader["data_file"]);
+                        if (reader["event_start_date"] != DBNull.Value)
+                            logEvent.StartDate = Convert.ToDateTime(reader["event_start_date"]);
+                        if (reader["event_end_date"] != DBNull.Value)
+                            logEvent.EndDate = Convert.ToDateTime(reader["event_end_date"]);
+                        if (reader["event_data1"] != DBNull.Value)
+                            logEvent.Data1 = (string)reader["event_data1"];
+                        if (reader["event_data2"] != DBNull.Value)
+                            logEvent.Data2 = (string)reader["event_data2"];
                     }
                     reader.Close();
                     //close connection
@@ -666,7 +822,7 @@ namespace HovedOppgave.Models
         }
         public bool EditLogEvent(LogEvent logEvent)
         {
-            string query = "UPDATE log_event SET event_type='" + logEvent.EventTypeID + "', device_id='" + logEvent.DeviceID + "', event_contact='" + logEvent.ContactID + "', event_location='" + logEvent.RoomID + "', event_registered_date='" + logEvent.RegisteredDate.Date.ToString("yyyy-MM-dd") + "', event_start_date='" + logEvent.StartDate.Date.ToString("yyyy-MM-dd") + "', event_end_date='" + logEvent.EndDate.Date.ToString("yyyy-MM-dd") + "', data_file='" + logEvent.FileID + "', event_data1='" + logEvent.Data1 + "', event_data2='" + logEvent.Data2 + "' WHERE event_id='" + logEvent.LogEventID + "'";
+            string query = "UPDATE log_event SET event_type='" + logEvent.EventTypeID + "', device_id='" + logEvent.DeviceID + "', event_company='" + logEvent.CompanyID + "', event_location='" + logEvent.RoomID + "', event_registered_date='" + logEvent.RegisteredDate.Date.ToString("yyyy-MM-dd") + "', event_start_date='" + logEvent.StartDate.Date.ToString("yyyy-MM-dd") + "', event_end_date='" + logEvent.EndDate.Date.ToString("yyyy-MM-dd") + "', data_file='" + logEvent.FileID + "', event_data1='" + logEvent.Data1 + "', event_data2='" + logEvent.Data2 + "' WHERE event_id='" + logEvent.LogEventID + "'";
 
             //Open connection
             if (this.OpenConnection())
@@ -706,35 +862,23 @@ namespace HovedOppgave.Models
                     MySqlDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
-                        var id = reader["event_id"];
-                        var eventTypeId = reader["event_type"];
-                        var deviceId = reader["device_id"];
-                        var eventLocationId = reader["event_location"];
-                        var eventContactId = reader["event_contact"];
-                        var fileId = reader["data_file"];
-                        var registeredDate = reader["event_registered_date"];
-                        var startDate = reader["event_start_date"];
-                        var endDate = reader["event_end_date"];
-                        var data1 = reader["event_data1"];
-                        var data2 = reader["event_data2"];
-
                         var item = new LogEvent();
-                        item.LogEventID = Convert.ToInt32(id);
-                        item.EventTypeID = Convert.ToInt32(eventTypeId);
-                        item.RoomID = Convert.ToInt32(eventLocationId);
-                        item.ContactID = Convert.ToInt32(eventContactId);
-                        item.DeviceID = Convert.ToInt32(deviceId);
-                        item.RegisteredDate = Convert.ToDateTime(registeredDate);
-                        if (startDate != DBNull.Value)
-                            item.StartDate = Convert.ToDateTime(startDate);
-                        if (endDate != DBNull.Value)
-                            item.EndDate = Convert.ToDateTime(endDate);
-                        if (fileId != DBNull.Value)
-                            item.FileID = Convert.ToInt32(fileId);
-                        if (data1 != DBNull.Value)
-                            item.Data1 = (string)data1;
-                        if (data2 != DBNull.Value)
-                            logEvent.Data2 = (string)data2;
+                        item.LogEventID = Convert.ToInt32(reader["event_id"]);
+                        item.EventTypeID = Convert.ToInt32(reader["event_type"]);
+                        item.RoomID = Convert.ToInt32(reader["event_location"]);
+                        item.CompanyID = Convert.ToInt32(reader["event_company"]);
+                        item.DeviceID = Convert.ToInt32(reader["device_id"]);
+                        item.RegisteredDate = Convert.ToDateTime(reader["event_registered_date"]);
+                        if (reader["data_file"] != DBNull.Value)
+                            item.FileID = Convert.ToInt32(reader["data_file"]);
+                        if (reader["event_start_date"] != DBNull.Value)
+                            item.StartDate = Convert.ToDateTime(reader["event_start_date"]);
+                        if (reader["event_end_date"] != DBNull.Value)
+                            item.EndDate = Convert.ToDateTime(reader["event_end_date"]);
+                        if (reader["event_data1"] != DBNull.Value)
+                            item.Data1 = (string)reader["event_data1"];
+                        if (reader["event_data2"] != DBNull.Value)
+                            item.Data2 = (string)reader["event_data2"];
 
                         list.Add(item);
                     }
@@ -771,35 +915,23 @@ namespace HovedOppgave.Models
                     MySqlDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
-                        var id = reader["event_id"];
-                        var eventTypeId = reader["event_type"];
-                        var deviceId = reader["device_id"];
-                        var eventLocationId = reader["event_location"];
-                        var eventContactId = reader["event_contact"];
-                        var fileID = reader["data_file"];
-                        var registeredDate = reader["event_registered_date"];
-                        var startDate = reader["event_start_date"];
-                        var endDate = reader["event_end_date"];
-                        var data1 = reader["event_data1"];
-                        var data2 = reader["event_data2"];
-
                         var item = new LogEvent();
-                        item.LogEventID = Convert.ToInt32(id);
-                        item.EventTypeID = Convert.ToInt32(eventTypeId);
-                        item.RoomID = Convert.ToInt32(eventLocationId);
-                        item.ContactID = Convert.ToInt32(eventContactId);
-                        item.DeviceID = Convert.ToInt32(deviceId);
-                        item.RegisteredDate = Convert.ToDateTime(registeredDate);
-                        if (startDate != DBNull.Value)
-                            item.StartDate = Convert.ToDateTime(startDate);
-                        if (endDate != DBNull.Value)
-                            item.EndDate = Convert.ToDateTime(endDate);
-                        if (fileID != DBNull.Value)
-                            item.FileID = Convert.ToInt32(fileID);
-                        if (data1 != DBNull.Value)
-                            item.Data1 = (string)data1;
-                        if (data2 != DBNull.Value)
-                            logEvent.Data2 = (string)data2;
+                        item.LogEventID = Convert.ToInt32(reader["event_id"]);
+                        item.EventTypeID = Convert.ToInt32(reader["event_type"]);
+                        item.RoomID = Convert.ToInt32(reader["event_location"]);
+                        item.CompanyID = Convert.ToInt32(reader["event_company"]);
+                        item.DeviceID = Convert.ToInt32(reader["device_id"]);
+                        item.RegisteredDate = Convert.ToDateTime(reader["event_registered_date"]);
+                        if (reader["data_file"] != DBNull.Value)
+                            item.FileID = Convert.ToInt32(reader["data_file"]);
+                        if (reader["event_start_date"] != DBNull.Value)
+                            item.StartDate = Convert.ToDateTime(reader["event_start_date"]);
+                        if (reader["event_end_date"] != DBNull.Value)
+                            item.EndDate = Convert.ToDateTime(reader["event_end_date"]);
+                        if (reader["event_data1"] != DBNull.Value)
+                            item.Data1 = (string)reader["event_data1"];
+                        if (reader["event_data2"] != DBNull.Value)
+                            item.Data2 = (string)reader["event_data2"];
 
                         list.Add(item);
                     }
@@ -813,10 +945,60 @@ namespace HovedOppgave.Models
                     this.CloseConnection();
                 }
             }
-            list.Reverse();
+            list.OrderBy(x => x.LogEventID).Reverse();
             logEvent = list.FirstOrDefault();
 
             return logEvent;
+        }
+        public List<LogEvent> GetAllLogEventToEventType(int eventTypeId)
+        {
+            string query = "select * from log_event where event_type='" + eventTypeId + "'";
+            List<LogEvent> list = new List<LogEvent>();
+
+            //Sjekke for åpen connection mot db
+            if (this.OpenConnection())
+            {
+                //Lager en kommando
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                try
+                {
+                    //lage en data reader og utfører kommandoen
+                    MySqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        var item = new LogEvent();
+                        item.LogEventID = Convert.ToInt32(reader["event_id"]);
+                        item.EventTypeID = Convert.ToInt32(reader["event_type"]);
+                        item.RoomID = Convert.ToInt32(reader["event_location"]);
+                        item.CompanyID = Convert.ToInt32(reader["event_company"]);
+                        item.DeviceID = Convert.ToInt32(reader["device_id"]);
+                        item.RegisteredDate = Convert.ToDateTime(reader["event_registered_date"]);
+                        if (reader["data_file"] != DBNull.Value)
+                            item.FileID = Convert.ToInt32(reader["data_file"]);
+                        if (reader["event_start_date"] != DBNull.Value)
+                            item.StartDate = Convert.ToDateTime(reader["event_start_date"]);
+                        if (reader["event_end_date"] != DBNull.Value)
+                            item.EndDate = Convert.ToDateTime(reader["event_end_date"]);
+                        if (reader["event_data1"] != DBNull.Value)
+                            item.Data1 = (string)reader["event_data1"];
+                        if (reader["event_data2"] != DBNull.Value)
+                            item.Data2 = (string)reader["event_data2"];
+
+                        list.Add(item);
+                    }
+                    reader.Close();
+                    //close connection
+                    this.CloseConnection();
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            return list;
         }
         #endregion
         #region NetworkInfo Queries
@@ -826,9 +1008,9 @@ namespace HovedOppgave.Models
         #region PostCode Queries
         #endregion
         #region Rights Queries
-        public Rights GetRightToUser(int userID)
+        public Rights GetRightToUser(User user)
         {
-            string query = "select * from rights where id =" + userID;
+            string query = "select * from rights where rightsid =" + user.RightsID;
             Rights right = new Rights();
 
             if (this.OpenConnection())
@@ -842,12 +1024,8 @@ namespace HovedOppgave.Models
                     MySqlDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
-                        var id = reader["rightsid"];
-                        var name = reader["name"];
-
-                        right.RightsID = (int)id;
-                        if (name != DBNull.Value)
-                            right.Name = (string)name;
+                        right.RightsID = Convert.ToInt32(reader["rightsId"]);
+                        right.Name = (string)reader["rightName"];
                     }
                     reader.Close();
                     //close connection
@@ -878,13 +1056,9 @@ namespace HovedOppgave.Models
 
                     while (reader.Read())
                     {
-                        var id = reader["rightsid"];
-                        var name = reader["name"];
-
                         var item = new Rights();
-                        item.RightsID = (int)id;
-                        if (name != DBNull.Value)
-                            item.Name = (string)name;
+                        item.RightsID = Convert.ToInt32(reader["rightsId"]);
+                        item.Name = (string)reader["rightName"];
 
                         list.Add(item);
                     }
@@ -918,18 +1092,13 @@ namespace HovedOppgave.Models
                     MySqlDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
-                        var id = reader["id"];
-                        var name = reader["name"];
-                        var description = reader["description"];
-                        var buildingId = reader["building_id"];
-
                         var item = new Room();
-                        item.RoomID = Convert.ToInt32(id);
-                        item.BuildingID = Convert.ToInt32(buildingId);
-                        if (name != DBNull.Value)
-                            item.Name = (string)name;
-                        if (description != DBNull.Value)
-                            item.Description = (string)description;
+                        item.RoomID = Convert.ToInt32(reader["id"]);
+                        item.BuildingID = Convert.ToInt32(reader["building_id"]);
+                        if (reader["name"] != DBNull.Value)
+                            item.Name = (string)reader["name"];
+                        if (reader["description"] != DBNull.Value)
+                            item.Description = (string)reader["description"];
 
                         list.Add(item);
                     }
@@ -961,17 +1130,12 @@ namespace HovedOppgave.Models
                     MySqlDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
-                        var id = reader["id"];
-                        var name = reader["name"];
-                        var description = reader["description"];
-                        var buildingId = reader["building_id"];
-
-                        room.RoomID = Convert.ToInt32(id);
-                        room.BuildingID = Convert.ToInt32(buildingId);
-                        if (name != DBNull.Value)
-                            room.Name = (string)name;
-                        if (description != DBNull.Value)
-                            room.Description = (string)description;
+                        room.RoomID = Convert.ToInt32(reader["id"]);
+                        room.BuildingID = Convert.ToInt32(reader["building_id"]);
+                        if (reader["name"] != DBNull.Value)
+                            room.Name = (string)reader["name"];
+                        if (reader["description"] != DBNull.Value)
+                            room.Description = (string)reader["description"];
                     }
                     reader.Close();
                     //close connection
@@ -989,14 +1153,62 @@ namespace HovedOppgave.Models
         #region SignalStandard Queries
         #endregion
         #region User Queries
-        public User GetUserWithRights(int userID, Constants.Rights rights)
+        public UserRight GetUserWithRights(int userID, Constant.Rights rights)
         {
-            
-            return null;
+            string query = "select * from user u, rights r where u.iduser='" + userID + "' and r.rightName='" + rights + "'";
+            User user = new User();
+            Rights right = new Rights();
+            if (this.OpenConnection())
+            {
+                //Lager en kommando
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                try
+                {
+                    //lage en data reader og utfører kommandoen
+                    MySqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        user.UserId = Convert.ToInt32(reader["iduser"]);
+                        user.RightsID = Convert.ToInt32(reader["rightsid"]);
+                        if (reader["name"] != DBNull.Value)
+                            user.Name = (string)reader["name"];
+                        if (reader["email"] != DBNull.Value)
+                            user.Email = (string)reader["email"];
+                        if (reader["passhash"] != DBNull.Value)
+                            user.PassHash = (string)reader["passhash"];
+                        if (reader["passsalt"] != DBNull.Value)
+                            user.PassSalt = (string)reader["passsalt"];
+
+                        right.RightsID = Convert.ToInt32(reader["rightsId"]);
+                        right.Name = (string)reader["rightName"];
+                    }
+                    reader.Close();
+                    //close connection
+                    this.CloseConnection();
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            if (right.RightsID == user.RightsID)
+            {
+                UserRight model = new UserRight()
+                {
+                    user = user,
+                    rights = right
+                };
+                return model;
+            }
+            else
+                return null;
         }
         public User GetUser(int userID)
         {
-            string query = "select * from user where id =" + userID;
+            string query = "select * from user where iduser =" + userID;
             User user = new User();
 
             if (this.OpenConnection())
@@ -1011,23 +1223,16 @@ namespace HovedOppgave.Models
 
                     while (reader.Read())
                     {
-                        var id = reader["iduser"];
-                        var name = reader["name"];
-                        var email = reader["email"];
-                        var passhash = reader["passhash"];
-                        var passsalt = reader["passsalt"];
-                        var rightsId = reader["rightsid"];
-
-                        user.UserId = (int)id;
-                        user.RightsID = (int)rightsId;
-                        if (name != DBNull.Value)
-                            user.Name = (string)name;
-                        if (email != DBNull.Value)
-                            user.Email = (string)email;
-                        if (passhash != DBNull.Value)
-                            user.PassHash = (string)passhash;
-                        if (passsalt != DBNull.Value)
-                            user.PassSalt = (string)passsalt;
+                        user.UserId = Convert.ToInt32(reader["iduser"]);
+                        user.RightsID = Convert.ToInt32(reader["rightsid"]);
+                        if (reader["name"] != DBNull.Value)
+                            user.Name = (string)reader["name"];
+                        if (reader["email"] != DBNull.Value)
+                            user.Email = (string)reader["email"];
+                        if (reader["passhash"] != DBNull.Value)
+                            user.PassHash = (string)reader["passhash"];
+                        if (reader["passsalt"] != DBNull.Value)
+                            user.PassSalt = (string)reader["passsalt"];
                     }
                     reader.Close();
                     //close connection
@@ -1062,6 +1267,89 @@ namespace HovedOppgave.Models
                     this.CloseConnection();
                 }
             }
+        }
+        public User AuthenticateLogin(User user)
+        {
+            string query = "Select * from user where name='" + user.Name + "' and passhash='" + user.PassHash + "' and passsalt='" + user.PassSalt + "'";
+            User returnUser = null;
+
+            if(this.OpenConnection())
+            {
+                //Lager en kommando med query og forbindelse
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                try
+                {
+                    //lage en data reader og utfører kommandoen
+                    MySqlDataReader reader = cmd.ExecuteReader();
+
+                    //sjekker om reader har noen verdi, viss den har er login true
+                    while(reader.Read())
+                    {
+                        returnUser.UserId = Convert.ToInt32(reader["iduser"]);
+                        returnUser.RightsID = Convert.ToInt32(reader["rightsid"]);
+                        if (reader["name"] != DBNull.Value)
+                            returnUser.Name = (string)reader["name"];
+                        if (reader["email"] != DBNull.Value)
+                            returnUser.Email = (string)reader["email"];
+                        if (reader["passhash"] != DBNull.Value)
+                            returnUser.PassHash = (string)reader["passhash"];
+                        if (reader["passsalt"] != DBNull.Value)
+                            returnUser.PassSalt = (string)reader["passsalt"];
+                    }
+                    reader.Close();
+                    this.CloseConnection();
+                }
+                catch
+                {
+                    //stenger tilkoblingen opp mot db
+                    this.CloseConnection();
+                }
+            }
+            return returnUser;
+        }
+        public List<User> GetAllUsers()
+        {
+            string query = "select * from user";
+            List<User> userList = new List<User>();
+
+            if (this.OpenConnection())
+            {
+                //Lager en kommando
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                try
+                {
+                    //lage en data reader og utfører kommandoen
+                    MySqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        var user = new User();
+                        user.UserId = Convert.ToInt32(reader["iduser"]);
+                        user.RightsID = Convert.ToInt32(reader["rightsid"]);
+                        if (reader["name"] != DBNull.Value)
+                            user.Name = (string)reader["name"];
+                        if (reader["email"] != DBNull.Value)
+                            user.Email = (string)reader["email"];
+                        if (reader["passhash"] != DBNull.Value)
+                            user.PassHash = (string)reader["passhash"];
+                        if (reader["passsalt"] != DBNull.Value)
+                            user.PassSalt = (string)reader["passsalt"];
+
+                        userList.Add(user);
+                    }
+                    reader.Close();
+                    //close connection
+                    this.CloseConnection();
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            return userList;
         }
         #endregion
     }

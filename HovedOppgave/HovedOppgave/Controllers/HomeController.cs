@@ -1,4 +1,6 @@
-﻿using System;
+﻿using HovedOppgave.Classes;
+using HovedOppgave.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -13,6 +15,7 @@ namespace HovedOppgave.Controllers
         public ActionResult Index()
         {
             var view = View();
+            SessionCheck.FindMaster();
             //view.MasterNam e= "_GuestLayout";
             return view;
         }

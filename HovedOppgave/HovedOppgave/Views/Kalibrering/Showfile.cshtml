@@ -1,4 +1,4 @@
-﻿@model HovedOppgave.Models.Files
+﻿@model HovedOppgave.Models.CalibrationViews
 @{
     ViewBag.Title = "Vis filen";
 }
@@ -23,12 +23,12 @@
 <script type="text/javascript">
 
     window.onload = function () {
-        var file = "file://localhost/@Model.FilePath";
+        var file = "file://localhost/@Model.File.FilePath";
         iFrame.src = file;
     }
 
     function Create() {
-        window.location.replace("/Kalibrering/Create");
+        window.location.replace("/Kalibrering/Create/" + 0);
     };
 
     function Overview() {
@@ -44,6 +44,6 @@
     };
 
     function Import() {
-        window.location.replace("/Kalibrering/Import");
+        window.location.replace("/Kalibrering/Import/" + 0);
     };
 </script>

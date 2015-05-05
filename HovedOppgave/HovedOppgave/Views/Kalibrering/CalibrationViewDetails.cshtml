@@ -23,31 +23,29 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.LogEvent.RegisteredDate)
+            @Html.DisplayName("Registrert dato")
         </dt>
         <dd>
             @Html.DisplayFor(model => model.LogEvent.RegisteredDate.Date)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.LogEvent.StartDate)
+            @Html.DisplayName("Planlagt dato")
         </dt>
         <dd>
             @Html.DisplayFor(model => model.LogEvent.StartDate.Date)
         </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.LogEvent.EndDate)
-        </dt>
+        <dt id="endDate"></dt>
         <dd>
             @Html.DisplayFor(model => model.LogEvent.EndDate.Date)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.LogEvent.Data1)
+            @Html.DisplayName("Data 1")
         </dt>
         <dd>
             @Html.DisplayFor(model => model.LogEvent.Data1)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.LogEvent.Data2)
+            @Html.DisplayName("Data 2")
         </dt>
         <dd>
             @Html.DisplayFor(model => model.LogEvent.Data2)
@@ -60,10 +58,10 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.EventType.Name)
+            @Html.DisplayName("Event type")
         </dt>
         <dd>
-            @Html.ActionLink(Model.EventType.Name, "EventType", "Global", new { id = Model.EventType.EventTypeID }, null)
+            @Html.DisplayFor(model => model.EventType.Name)
         </dd>
     </dl>
 </div>
@@ -73,24 +71,20 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.Device.Name)
+            @Html.DisplayName("Enhet")
         </dt>
-        <dd>
-            @Html.ActionLink(Model.Device.Name, "Device", "Global", new { id = Model.Device.DeviceID }, null)
-        </dd>
+        <dd id="device"></dd>
     </dl>
 </div>
 
 <div class="col-lg-12">
-    <h4>Kontakt</h4>
+    <h4>Organisasjon</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.Contact.Name)
+            @Html.DisplayName("Kalibreres av")
         </dt>
-        <dd>
-            @Html.ActionLink(Model.Contact.Name, "Contact", "Global", new { id = Model.Contact.CompanyID }, null)
-        </dd>
+        <dd id="company"></dd>
     </dl>
 </div>
 
@@ -99,10 +93,10 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.Room.Name)
+            @Html.DisplayName("Navn")
         </dt>
         <dd>
-            @Html.ActionLink(Model.Room.Name, "Room", "Global", new { id = Model.Room.RoomID }, null)
+            @Html.DisplayFor(model => model.Room.Name)
         </dd>
     </dl>
 </div>
@@ -112,7 +106,7 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.File.FileName)
+            @Html.DisplayName("Fil navn")
         </dt>
         <dd>
             @Html.DisplayFor(model => model.File.FileName)
@@ -120,17 +114,30 @@
     </dl>
 </div>
 
+<button class="btn btn-default" type="button" id="button">Rediger kalibrering</button>
+
 <script type="text/javascript">
+    $(document).ready(function () {
+        var device = @Html.Raw(Json.Encode(Model.Device));
+        var company = @Html.Raw(Json.Encode(Model.Company));
+        
+        CalibrationViewsDetails(device, company);
+
+        $("#button").click(function() {
+            window.location.replace("/Kalibrering/EditCalibration/" + @Model.LogEvent.LogEventID)
+        });
+    });
+
     function Overview() {
         window.location.replace("/Kalibrering/Overview");
     };
 
     function Create() {
-        window.location.replace("/Kalibrering/Create");
+        window.location.replace("/Kalibrering/Create/" + 0);
     };
 
     function Import() {
-        window.location.replace("/Kalibrering/Import");
+        window.location.replace("/Kalibrering/Import/" + 0);
     };
 
     function History() {

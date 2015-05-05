@@ -1,10 +1,10 @@
-﻿@model IEnumerable<HovedOppgave.Models.CalibrationViews>
+﻿@model HovedOppgave.Models.CalibrationViews
 
 @{
     ViewBag.Title = "Kalibrering logg";
 }
 
-<h2>Kalibrering logg</h2>
+<h2>Logg</h2>
 
 <br />
 <div class="col-lg-offset-3">
@@ -21,218 +21,59 @@
     </div>
 </div>
 <br />
-
-<table class="table">
-    <thead id="thead">
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.LogEvent.RegisteredDate)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 0, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LogEvent.StartDate)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 1, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LogEvent.EndDate)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 2, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.File.FileName)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 3, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.File.FileType)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 4, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.LogEvent.Data1)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 4, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.LogEvent.Data2)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 5, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.EventType.Name)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 6, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Device.Name)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 7, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.Contact.Name)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 8, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.Room.Name)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 9, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-        </tr>
-    </thead>
-    <tbody id="tbody">
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LogEvent.RegisteredDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LogEvent.StartDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LogEvent.EndDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.File.FileName)
-                </td>
-                <td hidden="hidden">
-                    @Html.DisplayFor(modelItem => item.File.FileType)
-                </td>
-                <td hidden="hidden">
-                    @Html.DisplayFor(modelItem => item.LogEvent.Data1)
-                </td>
-                <td hidden="hidden">
-                    @Html.DisplayFor(modelItem => item.LogEvent.Data2)
-                </td>
-                <td hidden="hidden">
-                    @Html.DisplayFor(modelItem => item.EventType.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Device.Name)
-                </td>
-                <td hidden="hidden">
-                    @Html.DisplayFor(modelItem => item.Contact.Name)
-                </td>
-                <td hidden="hidden">
-                    @Html.DisplayFor(modelItem => item.Room.Name)
-                </td>
-                <td>
-                    @Html.ActionLink("Detaljer", "CalibrationViewDetails", new { id = item.LogEvent.LogEventID })
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div id="tableContainer"></div>
 
 <script type="text/javascript">
     var th, tb;
     var asc1 = 1, asc2 = 1, asc3 = 1;
 
-    window.onload = function () {
-        th = document.getElementById("thead");
-        tb = document.getElementById("tbody");
-    }
+    $(document).ready(function () {
+        $("#tableContainer").empty();
+        var roomList = @Html.Raw(Json.Encode(Model.Rooms));
+        var logEventList = @Html.Raw(Json.Encode(Model.LogEvents));
+        var eventTypeList = @Html.Raw(Json.Encode(Model.EventTypes));
+        var deviceList = @Html.Raw(Json.Encode(Model.Devices));
+        var companyList = @Html.Raw(Json.Encode(Model.Companys));
+        var fileList = @Html.Raw(Json.Encode(Model.Files));
 
-    function sortTable(tbody, colnumber, asc) {
-        var rows = tbody.rows,
-            rlength = rows.length,
-            arr = new Array(),
-            i, j, cells, clen;
-        for (i = 0; i < rlength; i++) {
-            cells = rows[i].cells;
-            clen = cells.length;
-            arr[i] = new Array();
-            for (j = 0; j < clen; j++) {
-                arr[i][j] = cells[j].innerHTML;
-            }
-        }
-        arr.sort(function (a, b) {
-            var glyph = th.children[0].children[colnumber].children[0].children[0];
-            if (glyph.className === "glyphicon glyphicon-arrow-up")
-                glyph.className = "glyphicon glyphicon-arrow-down";
-            else
-                glyph.className = "glyphicon glyphicon-arrow-up";
+        jQuery.each(eventTypeList, function(i, eventType) {
+            var h4 = document.createElement("h4");
+            h4.textContent = eventType["Name"];
 
-            return (a[colnumber] == b[colnumber]) ? 0 : ((a[colnumber] > b[colnumber]) ? asc : -1 * asc);
+            var table = document.createElement("table");
+            table.className = "table";
+            var thead = document.createElement("thead");
+            thead.setAttribute("id", "thead");
+            var tbody = document.createElement("tbody");
+            tbody.setAttribute("id", "tbody")
+
+            FillTableHead(thead, "calibration");
+
+            jQuery.each(logEventList, function(i, logEvent) {
+                if(String(eventType["EventTypeID"]).match(logEvent["EventTypeID"])) {
+                    var startDate = new Date($.parseJSON(String(logEvent["StartDate"]).substr(6, 13)));
+                    var endDate = new Date($.parseJSON(String(logEvent["EndDate"]).substr(6, 13)));
+                    
+                    FillCalibrationTableBoby(tbody, startDate, endDate, companyList, fileList, roomList, logEvent, null, deviceList);
+                }
+            });
+            AddTableToContainer(thead, tbody, h4, table, null, null, null, null);
         });
-        for (i = 0; i < rlength; i++) {
-            rows[i].innerHTML = "<td>" + arr[i].join("</td><td>") + "</td>";
-        }
-        for (i = 0; i < rlength; i++) {
-            var test = th.rows[i].children;
-            var item = rows[i].children;
-            for (j = 0; i < item.length - 1; i++) {
-                if (test[j].hidden)
-                    item[j].hidden = true;
-            }
-        }
-    }
 
-    function getColName() {
-        var numberOfCol = 11;
-        var ddl = document.getElementById("ddm");
-        ddl.innerHTML = "";
-        var child = th.children[0];
-        for (var i = 0; i < numberOfCol; i++) {
-            if (child.children[i].hidden) {
-                ddl.innerHTML += "<li id='" + i + "'><a><input type='checkbox'/>" + child.children[i].textContent; + "</a></li>";
-            }
-            else {
-                ddl.innerHTML += "<li id='" + i + "'><a><input type='checkbox'checked='checked'/>" + child.children[i].textContent; + "</a></li>";
-            }
-        }
-    }
-
-    function checkColName() {
-        var numberOfCol = 11;
-        for (var i = 0; i < numberOfCol; i++) {
-            var el = document.getElementById(i);
+        $("#ddm").click(function() {
+            var colNumber = event.path[1].id;
+            var el = document.getElementById(colNumber);
             var checkInput = el.getElementsByTagName('input');
-            if (checkInput[0].type === 'checkbox') {
-                checkInput[0].onchange = hideColumn(i);
-            }
-        }
-    }
+            CheckColName(colNumber, th, tb, checkInput);
+        });
 
-    function hideColumn() {
-        var colNumber = event.path[1].id;
-        var childTH = th.children[0];
-        var hideTH = childTH.children[colNumber];
-        if (hideTH.hidden) {
-            hideTH.hidden = false;
-        }
-        else {
-            hideTH.hidden = true;
-        }
-        var length = tb.children.length, i;
-        for (i = 0; i < length; i++) {
-            var childTB = tb.children[i];
-            var hideCol = childTB.children[colNumber];
-            if (hideTH.hidden) {
-                hideCol.hidden = true;
-            }
-            else {
-                hideCol.hidden = false;
-            }
-        }
-    }
+        $("#menu").click(function() {
+            GetColName(th);
+        });
+    });
 
     function Create() {
-        window.location.replace("/Kalibrering/Create");
+        window.location.replace("/Kalibrering/Create/" + 0);
     };
 
     function Overview() {
@@ -244,6 +85,6 @@
     };
 
     function Import() {
-        window.location.replace("/Kalibrering/Import");
+        window.location.replace("/Kalibrering/Import/" + 0);
     };
 </script>

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using HovedOppgave.Classes;
+using HovedOppgave.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -11,30 +13,33 @@ using Microsoft.Owin.Security;
 using HovedOppgave.Models;
 using System.Net.Mail;
 using HovedOppgave.Classes;
+using System.Collections;
+using System.Web.UI.WebControls;
 
 namespace HovedOppgave.Controllers
 {
     [Authorize]
     public class AccountController : Controller
     {
+        IRepository myrep = new Repository();
+
         public AccountController()
-            : this(new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext())))
+            : this(new UserManager<User>(new UserStore<User>(new ApplicationDbContext())))
         {
         }
 
-        public AccountController(UserManager<ApplicationUser> userManager)
+        public AccountController(UserManager<User> userManager)
         {
             UserManager = userManager;
         }
 
-        public UserManager<ApplicationUser> UserManager { get; private set; }
+        public UserManager<User> UserManager { get; private set; }
 
         //
         // GET: /Account/Login
         [AllowAnonymous]
-        public ActionResult Login(string returnUrl)
+        public ActionResult Login()
         {
-            ViewBag.ReturnUrl = returnUrl;
             return View();
         }
 
@@ -43,24 +48,56 @@ namespace HovedOppgave.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
+        public ActionResult Login(LoginViewModel model, AuthenticateEventArgs e)
         {
             if (ModelState.IsValid)
             {
-                var user = await UserManager.FindAsync(model.UserName, model.Password);
-                if (user != null)
+                Hashtable hashtable = Hash.GetHashAndSalt(model.Password);
+                var user = new User()
                 {
-                    IRepository myRepository = new Repository();
-                    User dbUser = myRepository.GetUser(Validator.ConvertToNumbers(user.Id));
-                    Session["UserID"] = dbUser.UserId;
-                    Session["User"] = dbUser;
-                    Session["Name"] = dbUser.Name;
+                    Name = model.UserName,
+                    PassSalt = (string)hashtable["salt"],
+                    PassHash = (string)hashtable["hash"]
+                };
+                User loggedIn = myrep.AuthenticateLogin(user);
+                if (loggedIn != null)
+                {
+                    //Denne som vil autentisere brukeren
+                    e.Authenticated = true;
+                    Session["UserID"] = loggedIn.UserId;
+                    Session["User"] = loggedIn;
+                    Session["Name"] = loggedIn.Name;
+                    //lagre authenticated i en session så den er tigjengelig i hele prosjektet
                     Session["LoggedIn"] = true;
-                    await SignInAsync(user, model.RememberMe);
-                    return RedirectToLocal(returnUrl);
+
+                    // Sjekker rettigheter og sender brukeren videre til riktig hovedside
+                    if (Validator.CheckRights(loggedIn.UserId, Constant.Rights.Administrator))
+                    {
+                        Session["rettighet"] = Constant.Rights.Administrator.ToString();
+                        return RedirectToAction("Home", "Index");
+                    }
+                    else if (Validator.CheckRights(loggedIn.UserId, Constant.Rights.User))
+                    {
+                        Session["rettighet"] = Constant.Rights.User.ToString();
+                        return RedirectToAction("Home", "Index");
+                    }
+                    else if (Validator.CheckRights(loggedIn.UserId, Constant.Rights.Guest))
+                    {
+                        Session["rettighet"] = Constant.Rights.Guest.ToString();
+                        return RedirectToAction("Home", "Index");
+                    }
+                    else
+                    {
+                        Session["flashMelding"] = "Du har ingen rettigheter i dette systemet. Ta kontakt med Prosjektleder eller Administrator";
+                        Session["flashStatus"] = Constant.NotificationType.danger.ToString();
+                        Session["UserID"] = null;
+                        Session["loggedIn"] = null;
+                        return RedirectToAction("Login");
+                    }
                 }
                 else
                 {
+                    e.Authenticated = false;
                     ModelState.AddModelError("", "Invalid username or password.");
                 }
             }
@@ -86,7 +123,10 @@ namespace HovedOppgave.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser() { UserName = model.Name };
+                var user = new User();
+                user.Email = model.Email;
+                user.Name = model.Name;
+                
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -135,19 +175,19 @@ namespace HovedOppgave.Controllers
                     {
                         sendMsg.SendEpost(email, msg.Body, msg.Subject);
                         Session["flashMessage"] = "Du har nu fått en epost om ditt nye passord";
-                        Session["flashStatus"] = Classes.Constants.NotificationType.success.ToString();
+                        Session["flashStatus"] = Classes.Constant.NotificationType.success.ToString();
                         return RedirectToAction("Login", "Account");
                     }
                     else
                     {
                         Session["flashMessage"] = "Ville ikke oppdateres i databasen";
-                        Session["flashStatus"] = Classes.Constants.NotificationType.danger.ToString();
+                        Session["flashStatus"] = Classes.Constant.NotificationType.danger.ToString();
                     }
                 }
                 else
                 {
                     Session["flashMessage"] = "Eposten eksisterer ikke!";
-                    Session["flashStatus"] = Classes.Constants.NotificationType.danger.ToString();
+                    Session["flashStatus"] = Classes.Constant.NotificationType.danger.ToString();
                     AddErrors(result);
                 }
             }
@@ -186,7 +226,7 @@ namespace HovedOppgave.Controllers
                 : message == ManageMessageId.Error ? "An error has occurred."
                 : "";
             ViewBag.HasLocalPassword = HasPassword();
-            ViewBag.ReturnUrl = Url.Action("Manage");
+            
             return View();
         }
 
@@ -198,7 +238,7 @@ namespace HovedOppgave.Controllers
         {
             bool hasPassword = HasPassword();
             ViewBag.HasLocalPassword = hasPassword;
-            ViewBag.ReturnUrl = Url.Action("Manage");
+            
             if (hasPassword)
             {
                 if (ModelState.IsValid)
@@ -246,16 +286,16 @@ namespace HovedOppgave.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public ActionResult ExternalLogin(string provider, string returnUrl)
+        public ActionResult ExternalLogin(string provider)
         {
             // Request a redirect to the external login provider
-            return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
+            return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account"));
         }
 
         //
         // GET: /Account/ExternalLoginCallback
         [AllowAnonymous]
-        public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
+        public async Task<ActionResult> ExternalLoginCallback()
         {
             var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
             if (loginInfo == null)
@@ -268,12 +308,12 @@ namespace HovedOppgave.Controllers
             if (user != null)
             {
                 await SignInAsync(user, isPersistent: false);
-                return RedirectToLocal(returnUrl);
+                return RedirectToLocal();
             }
             else
             {
                 // If the user does not have an account, then prompt the user to create an account
-                ViewBag.ReturnUrl = returnUrl;
+                
                 ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
                 return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { UserName = loginInfo.DefaultUserName });
             }
@@ -311,7 +351,7 @@ namespace HovedOppgave.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl)
+        public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model)
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -334,13 +374,12 @@ namespace HovedOppgave.Controllers
                     if (result.Succeeded)
                     {
                         await SignInAsync(user, isPersistent: false);
-                        return RedirectToLocal(returnUrl);
+                        return RedirectToLocal();
                     }
                 }
                 AddErrors(result);
             }
 
-            ViewBag.ReturnUrl = returnUrl;
             return View(model);
         }
 
@@ -392,7 +431,7 @@ namespace HovedOppgave.Controllers
             }
         }
 
-        private async Task SignInAsync(ApplicationUser user, bool isPersistent)
+        private async Task SignInAsync(User user, bool isPersistent)
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ExternalCookie);
             var identity = await UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
@@ -423,18 +462,6 @@ namespace HovedOppgave.Controllers
             SetPasswordSuccess,
             RemoveLoginSuccess,
             Error
-        }
-
-        private ActionResult RedirectToLocal(string returnUrl)
-        {
-            if (Url.IsLocalUrl(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-            else
-            {
-                return RedirectToAction("Index", "Home");
-            }
         }
 
         private class ChallengeResult : HttpUnauthorizedResult

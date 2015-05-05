@@ -1,4 +1,4 @@
-﻿@model IEnumerable<HovedOppgave.Models.CalibrationViews>
+﻿@model HovedOppgave.Models.CalibrationViews
 
 @{
     ViewBag.Title = "Kalibrerings oversikt";
@@ -8,11 +8,11 @@
 <br />
 <div class="col-lg-offset-2">
     <div class="dropdown">
-        <button class="btn btn-default dropdown-toggle" onclick="getColName()" type="button" id="menu" data-toggle="dropdown">
+        <button class="btn btn-default dropdown-toggle" type="button" id="menu" data-toggle="dropdown">
             Gjem Kolonner
             <span class="caret"></span>
         </button>
-        <ul class="dropdown-menu" role="menu" aria-labelledby="menu" id="ddm" onclick="checkColName()"></ul>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="menu" id="ddm"></ul>
         <div class="btn-group" role="group">
             <button type="button" class="btn btn-default" onclick="Create()">Registrer ny enhet</button>
             <button type="button" class="btn btn-default" onclick="History()">Logg</button>
@@ -21,215 +21,129 @@
         </div>
     </div>
 </div>
+<br /><br /><br />
+
+<button class="btn btn-default dropdown-toggle" type="button" id="planed" data-toggle="dropdown" aria-expanded="true">
+    Planlagte kalibreringer om <span class="caret"></span>
+</button>
+<ul class="dropdown-menu" role="menu" id="planedCalibration" aria-labelledby="planed">
+    <li role="presentation"><a><input type="radio" value="1week" name="planedIn">1 Uke</a></li>
+    <li role="presentation"><a><input type="radio" value="2week" name="planedIn">2 Uke</a></li>
+    <li role="presentation" class="divider"></li>
+    <li role="presentation"><a><input type="radio" value="1month" name="planedIn">1 Månde</a></li>
+    <li role="presentation"><a><input type="radio" value="2month" name="planedIn">2 Månde</a></li>
+    <li role="presentation"><a><input type="radio" value="3month" name="planedIn">3 Månde</a></li>
+    <li role="presentation"><a><input type="radio" value="6month" name="planedIn">6 Månde</a></li>
+    <li role="presentation" class="divider"></li>
+    <li role="presentation"><a><input type="radio" value="1year" name="planedIn">1 År</a></li>
+</ul>
+<div class="btn-group" role="group">
+    <button type="button" class="btn btn-default" id="isCalibrated">Er kalibrert</button>
+    <button type="button" class="btn btn-default" id="goingToCalibrate">Skal kalibreres</button>
+    <button type="button" class="btn btn-default" id="canCalibrate">Kan kalibreres</button>
+    <button type="button" class="btn btn-default" id="create">Opprett kalibrering</button>
+</div>
+<h3 id="h3"></h3>
 <br />
-<table class="table">
-    <thead id="thead">
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.LogEvent.RegisteredDate)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 0, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LogEvent.StartDate)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 1, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LogEvent.EndDate)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 2, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.File.FileName)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 3, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.File.FileType)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 4, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.LogEvent.Data1)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 5, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.LogEvent.Data2)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 6, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.EventType.Name)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 7, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Device.Name)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 8, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.Contact.Name)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 9, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-            <th hidden="hidden">
-                @Html.DisplayNameFor(model => model.Room.Name)
-                <button type="button" class="btn btn-xs" aria-label="Left Align" onclick="sortTable(tbody, 10, asc1); asc1 *= -1; asc2 *= 1; asc3 *= 1;">
-                    <span class="glyphicon glyphicon-arrow-down"></span>
-                </button>
-            </th>
-        </tr>
-    </thead>
-    <tbody id="tbody">
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LogEvent.RegisteredDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LogEvent.StartDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LogEvent.EndDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.File.FileName)
-                </td>
-                <td hidden="hidden">
-                    @Html.DisplayFor(modelItem => item.File.FileType)
-                </td>
-                <td hidden="hidden">
-                    @Html.DisplayFor(modelItem => item.LogEvent.Data1)
-                </td>
-                <td hidden="hidden">
-                    @Html.DisplayFor(modelItem => item.LogEvent.Data2)
-                </td>
-                <td hidden="hidden">
-                    @Html.DisplayFor(modelItem => item.EventType.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Device.Name)
-                </td>
-                <td hidden="hidden">
-                    @Html.DisplayFor(modelItem => item.Contact.Name)
-                </td>
-                <td hidden="hidden">
-                    @Html.DisplayFor(modelItem => item.Room.Name)
-                </td>
-                <td>
-                    @Html.ActionLink("Rediger enhet", "EditCalibration", new { id = item.LogEvent.LogEventID }) |
-                    @Html.ActionLink("Detaljer", "CalibrationViewDetails", new { id = item.LogEvent.LogEventID })
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div id="tableContainer"></div>
 
 <script type="text/javascript">
     var th, tb;
     var asc1 = 1, asc2 = 1, asc3 = 1;
 
-    window.onload = function () {
-        th = document.getElementById("thead");
-        tb = document.getElementById("tbody");
-    }
+    $(document).ready(function () {
+        var deviceTypeList = @Html.Raw(Json.Encode(Model.DeviceTypes));
+        var deviceList = @Html.Raw(Json.Encode(Model.Devices));
+        var logEventList = @Html.Raw(Json.Encode(Model.LogEvents));
+        var companyList = @Html.Raw(Json.Encode(Model.Companys));
+        var fileList = @Html.Raw(Json.Encode(Model.Files));
+        var roomList = @Html.Raw(Json.Encode(Model.Rooms));
 
-    function sortTable(tbody, colnumber, asc) {
-        var rows = tbody.rows,
-            rlength = rows.length,
-            arr = new Array(),
-            i, j, cells, clen;
-        for (i = 0; i < rlength; i++) {
-            cells = rows[i].cells;
-            clen = cells.length;
-            arr[i] = new Array();
-            for (j = 0; j < clen; j++) {
-                arr[i][j] = cells[j].innerHTML;
-            }
-        }
-        arr.sort(function (a, b) {
-            var glyph = th.children[0].children[colnumber].children[0].children[0];
-            if (glyph.className === "glyphicon glyphicon-arrow-up")
-                glyph.className = "glyphicon glyphicon-arrow-down";
-            else
-                glyph.className = "glyphicon glyphicon-arrow-up";
-
-            return (a[colnumber] == b[colnumber]) ? 0 : ((a[colnumber] > b[colnumber]) ? asc : -1 * asc);
+        jQuery(function(){
+            jQuery("#isCalibrated").trigger("click");
         });
-        for (i = 0; i < rlength; i++) {
-            rows[i].innerHTML = "<td>" + arr[i].join("</td><td>") + "</td>";
-        }
-    }
 
-    function getColName() {
-        var numberOfCol = 11;
-        var ddl = document.getElementById("ddm");
-        ddl.innerHTML = "";
-        var child = th.children[0];
-        for (var i = 0; i < numberOfCol; i++) {
-            if (child.children[i].hidden) {
-                ddl.innerHTML += "<li id='" + i + "'><a><input type='checkbox'/>" + child.children[i].textContent; + "</a></li>";
-            }
-            else {
-                ddl.innerHTML += "<li id='" + i + "'><a><input type='checkbox'checked='checked'/>" + child.children[i].textContent; + "</a></li>";
-            }
-        }
-    }
+        $("#isCalibrated").click(function () {
+            $("#tableContainer").empty();
+            h3.textContent = "Er kalibrert";
 
-    function checkColName() {
-        var numberOfCol = 11;
-        for (var i = 0; i < numberOfCol; i++) {
-            var el = document.getElementById(i);
+            GetCalibrationTable("is", deviceTypeList, deviceList, logEventList, companyList, fileList, roomList, null);
+        });
+
+        $("#goingToCalibrate").click(function () {
+            $("#tableContainer").empty();
+            h3.textContent = "Skal kalibreres";
+
+
+            var nextWeek = new Date;
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            nextWeek.setHours(23);
+            nextWeek.setMinutes(59);
+            nextWeek.setSeconds(59);
+
+            GetCalibrationTable("goingTo", deviceTypeList, deviceList, logEventList, companyList, fileList, roomList, nextWeek);
+        });
+
+        $("#planedCalibration").click(function () {
+            $("#tableContainer").empty();
+            h3.textContent = "Planlagt kalibreringer";
+            var radioGroupeVal = $("input:radio[name='planedIn']:checked").val();
+            var choosenDate = new Date();
+            if(String(radioGroupeVal).match("1week"))
+                choosenDate.setDate(choosenDate.getDate() + 7);
+            else if(String(radioGroupeVal).match("2week"))
+                choosenDate.setDate(choosenDate.getDate() + 14);
+            else if(String(radioGroupeVal).match("1month"))
+                choosenDate.setMonth(choosenDate.getMonth() + 1);
+            else if(String(radioGroupeVal).match("2month"))
+                choosenDate.setMonth(choosenDate.getMonth() + 2);
+            else if(String(radioGroupeVal).match("3month"))
+                choosenDate.setMonth(choosenDate.getMonth() + 3);
+            else if(String(radioGroupeVal).match("6month"))
+                choosenDate.setMonth(choosenDate.getMonth() + 6);
+            else if(String(radioGroupeVal).match("1year"))
+                choosenDate.setFullYear(choosenDate.getFullYear() + 1);
+
+            choosenDate.setHours(0);
+            choosenDate.setMinutes(0);
+            choosenDate.setSeconds(0);
+
+            GetCalibrationTable("planed", deviceTypeList, deviceList, logEventList, companyList, fileList, roomList, choosenDate);
+        });
+
+        $("#canCalibrate").click(function () {
+            $("#tableContainer").empty();
+            h3.textContent = "Kan kalibreres";
+
+            var deviceTypeList = @Html.Raw(Json.Encode(Model.DeviceTypes));
+            var deviceList = @Html.Raw(Json.Encode(Model.Devices));
+            var roomList = @Html.Raw(Json.Encode(Model.Rooms));
+
+            GetDeviceTable(deviceTypeList, deviceList, roomList);
+        });
+
+        $("#ddm").click(function() {
+            var colNumber = event.path[1].id;
+            var el = document.getElementById(colNumber);
             var checkInput = el.getElementsByTagName('input');
-            if (checkInput[0].type === 'checkbox') {
-                checkInput[0].onchange = hideColumn(i);
-            }
-        }
-    }
+            CheckColName(colNumber, th, tb, checkInput);
+        });
 
-    function hideColumn() {
-        var colNumber = event.path[1].id;
-        var childTH = th.children[0];
-        var hideTH = childTH.children[colNumber];
-        if (hideTH.hidden) {
-            hideTH.hidden = false;
-        }
-        else {
-            hideTH.hidden = true;
-        }
-        var length = tb.children.length, i;
-        for (i = 0; i < length; i++) {
-            var childTB = tb.children[i];
-            var hideCol = childTB.children[colNumber];
-            if (hideTH.hidden) {
-                hideCol.hidden = true;
-            }
-            else {
-                hideCol.hidden = false;
-            }
-        }
-    }
-   
+        $("#menu").click(function() {
+            GetColName(th);
+        });
+
+        $("#create").click(function () {
+            window.location.replace("/Kalibrering/Create/" + 0);
+        });
+    });
+
     function Create() {
-        window.location.replace("/Kalibrering/Create");
+        window.location.replace("/Kalibrering/Create/" + 0);
     };
-    
+
     function Import() {
-        window.location.replace("/Kalibrering/Import");
+        window.location.replace("/Kalibrering/Import/" + 0);
     };
 
     function History() {
