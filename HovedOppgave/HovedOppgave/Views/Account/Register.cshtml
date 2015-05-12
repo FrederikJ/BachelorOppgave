@@ -3,50 +3,94 @@
     ViewBag.Title = "Register";
 }
 
-<h2>@ViewBag.Title.</h2>
+<h2>Opprett ny konto</h2>
 
 @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
 {
     @Html.AntiForgeryToken()
-    <h4>Create a new account.</h4>
     <hr />
-    @Html.ValidationSummary()
+    <h4>Konto detaljer</h4>
     <div class="form-group">
         @Html.LabelFor(m => m.Name, new { @class = "col-md-2 control-label" })
         <div class="col-md-10">
-            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+            @Html.TextBoxFor(m => m.Name, new { @class = "form-control", required = true })
+            @Html.ValidationMessageFor(m => m.Name, "Vennligst ikke bruk ulovlige tegn", new { @class = "text-danger" })
         </div>
     </div>
     <div class="form-group">
         @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
         <div class="col-md-10">
-            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", required = true })
+            @Html.ValidationMessageFor(m => m.Email, "Vennligst bruk riktig format: noe@noe.domene uten ulovlige tegn", new { @class = "text-danger" })
         </div>
     </div>
     <div class="form-group">
         @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
         <div class="col-md-10">
-            @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+            @Html.PasswordFor(m => m.Password, new { @class = "form-control", required = true })
+            @Html.ValidationMessageFor(m => m.Password, "Vennligst ikke bruk ulovlige tegn", new { @class = "text-danger" })
         </div>
     </div>
     <div class="form-group">
         @Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-md-2 control-label" })
         <div class="col-md-10">
-            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", required = true })
+            @Html.ValidationMessageFor(m => m.ConfirmPassword, "Vennligst skriv in passord som er lik", new { @class = "text-danger" })
         </div>
     </div>
     <div class="form-group">
-        @Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-md-2 control-label" })
-        <div class="col-md-10">
-            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+        <div id="lable"></div>
+        <div class="col-md-10" id="area"></div>
         </div>
-    </div>
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10">
             <input type="submit" class="btn btn-default" value="Register" />
         </div>
     </div>
+    <p>
+        <button type="button" class="btn btn-default" id="back"><span class="glyphicon glyphicon-arrow-left"></span></button>
+    </p>
 }
+<div id="showInFancy" style="display:none">
+    <h5>Rettigheter</h5>
+    <table class="table">
+        <thead><tr><th>@Html.DisplayName("Rettighet")</th><th>@Html.DisplayName("Velg")</th></tr></thead>
+        <tbody id="tbody"></tbody>
+    </table>
+    <button type="submit" id="putIn" class="btn btn-default">Sett inn</button>
+</div>
+<script type="text/javascript">
+    $(window).ready(function () {
+        $("#floating").fancybox();
+
+        var rightList = @Html.Raw(Json.Encode(Model.Rights));
+        if(rightList != null)
+        {
+            $("#lable").append('@Html.LabelFor(m => m.Right, new { @class = "col-md-2 control-label" })')
+            $("#area").append('@Html.TextBoxFor(m => m.Right.Name, new { @class = "form-control", readOnly = true, required = true })');
+            $("#area").append('@Html.ValidationMessageFor(m => m.Right.Name, "Vennligst velg rettighet", new { @class = "text-danger" })');
+            $("#area").append('<a href="#showInFancy" id="floating">Sett inn rettighet</a>');
+            $("#rights").append('@Html.HiddenFor(model => model.Right.RightsID, new { htmlAttributes = new { readOnly = true } })');
+        }
+
+        $("#floating").click(function() {
+            UserAccount.FancyboxTable(rightList);
+        });
+
+        $("#putIn").click(function() {
+            var radioGroupeVal = $("input:radio[name='group']:checked").val();
+            UserAccount.FancyboxPutIn(radioGroupeVal, rightList);
+
+            $("#tbody").empty();
+            radioGroupeVal = null;
+            $.fancybox.close()
+        });
+
+        $("#back").click(function () {
+            window.location.replace("/Account/Login");
+        });
+    });
+</script>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")

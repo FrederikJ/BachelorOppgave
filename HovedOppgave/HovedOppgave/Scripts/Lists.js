@@ -146,6 +146,12 @@ var FillTableHead = function (thead, type) {
             3: "Fil størrelse",
             4: "Dato lagt inn"
         }
+    else if (type == "user")
+        array = {
+            1: "Navn",
+            2: "Epost",
+            3: "Rettighet"
+        }
 
     var tr = document.createElement("tr");
     jQuery.each(array, function (index, item) {
@@ -290,10 +296,100 @@ var FillCalibrationTableBoby = function (tbody, startDate, endDate, companyList,
     tbody.appendChild(tr);
 }
 
+var FillUserTableBody = function(tbody, right, usersList, rightsList) {
+    jQuery.each(usersList, function (i, user) {
+        if (String(user["RightsID"]).match(String(right["RightsID"]))) {
+            var tr = document.createElement("tr");
+
+            var td = document.createElement("td");
+            td.textContent = user["Name"];
+            tr.appendChild(td);
+
+            td = document.createElement("td");
+            td.textContent = user["Email"];
+            tr.appendChild(td);
+
+            var rightTd = document.createElement("td");
+            var rightLable = document.createElement("lable");
+            rightLable.textContent = right["Name"];
+            rightTd.appendChild(rightLable);
+            tr.appendChild(rightTd);
+
+            var id = user["UserID"];
+            var btnTd = document.createElement("td");
+            var group = document.createElement("div");
+            group.className = "btn-group";
+            if (right == null) {
+                var inputEdit = document.createElement("button");
+                inputEdit.type = "button";
+                inputEdit.className = "btn btn-warning";
+                inputEdit.textContent = "Endre bruker";
+                inputEdit.onclick = function () {
+                    window.location.replace("/Account/Manage/" + id);
+                };
+                group.appendChild(inputEdit);
+
+                var inputDel = document.createElement("button");
+                inputDel.type = "button";
+                inputDel.className = "btn btn-danger";
+                inputDel.textContent = "Slett bruker";
+                inputDel.onclick = function () {
+                    window.location.replace("/Administrator/DeleteUser/" + id);
+                };
+                group.appendChild(inputDel);
+                btnTd.appendChild(group);
+            }
+            else {
+                var inputCheck = document.createElement("button");
+                inputCheck.type = "button";
+                inputCheck.className = "btn btn-default";
+                inputCheck.textContent = "Sett rettighet";
+                inputCheck.onclick = function () {
+                    var dropDown = document.createElement("select");
+                    dropDown.className = "form-control";
+                    var rightId = null
+                    jQuery.each(rightsList, function (i, rightSelected) {
+                        var option = document.createElement("option");
+                        option.value = rightSelected["RightsID"];
+                        option.textContent = rightSelected["Name"];
+                        dropDown.appendChild(option);
+                        rightId = rightSelected["RightsID"];
+                    });
+                    rightTd.replaceChild(dropDown, rightLable);
+
+                    var btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.textContent = "Godkjenn rettigheten";
+                    btn.className = "btn btn-success";
+                    
+                    btn.onclick = function () {
+                        window.location.replace("/Administrator/CheckUser/" + id + "/" + rightId);
+                    }
+                    group.replaceChild(btn, inputCheck);
+                };
+                group.appendChild(inputCheck);
+                var inputEdit = document.createElement("button");
+                inputEdit.type = "button";
+                inputEdit.className = "btn btn-warning";
+                inputEdit.textContent = "Endre bruker";
+                inputEdit.onclick = function () {
+                    window.location.replace("/Account/Manage/" + id);
+                };
+                group.appendChild(inputEdit);
+                btnTd.appendChild(group);
+            }
+            tr.appendChild(btnTd);
+
+            tbody.appendChild(tr);
+        }
+    });
+}
+
 var AddTableToContainer = function (thead, tbody, h4, table, hr, div, br, brr) {
     if (tbody != null && tbody.childElementCount !== 0) {
         table.appendChild(thead);
         table.appendChild(tbody);
+        if (h4 != null)
         $("#tableContainer").append(h4);
         if(hr != null)
             $("#tableContainer").append(hr);
@@ -429,6 +525,26 @@ var GetDeviceTable = function (deviceTypeList, deviceList, roomList) {
                 }
             });
         }
+        AddTableToContainer(thead, tbody, h4, table, null, null, null, null);
+    });
+}
+
+var GetUserTable = function (usersList, rightsList, right) {
+    jQuery.each(rightsList, function (i, right) {
+        var h4 = document.createElement("h4");
+        if (right != null)
+            h4.textContent = "Foreløbig bruker rettighet - " + String(right["Name"]);
+        else
+            h4.textContent = "Rettighet - " + String(right["Name"]);
+
+        var table = document.createElement("table");
+        table.className = "table";
+        var thead = document.createElement("thead");
+        var tbody = document.createElement("tbody");
+
+        FillTableHead(thead, "user");
+        FillUserTableBody(tbody, right, usersList, rightsList);
+
         AddTableToContainer(thead, tbody, h4, table, null, null, null, null);
     });
 }

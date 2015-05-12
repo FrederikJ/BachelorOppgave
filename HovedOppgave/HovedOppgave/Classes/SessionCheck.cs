@@ -17,27 +17,30 @@ namespace HovedOppgave.Classes
     {
         static IRepository myrep = new Repository();
 
-        public static void CheckForUserID()
+        public static int CheckForUserID()
         {
             HttpContext http = HttpContext.Current;
             if (http.Session["UserID"] == null)
             {
                 http.Session["flashMessage"] = "Du må logge deg inn";
                 http.Session["flashStatus"] = Constant.NotificationType.danger.ToString();
-                http.Response.Redirect("~/login", true);
+                http.Response.Redirect("~/Account/login", true);
+                return 0;
             }
+            int i = Validator.ConvertToNumbers(http.Session["UserID"].ToString());
+            return i;
         }
 
         public static void CheckForRightsOnLogInUser(Constant.Rights rettighet)
         {
-            HttpContext http = HttpContext.Current;
             CheckForUserID();
-            int UserID = Validator.ConvertToNumbers(http.Session["UserID"].ToString());
 
-            if (!Validator.CheckRights(UserID, rettighet))
+            if (!Validator.CheckRights(rettighet))
             {
+                HttpContext http = HttpContext.Current;
                 http.Session["flashMessage"] = "Du har ikke korrekte rettighet for aksessere siden du prøvde å nå";
                 http.Session["flashStatus"] = Constant.NotificationType.danger.ToString();
+                SmallClasses.DeleteSessions();
                 http.Response.Redirect(("~/Loggut"), true);
             }
         }
@@ -45,19 +48,16 @@ namespace HovedOppgave.Classes
         //sjekker hvilken masterpage den skal velge etter hvilken rettighet man har
         public static string FindMaster()
         {
-            HttpContext http = HttpContext.Current;
-            CheckForUserID();
-            User user = myrep.GetUser(Validator.ConvertToNumbers(http.Session["UserID"].ToString()));
+            string master = "";
+            User user = myrep.GetUser(CheckForUserID());
             Rights rights = myrep.GetRightToUser(user);
 
-            string master = "";
-
             if (rights.Name == Constant.Rights.Administrator.ToString())
-                master = "~/Views/Shared/_AdminLayout";
+                master = "~/Views/Shared/_AdminLayout.cshtml";
             else if (rights.Name == Constant.Rights.User.ToString())
-                master = "~/Views/Shared/_UserLayout";
+                master = "~/Views/Shared/_UserLayout.cshtml";
             else if (rights.Name == Constant.Rights.Guest.ToString())
-                master = "~/Views/Shared/_GuestLayout";
+                master = "~/Views/Shared/_GuestLayout.cshtml";
 
             return master;
         }

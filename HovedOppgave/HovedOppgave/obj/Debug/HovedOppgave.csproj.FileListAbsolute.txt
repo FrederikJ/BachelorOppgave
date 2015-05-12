@@ -1,4 +1,3 @@
-C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\obj\Debug\HovedOppgave.csprojResolveAssemblyReference.cache
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\bin\HovedOppgave.dll.config
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\bin\HovedOppgave.dll
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\bin\HovedOppgave.pdb
@@ -61,3 +60,4 @@ C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\H
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\bin\System.Web.WebPages.Razor.xml
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\obj\Debug\HovedOppgave.dll
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\obj\Debug\HovedOppgave.pdb
+C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\obj\Debug\HovedOppgave.csprojResolveAssemblyReference.cache

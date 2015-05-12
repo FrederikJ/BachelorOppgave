@@ -1,46 +1,46 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 
 namespace HovedOppgave.Models
 {
-    public class ExternalLoginConfirmationViewModel
-    {
-        [Required]
-        [Display(Name = "User name")]
-        public string UserName { get; set; }
-    }
-
     public class ManageUserViewModel
     {
         [Required]
         [DataType(DataType.Password)]
-        [Display(Name = "Current password")]
+        [Display(Name = "Nåværende passord")]
         public string OldPassword { get; set; }
 
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "New password")]
+        [Display(Name = "Nytt passord")]
         public string NewPassword { get; set; }
 
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm new password")]
-        [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+        [Display(Name = "Bekreft nytt passord")]
+        [System.ComponentModel.DataAnnotations.CompareAttribute("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+        public User AdminUser { get; set; }
+        public User ChangeUser { get; set; }
+        public Rights Right { get; set; }
+        public List<Rights> Rights { get; set; }
     }
 
     public class LoginViewModel
     {
         [Required]
-        [Display(Name = "User name")]
-        public string UserName { get; set; }
+        [DataType(DataType.EmailAddress)]
+        [Display(Name = "Epost")]
+        public string Email { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
+        [Display(Name = "Passord")]
         public string Password { get; set; }
 
-        [Display(Name = "Remember me?")]
+        [Display(Name = "Husk meg?")]
         public bool RememberMe { get; set; }
     }
 
@@ -57,8 +57,8 @@ namespace HovedOppgave.Models
         public string Password { get; set; }
 
         [DataType(DataType.Password)]
-        [Display(Name = "Gjenta passord")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        [Display(Name = "Bekreft passord")]
+        [System.ComponentModel.DataAnnotations.CompareAttribute("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
 
         [Required]
@@ -66,10 +66,10 @@ namespace HovedOppgave.Models
         [Display(Name = "Epost")]
         public string Email { get; set; }
 
-        [Required]
         [Display(Name = "Rettigheter")]
-        public IEnumerable<int> SelectedRight { get; set; }
-        public IEnumerable<System.Web.Mvc.SelectListItem> Rights { get; set; }
+        public Rights Right { get; set; }
+
+        public List<Rights> Rights { get; set; }
     }
 
     public class LostPasswordViewModel
@@ -79,11 +79,11 @@ namespace HovedOppgave.Models
         [Display(Name = "Email Address")]
         public string Email { get; set; }
     }
-
+    
     public class CalibrationViews
     {
         public Room Room { get; set; }
-        public Files File { get; set; }
+        public Files FileTo { get; set; }
         public Device Device { get; set; }
         public string FilePath { get; set; }
         public Company Company { get; set; }
@@ -101,7 +101,15 @@ namespace HovedOppgave.Models
 
     public class UserRight
     {
-        public User user { get; set; }
-        public Rights rights { get; set; }
+        public User User { get; set; }
+        public Rights Right { get; set; }
+    }
+
+    public class AdminViews
+    {
+        public User User { get; set; }
+        public Rights Right { get; set; }
+        public List<User> Users { get; set; }
+        public List<Rights> Rights { get; set; }
     }
 }

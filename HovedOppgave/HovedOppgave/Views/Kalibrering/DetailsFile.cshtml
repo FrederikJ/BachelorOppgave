@@ -26,7 +26,7 @@
             @Html.DisplayName("Fil navn")
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.File.FileName)
+            @Html.DisplayFor(model => model.FileTo.FileName)
         </dd>
         <dt>
             @Html.DisplayName("Fil plassering")
@@ -36,7 +36,7 @@
             @Html.DisplayName("Fil type")
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.File.FileType)
+            @Html.DisplayFor(model => model.FileTo.FileType)
         </dd>
         <dt>
             @Html.DisplayName("Fil størrelse")
@@ -46,7 +46,7 @@
             @Html.DisplayName("Dato lagt inn")
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.File.Date)
+            @Html.DisplayFor(model => model.FileTo.Date)
         </dd>
     </dl>
 </div>
@@ -101,7 +101,7 @@
 <script type="text/javascript">
     $(document).ready(function () {
         var filePath = @Html.Raw(Json.Encode(Model.FilePath));
-        var file = @Html.Raw(Json.Encode(Model.File));
+        var file = @Html.Raw(Json.Encode(Model.FileTo));
         var device = @Html.Raw(Json.Encode(Model.Device));
         var company = @Html.Raw(Json.Encode(Model.Company));
 

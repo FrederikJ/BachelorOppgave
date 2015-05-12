@@ -1024,7 +1024,7 @@ namespace HovedOppgave.Models
                     MySqlDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
-                        right.RightsID = Convert.ToInt32(reader["rightsId"]);
+                        right.RightsID = Convert.ToInt32(reader["rightsID"]);
                         right.Name = (string)reader["rightName"];
                     }
                     reader.Close();
@@ -1057,7 +1057,7 @@ namespace HovedOppgave.Models
                     while (reader.Read())
                     {
                         var item = new Rights();
-                        item.RightsID = Convert.ToInt32(reader["rightsId"]);
+                        item.RightsID = Convert.ToInt32(reader["rightsID"]);
                         item.Name = (string)reader["rightName"];
 
                         list.Add(item);
@@ -1155,7 +1155,7 @@ namespace HovedOppgave.Models
         #region User Queries
         public UserRight GetUserWithRights(int userID, Constant.Rights rights)
         {
-            string query = "select * from user u, rights r where u.iduser='" + userID + "' and r.rightName='" + rights + "'";
+            string query = "select * from user u, rights r where u.iduser='" + userID + "' and r.rightName='" + rights + "' and u.rightsid=r.rightsID";
             User user = new User();
             Rights right = new Rights();
             if (this.OpenConnection())
@@ -1172,6 +1172,7 @@ namespace HovedOppgave.Models
                     {
                         user.UserId = Convert.ToInt32(reader["iduser"]);
                         user.RightsID = Convert.ToInt32(reader["rightsid"]);
+                        user.Checked = (bool)reader["checked"];
                         if (reader["name"] != DBNull.Value)
                             user.Name = (string)reader["name"];
                         if (reader["email"] != DBNull.Value)
@@ -1179,9 +1180,9 @@ namespace HovedOppgave.Models
                         if (reader["passhash"] != DBNull.Value)
                             user.PassHash = (string)reader["passhash"];
                         if (reader["passsalt"] != DBNull.Value)
-                            user.PassSalt = (string)reader["passsalt"];
+                            user.PassSalt = (string)reader["passsalt"];                            
 
-                        right.RightsID = Convert.ToInt32(reader["rightsId"]);
+                        right.RightsID = Convert.ToInt32(reader["rightsID"]);
                         right.Name = (string)reader["rightName"];
                     }
                     reader.Close();
@@ -1194,21 +1195,17 @@ namespace HovedOppgave.Models
                     this.CloseConnection();
                 }
             }
-            if (right.RightsID == user.RightsID)
+            UserRight model = new UserRight();
+            if (right.RightsID != 0 && user.UserId != 0)
             {
-                UserRight model = new UserRight()
-                {
-                    user = user,
-                    rights = right
-                };
-                return model;
+                model.User = user;
+                model.Right = right;
             }
-            else
-                return null;
+            return model;
         }
         public User GetUser(int userID)
         {
-            string query = "select * from user where iduser =" + userID;
+            string query = "select * from user where iduser ='" + userID + "'";
             User user = new User();
 
             if (this.OpenConnection())
@@ -1225,6 +1222,7 @@ namespace HovedOppgave.Models
                     {
                         user.UserId = Convert.ToInt32(reader["iduser"]);
                         user.RightsID = Convert.ToInt32(reader["rightsid"]);
+                        user.Checked = (bool)reader["checked"];
                         if (reader["name"] != DBNull.Value)
                             user.Name = (string)reader["name"];
                         if (reader["email"] != DBNull.Value)
@@ -1246,36 +1244,14 @@ namespace HovedOppgave.Models
             }
             return user;
         }
-        public void CreateUser(User user)
+        public User GetUser(string email)
         {
-            string query = "Insert into user (name, email, passhash, passsalt, rightsid) values('" + user.Name.ToLower() + "','" + user.Email.ToLower() + "','" + user.PassHash + "','" + user.PassSalt + "','" + user.RightsID + "')";
-            
-            if(this.OpenConnection())
-            {
-                //Lager en kommando med query og forbindelse
-                MySqlCommand cmd = new MySqlCommand(query, conn);
-                try
-                {
-                    //utfører kommandoen
-                    cmd.ExecuteReader();
-                    //close connection
-                    this.CloseConnection();
-                }
-                catch
-                {
-                    //close connection
-                    this.CloseConnection();
-                }
-            }
-        }
-        public User AuthenticateLogin(User user)
-        {
-            string query = "Select * from user where name='" + user.Name + "' and passhash='" + user.PassHash + "' and passsalt='" + user.PassSalt + "'";
-            User returnUser = null;
+            string query = "select * from user where email ='" + email + "'";
+            User user = new User();
 
-            if(this.OpenConnection())
+            if (this.OpenConnection())
             {
-                //Lager en kommando med query og forbindelse
+                //Lager en kommando
                 MySqlCommand cmd = new MySqlCommand(query, conn);
 
                 try
@@ -1283,34 +1259,66 @@ namespace HovedOppgave.Models
                     //lage en data reader og utfører kommandoen
                     MySqlDataReader reader = cmd.ExecuteReader();
 
-                    //sjekker om reader har noen verdi, viss den har er login true
-                    while(reader.Read())
+                    while (reader.Read())
                     {
-                        returnUser.UserId = Convert.ToInt32(reader["iduser"]);
-                        returnUser.RightsID = Convert.ToInt32(reader["rightsid"]);
+                        user.UserId = Convert.ToInt32(reader["iduser"]);
+                        user.RightsID = Convert.ToInt32(reader["rightsid"]);
+                        user.Checked = (bool)reader["checked"];
                         if (reader["name"] != DBNull.Value)
-                            returnUser.Name = (string)reader["name"];
+                            user.Name = (string)reader["name"];
                         if (reader["email"] != DBNull.Value)
-                            returnUser.Email = (string)reader["email"];
+                            user.Email = (string)reader["email"];
                         if (reader["passhash"] != DBNull.Value)
-                            returnUser.PassHash = (string)reader["passhash"];
+                            user.PassHash = (string)reader["passhash"];
                         if (reader["passsalt"] != DBNull.Value)
-                            returnUser.PassSalt = (string)reader["passsalt"];
+                            user.PassSalt = (string)reader["passsalt"];
                     }
                     reader.Close();
+                    //close connection
                     this.CloseConnection();
                 }
                 catch
                 {
-                    //stenger tilkoblingen opp mot db
+                    //close connection
                     this.CloseConnection();
                 }
             }
-            return returnUser;
+            return user;
+        }
+        public int CreateUser(User user)
+        {
+            string query = null;
+            if(user.RightsID != 0)
+                query = "Insert into user (name, email, passhash, passsalt, rightsid, checked) values('" + user.Name.ToLower() + "','" + user.Email.ToLower() + "','" + user.PassHash + "','" + user.PassSalt + "','" + user.RightsID + "','1'); select last_insert_id();";
+            else
+                query = "Insert into user (name, email, passhash, passsalt) values('" + user.Name.ToLower() + "','" + user.Email.ToLower() + "','" + user.PassHash + "','" + user.PassSalt + "'); select last_insert_id();";
+
+            if(this.OpenConnection())
+            {
+                //Lager en kommando med query og forbindelse
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                try
+                {
+                    //utfører kommandoen
+                    IDataReader reader = cmd.ExecuteReader();
+                    int id = 0;
+                    while (reader != null && reader.Read())
+                        id = reader.GetInt32(0);
+                    //close connection
+                    this.CloseConnection();
+                    return id;
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            return 0;
         }
         public List<User> GetAllUsers()
         {
-            string query = "select * from user";
+            string query = "select * from user where checked='1'";
             List<User> userList = new List<User>();
 
             if (this.OpenConnection())
@@ -1328,6 +1336,7 @@ namespace HovedOppgave.Models
                         var user = new User();
                         user.UserId = Convert.ToInt32(reader["iduser"]);
                         user.RightsID = Convert.ToInt32(reader["rightsid"]);
+                        user.Checked = (bool)reader["checked"];
                         if (reader["name"] != DBNull.Value)
                             user.Name = (string)reader["name"];
                         if (reader["email"] != DBNull.Value)
@@ -1350,6 +1359,76 @@ namespace HovedOppgave.Models
                 }
             }
             return userList;
+        }
+        public List<User> GetAllUsersUnchecked()
+        {
+            string query = "select * from user where checked='0'";
+            List<User> userList = new List<User>();
+
+            if (this.OpenConnection())
+            {
+                //Lager en kommando
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                try
+                {
+                    //lage en data reader og utfører kommandoen
+                    MySqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        var user = new User();
+                        user.UserId = Convert.ToInt32(reader["iduser"]);
+                        user.RightsID = Convert.ToInt32(reader["rightsid"]);
+                        user.Checked = (bool)reader["checked"];
+                        if (reader["name"] != DBNull.Value)
+                            user.Name = (string)reader["name"];
+                        if (reader["email"] != DBNull.Value)
+                            user.Email = (string)reader["email"];
+                        if (reader["passhash"] != DBNull.Value)
+                            user.PassHash = (string)reader["passhash"];
+                        if (reader["passsalt"] != DBNull.Value)
+                            user.PassSalt = (string)reader["passsalt"];
+
+                        userList.Add(user);
+                    }
+                    reader.Close();
+                    //close connection
+                    this.CloseConnection();
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            return userList;
+        }
+        public bool EditUser(User user)
+        {
+            string query = "UPDATE user SET name='" + user.Name + "', email='" + user.Email + "', passhash='" + user.PassHash + "', passsalt='" + user.PassSalt + "', rightsid='" + user.RightsID + "'";
+
+            //Open connection
+            if (this.OpenConnection())
+            {
+                //create mysql command with cmdtext and connection
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                try
+                {
+                    //Execute query
+                    cmd.ExecuteNonQuery();
+                    //close connection
+                    this.CloseConnection();
+                    return true;
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+
+                }
+            }
+            return false;
         }
         #endregion
     }

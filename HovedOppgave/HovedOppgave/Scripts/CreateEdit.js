@@ -90,8 +90,8 @@ var Calibration = {
             jQuery.each(fileList, function (i, item) {
                 var str = String(item["FileID"]);
                 if (str.match(checkBoxGroupeVal)) {
-                    $("#File_FileID").val(item["FileID"]);
-                    $("#File_FileName").val(item["FileName"]);
+                    $("#FileTo_FileID").val(item["FileID"]);
+                    $("#FileTo_FileName").val(item["FileName"]);
                 }
             });
         }
@@ -106,5 +106,35 @@ var Calibration = {
             else
                 $("#File_FileName")[0].removeAttribute("required");
         }
+    }
+}
+
+var UserAccount = {
+    FancyboxTable: function (rightList) {
+        jQuery.each(rightList, function (i, item) {
+            var tr = document.createElement("tr");
+
+            var td = document.createElement("td");
+            td.textContent = item["Name"];
+            tr.appendChild(td);
+
+            td = document.createElement("td");
+            var input = document.createElement("input");
+            input.type = "Radio";
+            input.name = "group";
+            input.value = item["RightsID"];
+            td.appendChild(input);
+            tr.appendChild(td);
+            $("#tbody").append(tr);
+        });
+    },
+
+    FancyboxPutIn: function (radioGroupeVal, rightList) {
+        jQuery.each(rightList, function (i, item) {
+            if (String(item["RightsID"]).match(String(radioGroupeVal))) {
+                $("#Right_RightsID").val(item["RightsID"]);
+                $("#Right_Name").val(item["Name"]);
+            }
+        });
     }
 }

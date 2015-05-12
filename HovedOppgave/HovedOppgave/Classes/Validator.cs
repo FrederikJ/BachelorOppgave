@@ -37,11 +37,23 @@ namespace HovedOppgave.Classes
             return convert;
         }
 
+        public static bool CheckRights(Constant.Rights rights)
+        {
+            HttpContext http = HttpContext.Current;
+            int UserID = Validator.ConvertToNumbers(http.Session["UserID"].ToString());
+            UserRight model = myrep.GetUserWithRights(UserID, rights);
+            
+            if (model.Right == null || model.User == null)
+                return false;
+            else
+                return true;
+        }
+
         public static bool CheckRights(int UserID, Constant.Rights rights)
         {
-            UserRight user = myrep.GetUserWithRights(UserID, rights);
-            
-            if (user == null)
+            UserRight model = myrep.GetUserWithRights(UserID, rights);
+
+            if (model.Right == null || model.User == null)
                 return false;
             else
                 return true;
@@ -57,6 +69,15 @@ namespace HovedOppgave.Classes
                 return null;
             else
                 return "Du har skrevet inn ugyldige tegn";
+        }
+
+        public static bool ValidateEmail(string input)
+        {
+            //Hentet regex uttrykket her i fra http://stackoverflow.com/questions/5342375/c-sharp-regex-email-validation
+            if (input != "" && Regex.IsMatch(input, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"))
+                return true;
+            
+            return false;
         }
 
         public static bool IsValidFile(HttpPostedFileBase file, double maxFileSize)

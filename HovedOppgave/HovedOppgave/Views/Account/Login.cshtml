@@ -11,21 +11,21 @@
             @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
             {
                 @Html.AntiForgeryToken()
-                <h4>Logg inn</h4>
                 <hr />
+                <h4>Innloggings legitimasjon</h4>
                 @Html.ValidationSummary(true)
                 <div class="form-group">
-                    @Html.LabelFor(m => m.UserName, new { @class = "col-md-2 control-label" })
+                    @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
                     <div class="col-md-10">
-                        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", required = true })
-                        @Html.ValidationMessageFor(m => m.UserName)
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", required = true })
+                        @Html.ValidationMessageFor(m => m.Email, "Vennligst bruk riktig format: noe@noe.domene uten ulovlige tegn", new { @class = "text-danger" })
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
                     <div class="col-md-10">
                         @Html.PasswordFor(m => m.Password, new { @class = "form-control", required = true })
-                        @Html.ValidationMessageFor(m => m.Password)
+                        @Html.ValidationMessageFor(m => m.Password, "Vennligst ikke bruk ulovlige tegn", new { @class = "text-danger" })
                     </div>
                 </div>
                 <div class="form-group">
@@ -41,19 +41,26 @@
                         <input type="submit" value="Log in" class="btn btn-default" />
                     </div>
                 </div>
-                <p>
-                    @Html.ActionLink("Registrer", "Register") if you don't have a local account.
-                    @Html.ActionLink("Lost password", "LostPassword") if you have lost your password.
-                </p>
+                <div class="col-md-offset-1">
+                    <div class="btn-group">
+                        <button type="button" id="register" class="btn btn-default">Registrer</button>
+                        <button type="button" id="lostPassword" class="btn btn-default">Mistet passord?</button>
+                    </div>
+                </div>
             }
         </section>
     </div>
-    <div class="col-md-4">
-        <section id="socialLoginForm">
-            @Html.Partial("_ExternalLoginsListPartial", new { Action = "ExternalLogin" })
-        </section>
-    </div>
 </div>
+
+<script type="text/javascript">
+    $("#register").click(function () {
+        window.location.replace("/Account/Register");
+    });
+    $("#lostPassword").click(function () {
+        window.location.replace("/Account/LostPassword");
+    });
+</script>
+
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }

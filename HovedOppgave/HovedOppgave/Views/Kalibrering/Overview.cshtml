@@ -47,6 +47,8 @@
 <br />
 <div id="tableContainer"></div>
 
+<div id="test"></div>
+
 <script type="text/javascript">
     var th, tb;
     var asc1 = 1, asc2 = 1, asc3 = 1;
@@ -115,11 +117,17 @@
             $("#tableContainer").empty();
             h3.textContent = "Kan kalibreres";
 
-            var deviceTypeList = @Html.Raw(Json.Encode(Model.DeviceTypes));
-            var deviceList = @Html.Raw(Json.Encode(Model.Devices));
-            var roomList = @Html.Raw(Json.Encode(Model.Rooms));
+            jQuery.each(deviceList, function(i, device) {
+                jQuery.each(logEventList, function(i, logEvent) {
+                    if(device["DeviceID"] != logEvent["DeviceID"]) {
+                        var lable = document.createElement("lable");
+                        lable.textContent = device["DeviceID"] + " - " + device["Name"] + "\n";
+                        $("#test").append(lable);
+                    }
+                });
+            });
 
-            GetDeviceTable(deviceTypeList, deviceList, roomList);
+            GetDeviceTable(deviceTypeList, deviceList, roomList, logEventList);
         });
 
         $("#ddm").click(function() {

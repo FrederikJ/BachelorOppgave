@@ -120,12 +120,12 @@
         <h4>Sertifikat</h4>
         <hr />
         <div class="form-group">
-            @Html.LabelFor(model => model.File.FileName, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.FileTo.FileName, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 <input type="file" class="btn btn-default" id="fileInput" name="file" />
                 <br />
-                @Html.EditorFor(model => model.File.FileName, new { htmlAttributes = new { @class = "form-control", placeholder = "Fil", readOnly = true } })
-                @Html.ValidationMessageFor(model => model.File.FileName, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.FileTo.FileName, new { htmlAttributes = new { @class = "form-control", placeholder = "Fil", readOnly = true } })
+                @Html.ValidationMessageFor(model => model.FileTo.FileName, "", new { @class = "text-danger" })
                 <a href="#showInFancy" id="floating">Søk i eksisterende filer</a>
             </div>
         </div>
@@ -135,7 +135,7 @@
             @Html.HiddenFor(model => model.EventType.EventTypeID, new { htmlAttributes = new { readOnly = true } })
             @Html.HiddenFor(model => model.Company.CompanyID, new { htmlAttributes = new { readOnly = true } })
             @Html.HiddenFor(model => model.Room.RoomID, new { htmlAttributes = new { readOnly = true } })
-            @Html.HiddenFor(model => model.File.FileID, new { htmlAttributes = new { readOnly = true } })
+            @Html.HiddenFor(model => model.FileTo.FileID, new { htmlAttributes = new { readOnly = true } })
             @Html.HiddenFor(model => model.LogEvent.FileID, new { htmlAttributes = new { readOnly = true } })
         </div>
 
@@ -168,6 +168,13 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
+        var endDate = new Date($.parseJSON(String(logEvent["EndDate"]).substr(6, 13)));
+        var staDate = new Date($.parseJSON(String(logEvent["StartDate"]).substr(6, 13)));
+        var regDate = new Date($.parseJSON(String(logEvent["RegisteredDate"]).substr(6, 13)));
+        $("#LogEvent_RegisteredDate").val(regDate.getFullYear() + "." + regDate.getMonth + "." + regDate.getDate());
+        $("#LogEvent_StartDate").val(staDate.getFullYear() + "." + staDate.getMonth + "." + staDate.getDate());
+        $("#LogEvent_EndDate").val(endDate.getFullYear() + "." + endDate.getMonth + "." + endDate.getDate());
+
         var roomList = @Html.Raw(Json.Encode(Model.Rooms));
         var fileList = @Html.Raw(Json.Encode(Model.Files));
         var companyList = @Html.Raw(Json.Encode(Model.Companys));

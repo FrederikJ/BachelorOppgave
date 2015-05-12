@@ -15,6 +15,11 @@ namespace HovedOppgave.Controllers
     {
         IRepository myrep = new Repository();
 
+        public KalibreringController()
+        {
+            SessionCheck.CheckForRightsOnLogInUser(Constant.Rights.Administrator);
+            SessionCheck.CheckForRightsOnLogInUser(Constant.Rights.User);
+        }
         // GET: Kalibrering
         /// <summary>
         /// SETT INN WINDOWS.LOCATION.REPLACE VERDI FOR DETALJE KNAPPEN I "KAN KALIBRERES" KNAPPEN
@@ -44,7 +49,8 @@ namespace HovedOppgave.Controllers
             if (files.Count != 0)
                 model.Files = files;
 
-            return View(model);
+            string master = SessionCheck.FindMaster();
+            return View("Overview", master, model);
         }
         #region funker
         // GET: Kalibrering/Create
@@ -58,7 +64,9 @@ namespace HovedOppgave.Controllers
                 model.Device = device;
                 model.EventType = eventType;
             }
-            return View(model);
+
+            string master = SessionCheck.FindMaster();
+            return View("Create", master, model);
         }
 
         // POST: Kalibrering/Create
@@ -91,7 +99,9 @@ namespace HovedOppgave.Controllers
             model.Rooms = model1.Rooms;
             model.Files = model1.Files;
             model.Companys = model1.Companys;
-            return View(model);
+
+            string master = SessionCheck.FindMaster();
+            return View("EditCalibration", master, model);
         }
 
         // POST: Kalibrering/Edit/5
@@ -112,11 +122,11 @@ namespace HovedOppgave.Controllers
                     this.DeleteFileFromDirectory(tempFile);
                 //Skal kassere filen og settes opp et log event
             }
-            else if(model.File != null)
+            else if(model.FileTo != null)
             {
-                if (model.File.FileID != model.LogEvent.FileID)
+                if (model.FileTo.FileID != model.LogEvent.FileID)
                 {
-                    var tempFile = myrep.GetFile(model.File.FileID);
+                    var tempFile = myrep.GetFile(model.FileTo.FileID);
                     if (tempFile.FileID != model.LogEvent.FileID)
                         this.DeleteFileFromDirectory(tempFile);
                     //Skal kassere filen og settes opp et log event
@@ -171,8 +181,9 @@ namespace HovedOppgave.Controllers
             model.LogEvents = logEvents;
             model.Devices = devices;
             model.Rooms = rooms;
-            
-            return View(model);
+
+            string master = SessionCheck.FindMaster();
+            return View("Import", master, model);
         }
 
         // POST: Kalibrering/Import
@@ -197,7 +208,7 @@ namespace HovedOppgave.Controllers
                     myrep.EditLogEvent(logEvent);
                     return RedirectToAction("License");
                 }
-                else if(id != null)
+                else if(id != 0)
                     return RedirectToAction("License");
                 else
                     return View(model);
@@ -215,8 +226,9 @@ namespace HovedOppgave.Controllers
             CalibrationViews model = new CalibrationViews();
             model.FilePath = Server.MapPath("~/App_Data/Sertifikat");
             model.Files = list;
-            
-            return View(model);
+
+            string master = SessionCheck.FindMaster();
+            return View("License", master, model);
         }
 
         // GET: Kalibrering/History
@@ -238,14 +250,17 @@ namespace HovedOppgave.Controllers
             if (files.Count != 0)
                 model.Files = files;
 
-            return View(model);
+            string master = SessionCheck.FindMaster();
+            return View("History", master, model);
         }
         
         // GET: Kalibrering/CalibrationViewDetails
         public ActionResult CalibrationViewDetails(int id)
         {
             CalibrationViews model = this.CalibrationViews(id);
-            return View(model);
+            
+            string master = SessionCheck.FindMaster();
+            return View("CalibrationViewDetails", master, model);
         }
         #endregion
         #region skal ha?
@@ -256,9 +271,10 @@ namespace HovedOppgave.Controllers
             string path = Path.Combine(Server.MapPath("~/App_Data/Sertifikat"), file.FileName);
             file.FilePath = path;
             CalibrationViews model = new CalibrationViews();
-            model.File = file;
+            model.FileTo = file;
 
-            return View(model);
+            string master = SessionCheck.FindMaster();
+            return View("Showfile", master, model);
         }
         #endregion
         #region funker
@@ -266,14 +282,18 @@ namespace HovedOppgave.Controllers
         public ActionResult Detailsfile(int id)
         {
             CalibrationViews model = this.DeleteDetailsFile(id);
-            return View(model);
+            
+            string master = SessionCheck.FindMaster();
+            return View("Detailsfile", master, model);
         }
         
         // GET: Kalibrering/Deletefile
         public ActionResult Deletefile(int id)
         {
             CalibrationViews model = this.DeleteDetailsFile(id);
-            return View(model);
+
+            string master = SessionCheck.FindMaster();
+            return View("Deletefile", master, model);
         }
         #endregion
         //settes opp et log event og kassere filen
@@ -343,7 +363,7 @@ namespace HovedOppgave.Controllers
             model.Device = device;
             model.Company = Company;
             model.EventType = eventType;
-            model.File = file;
+            model.FileTo = file;
 
             return model;
         }
@@ -363,8 +383,8 @@ namespace HovedOppgave.Controllers
                 calibration.DeviceID = model.Device.DeviceID;
                 calibration.EventTypeID = model.EventType.EventTypeID;
                 calibration.RoomID = model.Room.RoomID;
-                if (model.File != null)
-                    calibration.FileID = model.File.FileID;
+                if (model.FileTo != null)
+                    calibration.FileID = model.FileTo.FileID;
                 if (model.LogEvent.StartDate.Year != 1 || model.LogEvent.EndDate.Year != 1)
                 {
                     calibration.StartDate = model.LogEvent.StartDate;
@@ -449,7 +469,7 @@ namespace HovedOppgave.Controllers
                 model.Device = device;
                 model.LogEvent = logEvent;
             }
-            model.File = file;
+            model.FileTo = file;
             model.FilePath = Server.MapPath("~/App_Data/Sertifikat");
 
             return model;

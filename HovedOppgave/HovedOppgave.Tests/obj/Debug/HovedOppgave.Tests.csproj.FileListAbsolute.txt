@@ -11,7 +11,6 @@ C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\H
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\System.Web.WebPages.Deployment.dll
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\System.Web.WebPages.dll
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\System.Web.WebPages.Razor.dll
-C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.dll
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\System.Web.Optimization.dll
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\Owin.dll
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\System.Web.Http.dll
@@ -20,8 +19,6 @@ C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\H
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\Microsoft.Owin.Security.Cookies.dll
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\Microsoft.Owin.Security.dll
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\Microsoft.AspNet.Identity.Owin.dll
-C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\EntityFramework.dll
-C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\Microsoft.Owin.Host.SystemWeb.dll
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\System.Web.Http.WebHost.dll
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\System.Net.Http.Formatting.dll
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\HovedOppgave.pdb
@@ -32,7 +29,6 @@ C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\H
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\System.Web.WebPages.xml
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\System.Web.WebPages.Deployment.xml
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\System.Web.WebPages.Razor.xml
-C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\Microsoft.AspNet.Identity.EntityFramework.xml
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\System.Web.Optimization.xml
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\System.Web.Http.xml
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\Microsoft.AspNet.Identity.Core.xml
@@ -40,8 +36,6 @@ C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\H
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\Microsoft.Owin.Security.Cookies.xml
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\Microsoft.Owin.Security.xml
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\Microsoft.AspNet.Identity.Owin.xml
-C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\EntityFramework.xml
-C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\Microsoft.Owin.Host.SystemWeb.xml
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\System.Web.Http.WebHost.xml
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\bin\Debug\System.Net.Http.Formatting.xml
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave.Tests\obj\Debug\HovedOppgave.Tests.dll
