@@ -25,7 +25,7 @@
         var usersList = @Html.Raw(Json.Encode(Model.Users));
 
         $("#tableContainer").empty();
-        GetUserTable(usersList, rightsList, null);
+        GetUserTable(usersList, rightsList);
 
         $("manage").click(function () {
             window.location.replace("/Account/Manage/0");

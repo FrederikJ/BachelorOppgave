@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
+/**
+ * Model klasse for enhet typer
+*/
+
 namespace HovedOppgave.Models
 {
     public class DeviceType

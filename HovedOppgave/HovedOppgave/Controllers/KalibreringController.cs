@@ -14,11 +14,12 @@ namespace HovedOppgave.Controllers
     public class KalibreringController : Controller
     {
         IRepository myrep = new Repository();
+        SessionCheck sessionCheck = new SessionCheck();
 
         public KalibreringController()
         {
-            SessionCheck.CheckForRightsOnLogInUser(Constant.Rights.Administrator);
-            SessionCheck.CheckForRightsOnLogInUser(Constant.Rights.User);
+            //SessionCheck.CheckForRightsOnLogInUser(Constant.Rights.Administrator);
+            //SessionCheck.CheckForRightsOnLogInUser(Constant.Rights.User);
         }
         // GET: Kalibrering
         /// <summary>
@@ -36,7 +37,7 @@ namespace HovedOppgave.Controllers
             List<Room> rooms = myrep.GetAllRooms();
             List<Company> companies = myrep.GetAllCompanys();
             List<EventType> eventTypes = myrep.GetAllEventTypes();
-            List<Files> files = myrep.GetAllFiles();
+            List<Files> files = myrep.GetAllFilesNotDiscarded();
             logEvents.Sort((x, y) => DateTime.Compare(x.StartDate, y.StartDate));
             logEvents.Reverse();
             
@@ -49,7 +50,7 @@ namespace HovedOppgave.Controllers
             if (files.Count != 0)
                 model.Files = files;
 
-            string master = SessionCheck.FindMaster();
+            string master = sessionCheck.FindMaster();
             return View("Overview", master, model);
         }
         #region funker
@@ -64,8 +65,20 @@ namespace HovedOppgave.Controllers
                 model.Device = device;
                 model.EventType = eventType;
             }
+            
+            
+            string master = "";
+            int userId = Validator.ConvertToNumbers(Session["UserID"].ToString());
+            User user = myrep.GetUser(userId);
+            Rights rights = myrep.GetRightToUser(user);
 
-            string master = SessionCheck.FindMaster();
+            if (rights.Name == Constant.Rights.Administrator.ToString())
+                master = "~/Views/Shared/_AdminLayout.cshtml";
+            else if (rights.Name == Constant.Rights.User.ToString())
+                master = "~/Views/Shared/_UserLayout.cshtml";
+            else if (rights.Name == Constant.Rights.Guest.ToString())
+                master = "~/Views/Shared/_GuestLayout.cshtml";
+
             return View("Create", master, model);
         }
 
@@ -100,7 +113,7 @@ namespace HovedOppgave.Controllers
             model.Files = model1.Files;
             model.Companys = model1.Companys;
 
-            string master = SessionCheck.FindMaster();
+            string master = sessionCheck.FindMaster();
             return View("EditCalibration", master, model);
         }
 
@@ -114,23 +127,18 @@ namespace HovedOppgave.Controllers
                 return View(model);
 
             //siden man evt skifter filen sjekke om det filnavnet ligger i systemet, viss ikke
-            //slettes filen
-            if (file != null)
+            //kasseres filen
+            if (file != null && calibration.FileID  != 0 && calibration.FileID != model.LogEvent.FileID)
             {
-                var tempFile = myrep.GetLastInsertedFile();
-                if(tempFile.FileID != model.LogEvent.FileID)
-                    this.DeleteFileFromDirectory(tempFile);
-                //Skal kassere filen og settes opp et log event
+                var tempFile = myrep.GetFile(calibration.FileID);
+                tempFile.Kassert = true;
+                myrep.EditFile(tempFile);
             }
-            else if(model.FileTo != null)
+            else if(model.FileTo != null && model.FileTo.FileID != model.LogEvent.FileID)
             {
-                if (model.FileTo.FileID != model.LogEvent.FileID)
-                {
-                    var tempFile = myrep.GetFile(model.FileTo.FileID);
-                    if (tempFile.FileID != model.LogEvent.FileID)
-                        this.DeleteFileFromDirectory(tempFile);
-                    //Skal kassere filen og settes opp et log event
-                }
+                var tempFile = myrep.GetFile(model.LogEvent.FileID);
+                tempFile.Kassert = true;
+                myrep.EditFile(tempFile);
             }
 
             try
@@ -182,7 +190,7 @@ namespace HovedOppgave.Controllers
             model.Devices = devices;
             model.Rooms = rooms;
 
-            string master = SessionCheck.FindMaster();
+            string master = sessionCheck.FindMaster();
             return View("Import", master, model);
         }
 
@@ -200,8 +208,8 @@ namespace HovedOppgave.Controllers
                     if (logEvent.FileID != 0)
                     {
                         Files tempFile = myrep.GetFile(logEvent.FileID);
-                        this.DeleteFileFromDirectory(tempFile);
-                        myrep.DeleteFile(tempFile);
+                        tempFile.Kassert = true;
+                        myrep.EditFile(tempFile);
                     }
                     logEvent.FileID = id;
 
@@ -222,12 +230,12 @@ namespace HovedOppgave.Controllers
         // GET: Kalibrering/License
         public ActionResult License()
         {
-            List<Files> list = myrep.GetAllFiles();
+            List<Files> list = myrep.GetAllFilesNotDiscarded();
             CalibrationViews model = new CalibrationViews();
-            model.FilePath = Server.MapPath("~/App_Data/Sertifikat");
+            model.ExtraStringHelp = Url.Content("~/Sertifikat");
             model.Files = list;
 
-            string master = SessionCheck.FindMaster();
+            string master = sessionCheck.FindMaster();
             return View("License", master, model);
         }
 
@@ -235,12 +243,12 @@ namespace HovedOppgave.Controllers
         public ActionResult History()
         {
             CalibrationViews model = new CalibrationViews();
-            List<LogEvent> logEvents = myrep.GetAllLogEvent();
+            List<LogEvent> logEvents = myrep.GetAllLogEventWithDiscarded();
             List<Device> devices = myrep.GetAllDevices();
             List<Room> rooms = myrep.GetAllRooms();
             List<Company> companies = myrep.GetAllCompanys();
             List<EventType> eventTypes = myrep.GetAllEventTypes();
-            List<Files> files = myrep.GetAllFiles();
+            List<Files> files = myrep.GetAllFilesNotDiscarded();
 
             model.Companys = companies;
             model.Devices = devices;
@@ -250,7 +258,7 @@ namespace HovedOppgave.Controllers
             if (files.Count != 0)
                 model.Files = files;
 
-            string master = SessionCheck.FindMaster();
+            string master = sessionCheck.FindMaster();
             return View("History", master, model);
         }
         
@@ -258,32 +266,17 @@ namespace HovedOppgave.Controllers
         public ActionResult CalibrationViewDetails(int id)
         {
             CalibrationViews model = this.CalibrationViews(id);
-            
-            string master = SessionCheck.FindMaster();
+
+            string master = sessionCheck.FindMaster();
             return View("CalibrationViewDetails", master, model);
         }
-        #endregion
-        #region skal ha?
-        // GET: Kalibrering/Showfile
-        public ActionResult Showfile(int id)
-        {
-            Files file = myrep.GetFile(id);
-            string path = Path.Combine(Server.MapPath("~/App_Data/Sertifikat"), file.FileName);
-            file.FilePath = path;
-            CalibrationViews model = new CalibrationViews();
-            model.FileTo = file;
 
-            string master = SessionCheck.FindMaster();
-            return View("Showfile", master, model);
-        }
-        #endregion
-        #region funker
         // GET: Kalibrering/Detailsfile
         public ActionResult Detailsfile(int id)
         {
             CalibrationViews model = this.DeleteDetailsFile(id);
-            
-            string master = SessionCheck.FindMaster();
+
+            string master = sessionCheck.FindMaster();
             return View("Detailsfile", master, model);
         }
         
@@ -292,10 +285,10 @@ namespace HovedOppgave.Controllers
         {
             CalibrationViews model = this.DeleteDetailsFile(id);
 
-            string master = SessionCheck.FindMaster();
+            string master = sessionCheck.FindMaster();
             return View("Deletefile", master, model);
         }
-        #endregion
+        
         //settes opp et log event og kassere filen
         // POST: Kalibrering/Deletefile
         [HttpPost]
@@ -314,7 +307,6 @@ namespace HovedOppgave.Controllers
 
             try
             {
-                this.DeleteFileFromDirectory(file);
                 myrep.EditFile(file);
                 myrep.CreateLogEvent(logevent);
                 return RedirectToAction("License");
@@ -325,15 +317,15 @@ namespace HovedOppgave.Controllers
                 return View(model);
             }
         }
+        #endregion
         
-        #region Create Calibration view method
         public CalibrationViews CreateCalibrationView()
         {
             List<Device> deviceList = myrep.GetAllDevices();
             List<Room> roomList = myrep.GetAllRooms();
             List<EventType> eventTypeList = myrep.GetAllEventTypes();
             List<Company> companyList = myrep.GetAllCompanys();
-            List<Files> files = myrep.GetAllFiles();
+            List<Files> files = myrep.GetAllFilesNotDiscarded();
 
             CalibrationViews model = new CalibrationViews()
             {
@@ -346,8 +338,7 @@ namespace HovedOppgave.Controllers
 
             return model;
         }
-        #endregion
-        #region Calibration view model
+        
         public CalibrationViews CalibrationViews(int id)
         {
             var logEvent = myrep.GetLogEvent(id);
@@ -367,7 +358,6 @@ namespace HovedOppgave.Controllers
 
             return model;
         }
-        #endregion
 
         public LogEvent CreatEditFillLogEvent(CalibrationViews model, HttpPostedFileBase file)
         {
@@ -408,33 +398,13 @@ namespace HovedOppgave.Controllers
             }
         }
 
-        public void DeleteFileFromDirectory(Files file)
-        {
-            //Går igjennom alle filer vi har, sjekker om det er flere med samme fil navn
-            List<Files> files = myrep.GetAllFiles();
-            var tempList = new List<Files>();
-            for (int i = 0; i < files.Count; i++)
-                if (files[i].FileName.Equals(file.FileName))
-                    tempList.Add(files[i]);
-
-            //count vil være 1 vis det ikke er flere med samme navn så man kan slette filen
-            // fra directory. for når man lagre filen, så lagre den ikke om det er en fil med samme navnet fra før av.
-            if (tempList.Count == 1)
-            {
-                DirectoryInfo myDir = new DirectoryInfo(Server.MapPath("~/App_Data/Sertifikat"));
-                foreach (FileInfo fil in myDir.GetFiles())
-                    if (fil.Name.Equals(file.FileName))
-                        fil.Delete();
-            }
-        }
-
         public int SaveFileToDirectoryAndDB(HttpPostedFileBase file)
         {
             if (file != null)
             {
                 if (Validator.IsValidFile(file, 5))
                 {
-                    string path = Path.Combine(Server.MapPath("~/App_Data/Sertifikat"), file.FileName);
+                    string path = Path.Combine(Server.MapPath("~/Sertifikat"), file.FileName);
                     file.SaveAs(path);
                     Files dbFile = new Files()
                     {
@@ -447,11 +417,8 @@ namespace HovedOppgave.Controllers
                     int fileId = myrep.CreateFile(dbFile);
                     return fileId;
                 }
-                else
-                    return 0;
             }
-            else
-                return 0;
+            return 0;
         }
 
         public CalibrationViews DeleteDetailsFile(int id)
@@ -470,7 +437,7 @@ namespace HovedOppgave.Controllers
                 model.LogEvent = logEvent;
             }
             model.FileTo = file;
-            model.FilePath = Server.MapPath("~/App_Data/Sertifikat");
+            model.ExtraStringHelp = Server.MapPath("~/Sertifikat");
 
             return model;
         }

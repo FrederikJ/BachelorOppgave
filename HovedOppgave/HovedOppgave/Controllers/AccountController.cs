@@ -211,11 +211,13 @@ namespace HovedOppgave.Controllers
         }
 
         // GET: /Account/Manage
+        [AllowAnonymous]
         public ActionResult Manage(int id)
         {
             ManageUserViewModel model = new ManageUserViewModel();
-            User loggedIn = null;
-            //User loggedIn = myrep.GetUser(SessionCheck.CheckForUserID());
+            SessionCheck.CheckForUserID();
+            
+            User loggedIn = myrep.GetUser(5);
             User change = null;
 
             if (id != 0)
@@ -231,7 +233,8 @@ namespace HovedOppgave.Controllers
             }
             model.ChangeUser = change;
 
-            string master = SessionCheck.FindMaster();
+            SessionCheck check = new SessionCheck();
+            string master = check.FindMaster();
             return View("Manage", master, model);
         }
         

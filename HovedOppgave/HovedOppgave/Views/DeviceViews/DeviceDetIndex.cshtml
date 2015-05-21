@@ -1,0 +1,95 @@
+﻿@model HovedOppgave.Models.CalibrationViews
+
+@{
+    ViewBag.Title = "DeviceDetIndex";
+}
+
+<h2>DeviceDetIndex</h2>
+
+<div>
+    <h4>Status</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayName("Rom")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Room.Name)
+        </dd>
+        <dt></dt>
+        <dd>
+            @Html.DisplayFor(model => model.ExtraStringHelp)
+        </dd>
+        <dt></dt>
+        <dd>
+            @Html.DisplayFor(model => model.ExtraStringHelp1)
+        </dd>
+        <dt></dt>
+        <dd>
+            @Html.DisplayFor(model => model.ExtraStringHelp2)
+        </dd>
+    </dl>
+</div>
+
+<div>
+    <h4>Enhet</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt></dt>
+        <dd id="nextCalibrationStart"></dd>
+        <dt id="textNextCalibration">
+            @Html.DisplayName("Dager til kalibrering")
+        </dt>
+        <dd id="daysNextCalibration"></dd>
+        <dt>
+            @Html.DisplayName("IP adresse")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DeviceWithNetwork.NetworkInfo.IP)
+        </dd>
+        <dt>
+            @Html.DisplayName("Serie nummeret")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DeviceWithNetwork.Device.SerialNum)
+        </dd>
+    </dl>
+</div>
+
+<button type="button" class="btn btn-default" id="discardUnit">Kasser enheten</button>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var logEvent = @Html.Raw(Json.Encode(Model.LogEvent));
+        if(logEvent != null) {
+            var date = new Date($.parseJSON(String(logEvent["StartDate"]).substr(6, 13)));
+            var month = date.getMonth() + 1;
+            var nowDate = new Date();
+            nowDate.setSeconds(0);
+            nowDate.setMinutes(0);
+            nowDate.setHours(0);
+
+            var lable = document.createElement("lable");
+            lable.textContent = "Denne enheten skal kalibreres neste gang den " + date.getDate() + "." + month + "." + date.getFullYear();
+            $("#nextCalibrationStart").append(lable);
+
+            //startdate minus dagens dato delt på ant. millisekunder i en dag
+            var difference = (date-nowDate)/(1000*60*60*24);
+            lable = document.createElement("lable");
+            lable.textContent = difference.toFixed(0);
+            $("#daysNextCalibration").append(lable);
+        }
+        else {
+            var lable = document.createElement("lable");
+            lable.textContent = "Denne enheten er ikke satt opp til noen fremtidige kalibreringer";
+            $("#nextCalibrationStart").append(lable);
+            textNextCalibration.hidden = true;
+            daysNextCalibration.hidden = true;
+        }
+
+        $("#discardUnit").click(function() {
+            var device = @Html.Raw(Json.Encode(Model.DeviceWithNetwork.Device));
+            window.location.replace("/DeviceViews/DiscardDevice/" + device["DeviceID"]);
+        });
+    });
+</script>

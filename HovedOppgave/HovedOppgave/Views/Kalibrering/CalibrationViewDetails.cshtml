@@ -17,102 +17,7 @@
     </div>
 </div>
 <br />
-
-<div class="col-lg-12">
-    <h4>Kalibrering</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayName("Registrert dato")
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.LogEvent.RegisteredDate.Date)
-        </dd>
-        <dt>
-            @Html.DisplayName("Planlagt dato")
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.LogEvent.StartDate.Date)
-        </dd>
-        <dt id="endDate"></dt>
-        <dd>
-            @Html.DisplayFor(model => model.LogEvent.EndDate.Date)
-        </dd>
-        <dt>
-            @Html.DisplayName("Data 1")
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.LogEvent.Data1)
-        </dd>
-        <dt>
-            @Html.DisplayName("Data 2")
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.LogEvent.Data2)
-        </dd>
-    </dl>
-</div>
-
-<div class="col-lg-12">
-    <h4>Event type</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayName("Event type")
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.EventType.Name)
-        </dd>
-    </dl>
-</div>
-
-<div class="col-lg-12">
-    <h4>Utstyrsenhet</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayName("Enhet")
-        </dt>
-        <dd id="device"></dd>
-    </dl>
-</div>
-
-<div class="col-lg-12">
-    <h4>Organisasjon</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayName("Kalibreres av")
-        </dt>
-        <dd id="company"></dd>
-    </dl>
-</div>
-
-<div class="col-lg-12">
-    <h4>Rom</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayName("Navn")
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Room.Name)
-        </dd>
-    </dl>
-</div>
-
-<div class="col-lg-12">
-    <h4>Sertifikat</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayName("Fil navn")
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.FileTo.FileName)
-        </dd>
-    </dl>
-</div>
+<div id="fillDetails"></div>
 
 <button class="btn btn-default" type="button" id="button">Rediger kalibrering</button>
 
@@ -120,8 +25,12 @@
     $(document).ready(function () {
         var device = @Html.Raw(Json.Encode(Model.Device));
         var company = @Html.Raw(Json.Encode(Model.Company));
-        
-        CalibrationViewsDetails(device, company);
+        var file = @Html.Raw(Json.Encode(Model.FileTo));
+        var room = @Html.Raw(Json.Encode(Model.Room));
+        var eventType = @Html.Raw(Json.Encode(Model.EventType));
+        var logEvent = @Html.Raw(Json.Encode(Model.LogEvent));
+
+        CalibrationViewsDetails(logEvent, eventType, device, company, room, file);
 
         $("#button").click(function() {
             window.location.replace("/Kalibrering/EditCalibration/" + @Model.LogEvent.LogEventID)

@@ -47,8 +47,6 @@
 <br />
 <div id="tableContainer"></div>
 
-<div id="test"></div>
-
 <script type="text/javascript">
     var th, tb;
     var asc1 = 1, asc2 = 1, asc3 = 1;
@@ -116,16 +114,6 @@
         $("#canCalibrate").click(function () {
             $("#tableContainer").empty();
             h3.textContent = "Kan kalibreres";
-
-            jQuery.each(deviceList, function(i, device) {
-                jQuery.each(logEventList, function(i, logEvent) {
-                    if(device["DeviceID"] != logEvent["DeviceID"]) {
-                        var lable = document.createElement("lable");
-                        lable.textContent = device["DeviceID"] + " - " + device["Name"] + "\n";
-                        $("#test").append(lable);
-                    }
-                });
-            });
 
             GetDeviceTable(deviceTypeList, deviceList, roomList, logEventList);
         });

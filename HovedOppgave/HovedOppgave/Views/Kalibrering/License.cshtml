@@ -21,8 +21,37 @@
     </div>
 </div>
 <br />
-<div id="tableContainer"></div>
-<a class="fancybox" id="showFile" data-fancybox-type="iframe" href="~/App_Data/Sertifikat/Fabrikantsertifikat_eks_1.pdf">hei</a>
+<h4>Filer</h4><br />
+<table class="table" id="tableFill">
+    <tbody id="tbody">
+        @foreach(var item in Model.Files)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FileName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FileType)
+                </td>
+                <td id="fileType">
+                    @Html.DisplayFor(modelItem => item.FileSize)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Date)
+                </td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn btn-success" type="button" onclick="btnShowFile('@item.FileName')">Vis fil</button>
+                        <button class="btn btn-warning" type="button" onclick="btnDetails('@item.FileID')">Detaljer</button>
+                        <button class="btn btn-danger" type="button" onclick="btnDelete('@item.FileID')">Slett fil</button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a class="fancybox" id="showFile" data-fancybox-type="iframe" href="" hidden></a>
 <script type="text/javascript">
     var th, tb;
     var asc1 = 1, asc2 = 1, asc3 = 1;
@@ -30,93 +59,11 @@
     $(document).ready(function () {
         $(".fancybox").fancybox();
 
-        var h4 = document.createElement("h4");
-        h4.textContent = "Fil plassering";
-        var hr = document.createElement("hr");
-        var div = document.createElement("div");
-        div.className = "col-lg-12";
-        var lable = document.createElement("lable");
-        var filePath = @Html.Raw(Json.Encode(Model.FilePath));
-        lable.textContent = filePath;
-        div.appendChild(lable);
-
-        var br = document.createElement("br");
-        var brr = document.createElement("br");
-
-        var table = document.createElement("table");
-        table.className = "table";
         var thead = document.createElement("thead");
         thead.setAttribute("id", "thead");
-        var tbody = document.createElement("tbody");
-        tbody.setAttribute("id", "tbody");
-
         FillTableHead(thead, "file");
-
-        var fileList = @Html.Raw(Json.Encode(Model.Files));
-        jQuery.each(fileList, function(i, file) {
-            tr = document.createElement("tr");
-
-            var td = document.createElement("td");
-            td.textContent = String(file["FileName"]);
-            tr.appendChild(td);
-
-            td = document.createElement("td");
-            td.textContent = String(file["FileType"]);
-            tr.appendChild(td);
-
-            td = document.createElement("td");
-            td.textContent = String(file["FileSize"]);
-            tr.appendChild(td);
-
-            td = document.createElement("td");
-            var date = new Date($.parseJSON(String(file["Date"]).substr(6, 13)));
-            var month = date.getMonth() + 1;
-            td.textContent = String(date.getDate() + "." + month + "." + date.getFullYear());
-            tr.appendChild(td);
-
-            var id = file["FileID"];
-            var td = document.createElement("td");
-
-            var inputShow = document.createElement("button");
-            inputShow.type = "button";
-            inputShow.className = "btn btn-success";
-            inputShow.textContent = "Vis fil";
-            inputShow.onclick = function() {
-                //showFile.hidden = false;
-                //$("#showFile").href= "@Model.FilePath" + "/" + file["FileName"];
-
-            };
-
-            var inputDet = document.createElement("button");
-            inputDet.type = "button";
-            inputDet.className = "btn btn-warning";
-            inputDet.textContent = "Detaljer";
-            inputDet.onclick = function(){
-                window.location.replace("/Kalibrering/Detailsfile/" + id);
-            };
-
-            var inputDel = document.createElement("button");
-            inputDel.type = "button";
-            inputDel.className = "btn btn-danger";
-            inputDel.textContent = "Slett fil";
-            inputDel.onclick = function() {
-                window.location.replace("/Kalibrering/Deletefile/" + id);
-            };
-
-            var group = document.createElement("div");
-            group.className = "btn-group";
-            group.appendChild(inputShow);
-            group.appendChild(inputDet);
-            group.appendChild(inputDel);
-
-            td.appendChild(group);
-            tr.appendChild(td);
-
-            tbody.appendChild(tr);
-
-            AddTableToContainer(thead, tbody, h4, table, hr, div, br, brr);
-        });
-
+        $("#tableFill").append(thead);
+        
         $("#ddm").click(function() {
             var colNumber = event.path[1].id;
             var el = document.getElementById(colNumber);
@@ -128,6 +75,20 @@
             GetColName(th);
         });
     });
+
+    function btnShowFile(name) {
+        var href = @Html.Raw(Json.Encode(Model.ExtraStringHelp)) + "/" + name;
+        showFile.href = href;
+        $("#showFile").trigger('click');
+    }
+
+    function btnDetails(id) {
+        window.location.replace("/Kalibrering/Deletefile/" + id);
+    }
+
+    function btnDelete(id) {
+        window.location.replace("/Kalibrering/Detailsfile/" + id);
+    }
 
     function Overview() {
         window.location.replace("/Kalibrering/Overview");

@@ -1,0 +1,94 @@
+﻿@model HovedOppgave.Models.CalibrationViews
+
+@{
+    ViewBag.Title = "DeviceDetails";
+}
+
+<h2>Enhets detaljer</h2>
+
+<div>
+    <h4>Enhet</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayName("Navn")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Device.Name)
+        </dd>
+        <dt>
+            @Html.DisplayName("Beskrivelse")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Device.Description)
+        </dd>
+        <dt>
+            @Html.DisplayName("Serie nummeret")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Device.SerialNum)
+        </dd>
+        <dt>
+            @Html.DisplayName("Høyde")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Device.Height)
+        </dd>
+        <dt>
+            @Html.DisplayName("Vekt")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Device.Weight)
+        </dd>
+        <dt>
+            @Html.DisplayName("Er montert")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Device.IsRackMountable)
+        </dd>
+        <dt>
+            @Html.DisplayName("Model")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Device.Model)
+        </dd>
+        <dt>
+            @Html.DisplayName("Merke")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Device.Brand)
+        </dd>
+        <dt>
+            @Html.DisplayName("Spenning inn")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Device.InputVoltage)
+        </dd>
+    </dl>
+</div>
+
+<div>
+    <h4>Enhet type</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayName("Type")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DeviceType.Type)
+        </dd>
+    </dl>
+</div>
+
+<div>
+    <h4>Rom</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayName("Navn")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Room.Name)
+        </dd>
+    </dl>
+</div>

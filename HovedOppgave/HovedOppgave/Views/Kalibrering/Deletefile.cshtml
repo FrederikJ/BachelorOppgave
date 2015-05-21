@@ -107,7 +107,7 @@
 }
 <script type="text/javascript">
     $(document).ready(function () {
-        var filePath = @Html.Raw(Json.Encode(Model.FilePath));
+        var filePath = @Html.Raw(Json.Encode(Model.ExtraStringHelp));
         var file = @Html.Raw(Json.Encode(Model.FileTo));
         var device = @Html.Raw(Json.Encode(Model.Device));
         var company = @Html.Raw(Json.Encode(Model.Company));

@@ -11,9 +11,11 @@ namespace HovedOppgave.Controllers
 {
     public class HomeController : Controller
     {
+        SessionCheck check = new SessionCheck();
+
         public ActionResult Index()
         {
-            string master = SessionCheck.FindMaster();
+            string master = check.FindMaster();
             return View("Index", master);
         }
 
@@ -21,7 +23,7 @@ namespace HovedOppgave.Controllers
         {
             string master = "~/Views/Shared/_LoggedOut.cshtml";
             if(Session["UserID"] != null)
-                master = SessionCheck.FindMaster();
+                master = check.FindMaster();
             return View("Contact", master);
         }
     }

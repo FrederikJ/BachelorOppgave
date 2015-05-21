@@ -7,7 +7,19 @@
 
 var GetColName = function (thead) {
     var child = thead.children[0];
-    var ddl = document.getElementById("ddm");
+    var ddl;
+    if (thead.id == "theadFiles")
+        ddl = document.getElementById("ddmFile");
+    else if (thead.id == "theadEvents")
+        ddl = document.getElementById("ddmEvent");
+    else if (thead.id == "theadGoingTo")
+        ddl = document.getElementById("ddmGoingTo");
+    else if (thead.id == "theadIs")
+        ddl = document.getElementById("ddmIs");
+    else if (thead.id == "theadHave")
+        ddl = document.getElementById("ddmHave");
+    else
+        ddl = document.getElementById("ddm");
     ddl.innerHTML = "";
     for (var i = 0; i < child.children.length; i++) {
         if (child.children[i].hidden) {
@@ -21,7 +33,7 @@ var GetColName = function (thead) {
 
 var CheckColName = function (colNumber, thead, tbody, checkInput) {
     if (checkInput[0].type === 'checkbox')
-        checkInput[0].onchange = HideColumn(colNumber, thead, tbody);     
+        checkInput[0].onchange = HideColumn(colNumber, thead, tbody);
 }
 
 var HideColumn = function (colNumber, thead, tbody) {
@@ -43,7 +55,7 @@ var HideColumn = function (colNumber, thead, tbody) {
             hideCol.hidden = false;
         }
     }
-};
+}
 
 var GetCalibrationTable = function (type, deviceTypeList, deviceList, logEventList, companyList,
     fileList, roomList, dateObject) {
@@ -119,6 +131,14 @@ var FillTableHead = function (thead, type) {
             7: "Fil navn",
             8: "Rom"
         }
+    else if (type == "otherCalibration")
+        array = {
+            1: "Registrert dato",
+            2: "Data 1",
+            3: "Data 2",
+            4: "Enhet",
+            5: "Rom"
+        }
     else if (type == "device")
         array = {
             1: "Enhet navn",
@@ -192,9 +212,10 @@ var FillTableHead = function (thead, type) {
             span.className = "glyphicon glyphicon-arrow-down";
             input.appendChild(span);
             th.appendChild(input);
-            if (th.textContent == "Data 1" || th.textContent == "Data 2" || th.textContent == "Rom" || th.textContent == "Høyde(m)" ||
-                th.textContent == "Vekt(kg)" || th.textContent == "Merke" || th.textContent == "Beskrivelse")
-                th.hidden = true;
+            if (type != "otherCalibration")
+                if (th.textContent == "Data 1" || th.textContent == "Data 2" || th.textContent == "Rom" || th.textContent == "Høyde(m)" ||
+                    th.textContent == "Vekt(kg)" || th.textContent == "Merke" || th.textContent == "Beskrivelse")
+                    th.hidden = true;
             tr.appendChild(th);
             thead.appendChild(tr);
         }
@@ -215,8 +236,8 @@ var FillCalibrationTableBoby = function (tbody, startDate, endDate, companyList,
     tr.appendChild(td);
 
     td = document.createElement("td");
-    var endMonth = endDate.getMonth() + 1;
-    td.textContent = String(endDate.getDate() + "." + endMonth + "." + endDate.getFullYear());
+    month = endDate.getMonth() + 1;
+    td.textContent = String(endDate.getDate() + "." + month + "." + endDate.getFullYear());
     tr.appendChild(td);
 
     td = document.createElement("td");
@@ -296,7 +317,7 @@ var FillCalibrationTableBoby = function (tbody, startDate, endDate, companyList,
     tbody.appendChild(tr);
 }
 
-var FillUserTableBody = function(tbody, right, usersList, rightsList) {
+var FillUserTableBody = function(tbody, right, usersList) {
     jQuery.each(usersList, function (i, user) {
         if (String(user["RightsID"]).match(String(right["RightsID"]))) {
             var tr = document.createElement("tr");
@@ -319,65 +340,26 @@ var FillUserTableBody = function(tbody, right, usersList, rightsList) {
             var btnTd = document.createElement("td");
             var group = document.createElement("div");
             group.className = "btn-group";
-            if (right == null) {
-                var inputEdit = document.createElement("button");
-                inputEdit.type = "button";
-                inputEdit.className = "btn btn-warning";
-                inputEdit.textContent = "Endre bruker";
-                inputEdit.onclick = function () {
-                    window.location.replace("/Account/Manage/" + id);
-                };
-                group.appendChild(inputEdit);
+            
+            var inputEdit = document.createElement("button");
+            inputEdit.type = "button";
+            inputEdit.className = "btn btn-warning";
+            inputEdit.textContent = "Endre bruker";
+            inputEdit.onclick = function () {
+                window.location.replace("/Account/Manage/" + id);
+            };
+            group.appendChild(inputEdit);
 
-                var inputDel = document.createElement("button");
-                inputDel.type = "button";
-                inputDel.className = "btn btn-danger";
-                inputDel.textContent = "Slett bruker";
-                inputDel.onclick = function () {
-                    window.location.replace("/Administrator/DeleteUser/" + id);
-                };
-                group.appendChild(inputDel);
-                btnTd.appendChild(group);
-            }
-            else {
-                var inputCheck = document.createElement("button");
-                inputCheck.type = "button";
-                inputCheck.className = "btn btn-default";
-                inputCheck.textContent = "Sett rettighet";
-                inputCheck.onclick = function () {
-                    var dropDown = document.createElement("select");
-                    dropDown.className = "form-control";
-                    var rightId = null
-                    jQuery.each(rightsList, function (i, rightSelected) {
-                        var option = document.createElement("option");
-                        option.value = rightSelected["RightsID"];
-                        option.textContent = rightSelected["Name"];
-                        dropDown.appendChild(option);
-                        rightId = rightSelected["RightsID"];
-                    });
-                    rightTd.replaceChild(dropDown, rightLable);
-
-                    var btn = document.createElement("button");
-                    btn.type = "button";
-                    btn.textContent = "Godkjenn rettigheten";
-                    btn.className = "btn btn-success";
-                    
-                    btn.onclick = function () {
-                        window.location.replace("/Administrator/CheckUser/" + id + "/" + rightId);
-                    }
-                    group.replaceChild(btn, inputCheck);
-                };
-                group.appendChild(inputCheck);
-                var inputEdit = document.createElement("button");
-                inputEdit.type = "button";
-                inputEdit.className = "btn btn-warning";
-                inputEdit.textContent = "Endre bruker";
-                inputEdit.onclick = function () {
-                    window.location.replace("/Account/Manage/" + id);
-                };
-                group.appendChild(inputEdit);
-                btnTd.appendChild(group);
-            }
+            var inputDel = document.createElement("button");
+            inputDel.type = "button";
+            inputDel.className = "btn btn-danger";
+            inputDel.textContent = "Slett bruker";
+            inputDel.onclick = function () {
+                window.location.replace("/Administrator/DeleteUser/" + id);
+            };
+            group.appendChild(inputDel);
+            btnTd.appendChild(group);
+            
             tr.appendChild(btnTd);
 
             tbody.appendChild(tr);
@@ -529,13 +511,10 @@ var GetDeviceTable = function (deviceTypeList, deviceList, roomList) {
     });
 }
 
-var GetUserTable = function (usersList, rightsList, right) {
+var GetUserTable = function (usersList, rightsList) {
     jQuery.each(rightsList, function (i, right) {
         var h4 = document.createElement("h4");
-        if (right != null)
-            h4.textContent = "Foreløbig bruker rettighet - " + String(right["Name"]);
-        else
-            h4.textContent = "Rettighet - " + String(right["Name"]);
+        h4.textContent = "Rettighet - " + String(right["Name"]);
 
         var table = document.createElement("table");
         table.className = "table";
@@ -543,8 +522,217 @@ var GetUserTable = function (usersList, rightsList, right) {
         var tbody = document.createElement("tbody");
 
         FillTableHead(thead, "user");
-        FillUserTableBody(tbody, right, usersList, rightsList);
+        FillUserTableBody(tbody, right, usersList);
 
         AddTableToContainer(thead, tbody, h4, table, null, null, null, null);
     });
+}
+
+var GetDeviceEventTable = function (type, joinQuery) {
+    var nowDate = new Date();
+    nowDate.setHours(0);
+    nowDate.setMinutes(0);
+    nowDate.setSeconds(0);
+
+    var table = document.createElement("table");
+    table.className = "table";
+    var thead = document.createElement("thead");
+    var tbody = document.createElement("tbody");
+    var next = joinQuery.length - 1;
+    if (type != "others")
+        FillTableHead(thead, "calibration");
+    else
+        FillTableHead(thead, "otherCalibration");
+    //jQuery.each(joinQuery, function (i, item) {
+    while (next >= 0) {
+        
+        var logEvent = joinQuery[next]["LogEvent"];
+        var device = joinQuery[next]["Device"];
+        var eventType = joinQuery[next]["EventType"];
+        var file = joinQuery[next]["File"];
+        var company = joinQuery[next]["Company"];
+        var room = joinQuery[next]["Room"];
+
+        var endDate = new Date($.parseJSON(String(logEvent["EndDate"]).substr(6, 13)));
+        var startDate = new Date($.parseJSON(String(logEvent["StartDate"]).substr(6, 13)));
+
+        switch (type) {
+            case "goingTo":
+                if (startDate.getFullYear() > 2000 && nowDate <= startDate) {
+                    FillDeviceEventTableBoby(tbody, startDate, endDate, logEvent, device, file, company, room, type, eventType);
+                    joinQuery.splice($.inArray(joinQuery[next], joinQuery), 1);
+                    next = joinQuery.length - 1;
+                    break;
+                }
+                else {
+                    next -= 1;
+                    break;
+                }
+            case "is":
+                if (startDate.getFullYear() > 2000 && endDate.getFullYear() > 2000 && nowDate >= startDate && nowDate <= endDate) {
+                    FillDeviceEventTableBoby(tbody, startDate, endDate, logEvent, device, file, company, room, type, eventType);
+                    joinQuery.splice($.inArray(joinQuery[next], joinQuery), 1);
+                    next = joinQuery.length - 1;
+                    break;
+                }
+                else {
+                    next -= 1;
+                    break;
+                }
+            case "have":
+                if (endDate.getFullYear() > 2000 && nowDate >= endDate) {
+                    FillDeviceEventTableBoby(tbody, startDate, endDate, logEvent, device, file, company, room, type, eventType);
+                    joinQuery.splice($.inArray(joinQuery[next], joinQuery), 1);
+                    next = joinQuery.length - 1;
+                    break;
+                }
+                else {
+                    next -= 1;
+                    break;
+                }
+            case "others":
+                FillDeviceEventTableBoby(tbody, startDate, endDate, logEvent, device, file, company, room, type, eventType);
+                joinQuery.splice($.inArray(joinQuery[next], joinQuery), 1);
+                next = joinQuery.length - 1;
+                break;
+        }
+    }
+    switch (type) {
+        case "goingTo":
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            $("#goingTo").append(table);
+            break;
+        case "is":
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            $("#is").append(table);
+            break;
+        case "have":
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            $("#have").append(table);
+            break;
+        case "others":
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            $("#others").append(table);
+            break;
+    }
+    return joinQuery;
+}
+
+var FillDeviceEventTableBoby = function (tbody, startDate, endDate, logEvent, device, file, company, room, type, eventType) {
+    tr = document.createElement("tr");
+
+    if (type != "others") {
+        var td = document.createElement("td");
+        var month = startDate.getMonth() + 1;
+        td.textContent = String(startDate.getDate() + "." + month + "." + startDate.getFullYear());
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        month = endDate.getMonth() + 1;
+        td.textContent = String(endDate.getDate() + "." + month + "." + endDate.getFullYear());
+        tr.appendChild(td);
+    }
+    else {
+        var td = document.createElement("td");
+        var date = new Date($.parseJSON(String(logEvent["RegisteredDate"]).substr(6, 13)));
+        var month = date.getMonth() + 1;
+        td.textContent = String(date.getDate() + "." + month + "." + date.getFullYear());
+        tr.appendChild(td);
+    }
+
+    td = document.createElement("td");
+    if (logEvent["Data1"] != null)
+        td.textContent = String(logEvent["Data1"]);
+    if(type != "others")
+        td.hidden = true;
+    tr.appendChild(td);
+
+    td = document.createElement("td");
+    if (logEvent["Data2"] != null)
+        td.textContent = String(logEvent["Data2"]);
+    if (type != "others")
+        td.hidden = true;
+    tr.appendChild(td);
+
+    var td = document.createElement("td");
+    td.textContent = String(device["Name"]);
+    tr.appendChild(td);
+
+    if (type != "others") {
+        var td = document.createElement("td");
+        td.textContent = String(company["Name"]);
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        if (String(file["FileName"]) != "null")
+            td.textContent = String(file["FileName"]);
+        tr.appendChild(td);
+    }
+
+    var td = document.createElement("td");
+    td.textContent = String(room["Name"]);
+    if (type != "others")
+        td.hidden = true;
+    tr.appendChild(td);
+
+    var id = logEvent["LogEventID"];
+    var td = document.createElement("td");
+    var group = document.createElement("div");
+    group.className = "btn-group";
+
+    var inputDet = document.createElement("button");
+    inputDet.type = "button";
+    inputDet.className = "btn btn-success";
+    inputDet.textContent = "Detaljer om";
+    inputDet.onclick = function() {
+        $("#fillDetails").empty();
+        CalibrationViewsDetails(logEvent, eventType, device, company, room, file);
+        $("#showDet").trigger('click');
+    };
+    group.appendChild(inputDet);
+
+    if (type != "others") {
+        var inputEdit = document.createElement("button");
+        inputEdit.type = "button";
+        inputEdit.className = "btn btn-warning";
+        inputEdit.textContent = "Rediger event";
+        inputEdit.onclick = function () {
+            window.location.replace("/Kalibrering/EditCalibration/" + id);
+        };
+        group.appendChild(inputEdit);
+    }
+
+    if (type == "goingTo") {
+        var inputDel = document.createElement("button");
+        inputDel.type = "button";
+        inputDel.className = "btn btn-danger";
+        inputDel.textContent = "Slett event";
+        inputDel.onclick = function () {
+            $.ajax({
+                type: 'POST',
+                url: '/DeviceViews/DeleteLogEvent?logEventId=' + id,
+                cache: false,
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                success: function () {
+                    tbody.removeChild(tr);
+                    if (tbody.childElementCount == 0) {
+                        $("#goingTo").hidden = true;
+                        $("#eventDivGoingTo").hidden = true;
+                    }
+                },
+                error: function () { }
+            });
+        };
+        group.appendChild(inputDel);
+    }
+
+    td.appendChild(group);
+    tr.appendChild(td);
+
+    tbody.appendChild(tr);
 }

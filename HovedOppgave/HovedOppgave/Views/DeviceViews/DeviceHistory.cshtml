@@ -1,0 +1,142 @@
+﻿@model HovedOppgave.Models.CalibrationViews
+
+@{
+    ViewBag.Title = "DeviceHistory";
+}
+
+<h2>Enhetens historie</h2>
+
+<div id="eventDivGoingTo">
+    <h4 class="col-md-4" id="h4Event">Planlagt kalibreringer</h4>
+    <div class="dropdown" id="dd">
+        <button class="btn btn-default dropdown-toggle" type="button" id="eventGoingTo" data-toggle="dropdown">
+            Gjem Kolonner
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="eventGoingTo" id="ddmGoingTo"></ul>
+    </div>
+</div>
+<br />
+<div id="goingTo"></div>
+<br /><br />
+<div id="eventDivIs">
+    <h4 class="col-md-4">Aktive kalibreringer</h4>
+    <div class="dropdown" id="dd">
+        <button class="btn btn-default dropdown-toggle" type="button" id="eventIs" data-toggle="dropdown">
+            Gjem Kolonner
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="eventIs" id="ddmIs"></ul>
+    </div>
+</div>
+<br />
+<div id="is"></div>
+<br /><br />
+<div id="eventDivHave">
+    <h4 class="col-md-4">Kalibrerings historikk</h4>
+    <div class="dropdown" id="dd">
+        <button class="btn btn-default dropdown-toggle" type="button" id="eventHave" data-toggle="dropdown">
+            Gjem Kolonner
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="eventHave" id="ddmHave"></ul>
+    </div>
+</div>
+<br />
+<div id="have"></div>
+<br /><br />
+<div id="eventDivOthers">
+    <h4 class="col-md-4">Annen event historikk</h4>
+    <div class="dropdown" id="dd">
+        <button class="btn btn-default dropdown-toggle" type="button" id="eventOthers" data-toggle="dropdown">
+            Gjem Kolonner
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="eventOthers" id="ddmOthers"></ul>
+    </div>
+</div>
+<br />
+<div id="others"></div>
+
+<a class="fancybox" id="showDet" href="#fillDetails" hidden></a>
+<div id="fillDetails" style="display:none"></div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        if(@Model.JoinQuery.Count == 0)
+        {
+            goingTo.hidden = true;
+            have.hidden = true;
+            is.hidden = true;
+            dd.hidden = true;
+            eventDivIs.hidden = true;
+            eventDivHave.hidden = true;
+            var h3 = document.createElement("h3");
+            h3.textContent = "Det finnes ingen event til denne enheten";
+            eventDiv.replaceChild(h3, h4Event);
+        }
+
+        $(".fancybox").fancybox();
+
+        $(".dropdown-toggle").click(function () {
+            var th;
+            if(this.id = "eventGoingTo") {
+                th = $("#goingTo")[0].children[0].children[0];
+                th.id = "theadGoingTo";
+            }
+            else if(this.id = "eventIs") {
+                th = $("#is")[0].children[0].children[0];
+                th.id = "theadIs";
+            }
+            else {
+                th = $("#have")[0].children[0].children[0];
+                th.id = "theadHave";
+            }
+            
+            GetColName(th);
+        });
+
+        $(".dropdown-menu").click(function () {
+            var th, tb;
+            if(this.id = "ddmGoingTo") {
+                th = $("#goingTo")[0].children[0].children[0];
+                tb = $("#goingTo")[0].children[0].children[1];
+            }
+            else if(this.id = "ddmIs") {
+                th = $("#is")[0].children[0].children[0];
+                tb = $("#is")[0].children[0].children[1];
+            }
+            else {
+                th = $("#have")[0].children[0].children[0];
+                tb = $("#have")[0].children[0].children[1];
+            }
+            var colNumber = event.path[1].id;
+            var el = document.getElementById(colNumber);
+            var checkInput = el.getElementsByTagName('input');
+            CheckColName(colNumber, th, tb, checkInput);
+        });
+
+        var joinQuery = @Html.Raw(Json.Encode(Model.JoinQuery));
+        var whatsLeft = GetDeviceEventTable("goingTo", joinQuery);
+        whatsLeft = GetDeviceEventTable("is", whatsLeft);
+        whatsLeft = GetDeviceEventTable("have", whatsLeft);
+        whatsLeft = GetDeviceEventTable("others", whatsLeft);
+
+        if($("#goingTo")[0].children[0].children[1].childElementCount == 0) {
+            goingTo.hidden = true;
+            eventDivGoingTo.hidden = true;
+        }
+        if($("#is")[0].children[0].children[1].childElementCount == 0) {
+            is.hidden = true;
+            eventDivIs.hidden = true;
+        }
+        if($("#have")[0].children[0].children[1].childElementCount == 0) {
+            have.hidden = true;
+            eventDivHave.hidden = true;
+        }
+        if($("#others")[0].children[0].children[1].childElementCount == 0) {
+            others.hidden = true;
+            eventDivOthers.hidden = true;
+        }
+    });
+</script>

@@ -85,7 +85,6 @@ namespace HovedOppgave.Models
         public Room Room { get; set; }
         public Files FileTo { get; set; }
         public Device Device { get; set; }
-        public string FilePath { get; set; }
         public Company Company { get; set; }
         public List<Room> Rooms { get; set; }
         public List<Files> Files { get; set; }
@@ -94,9 +93,15 @@ namespace HovedOppgave.Models
         public List<Device> Devices { get; set; }
         public DeviceType DeviceType { get; set; }
         public List<Company> Companys { get; set; }
+        public string ExtraStringHelp { get; set; }
+        public string ExtraStringHelp1 { get; set; }
+        public string ExtraStringHelp2 { get; set; }
         public List<LogEvent> LogEvents { get; set; }
         public List<EventType> EventTypes { get; set; }
+        public List<Files> FilesToLogevent { get; set; }
         public List<DeviceType> DeviceTypes { get; set; }
+        public List<JoinLogEventWithNames> JoinQuery { get; set; }
+        public DeviceWithNetworkInfo DeviceWithNetwork { get; set; }
     }
 
     public class UserRight
@@ -111,5 +116,31 @@ namespace HovedOppgave.Models
         public Rights Right { get; set; }
         public List<User> Users { get; set; }
         public List<Rights> Rights { get; set; }
+    }
+
+    public class JoinLogEventWithNames
+    {
+        public Room Room { get; set; }
+        public Files File { get; set; }
+        public Device Device { get; set; }
+        public Company Company { get; set; }
+        public LogEvent LogEvent { get; set; }
+        public EventType EventType { get; set; }
+    }
+
+    public class DeviceWithNetworkInfo
+    {
+        public NerworkInfo NetworkInfo { get; set; }
+        public Device Device { get; set; }
+    }
+
+    public class DeviceWithConnections
+    {
+        public Device Device { get; set; }
+        public ConnectorType ConnectorType { get; set; }
+        public ConnectorTypeHasPin ConnectorTypeHasPin { get; set; }
+        public Connection Connection { get; set; }
+        public Pin Pin { get; set; }
+        public SignalStandard SignaldStandard { get; set; }
     }
 }
