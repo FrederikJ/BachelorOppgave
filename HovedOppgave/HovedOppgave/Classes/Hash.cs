@@ -29,9 +29,12 @@ namespace HovedOppgave.Classes
 
         static public Hashtable GetHashAndSalt(string password)
         {
+            //henter saltet
             string salt = GetSalt();
+            //lager hash til passordet med hjelp av saltet
             string hash = CreateHash(password, salt);
 
+            //leger verdiene i et hash tabell og returnere tabellen
             Hashtable hashtable = new Hashtable();
             hashtable.Add("hash", hash);
             hashtable.Add("salt", salt);
@@ -41,10 +44,12 @@ namespace HovedOppgave.Classes
 
         static public string GetHash(string password, string salt)
         {
+            //henter hashen til passordet
             string hash = CreateHash(password, salt);
             return hash;
         }
 
+        //oppretter en hash for passordet hvor man inkludere saltet også
         static private string CreateHash(string password, string salt)
         {
             UnicodeEncoding utf16 = new UnicodeEncoding();
@@ -62,6 +67,7 @@ namespace HovedOppgave.Classes
             return hash;
         }
 
+        //sjekker passordet med et allerede eksisterende passord, (eks. inn logging)
         static public bool CheckPassword(string password, string hash, string salt)
         {
             string hash2 = GetHash(password, salt);

@@ -18,17 +18,26 @@ namespace HovedOppgave.Models
         MySqlConnection conn;
         HttpContext http = HttpContext.Current;
 
+        /**
+         * Starter initialiseringen til db
+        */
         public Repository()
         {
             this.Initialize();    
         }
 
         #region DB klasser
+        /**
+         * Initialiser db kontakt, setter opp kontakt stringen
+        */
         private void Initialize()
         {
             string myConnectionString = "server=82.164.4.64;UID=boppg;PASSWORD=AXf698LN2VKu8cAn;persistsecurityinfo=True;database=mydb;port=3300;allowuservariables=True";
             conn = new MySqlConnection(myConnectionString);  
         }
+        /**
+         * Opner den allerede eksisterende kontakten til db 
+        */
         private bool OpenConnection()
         {
             try
@@ -53,6 +62,9 @@ namespace HovedOppgave.Models
                 return false;
             }
         }
+        /**
+         * stenger den allerede eksisterende kontakten til db 
+        */
         private bool CloseConnection()
         {
             try
@@ -76,6 +88,7 @@ namespace HovedOppgave.Models
         #region CableType Queries
         #endregion
         #region Company Queries
+        //henter alle firmaer fra db
         public List<Company> GetAllCompanys()
         {
             string query = "select * from company";
@@ -98,7 +111,7 @@ namespace HovedOppgave.Models
                         if (reader["org_num"] != DBNull.Value)
                             item.OrganisationNum = Convert.ToInt32(reader["org_num"]);
                         if (reader["companyname"] != DBNull.Value)
-                            item.Name = (string)reader["name"];
+                            item.Name = (string)reader["companyname"];
 
                         list.Add(item);
                     }
@@ -114,6 +127,7 @@ namespace HovedOppgave.Models
             }
             return list;
         }
+        //henter et firma med en firma id
         public Company GetCompany(int companyId)
         {
             string query = "select * from company where companyID = '" + companyId + "'";
@@ -133,7 +147,7 @@ namespace HovedOppgave.Models
                     {
                         company.CompanyID = Convert.ToInt32(reader["companyID"]);
                         if (reader["companyname"] != DBNull.Value)
-                            company.Name = (string)reader["name"];
+                            company.Name = (string)reader["companyname"];
                         if (reader["org_num"] != DBNull.Value)
                             company.OrganisationNum = Convert.ToInt32(reader["org_num"]);
                     }
@@ -149,6 +163,90 @@ namespace HovedOppgave.Models
             }
             return company;
         }
+        //henter et firma med kontakt personen til firmaet
+        public CompanyWithContact GetCompanyWithContactInfo(int companyId)
+        {
+            string query = "select * from company cm, contact cn, contact_info ci, contact_info_type cit where cm.companyID = '" + companyId + "' and cn.company_companyID = cm.companyID and cn.contactID = ci.contactID and ci.type = cit.type";
+            CompanyWithContact model = new CompanyWithContact();
+            Company cm = new Company();
+            Contact cn = new Contact();
+            ContactInfo ci = new ContactInfo();
+            ContactInfoType cit = new ContactInfoType();
+
+            //Sjekke for åpen connection mot db
+            if (this.OpenConnection() == true)
+            {
+                //Lager en kommando
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                try
+                {
+                    //lage en data reader og utfører kommandoen
+                    MySqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        cm.CompanyID = Convert.ToInt32(reader["companyID"]);
+                        if (reader["companyname"] != DBNull.Value)
+                            cm.Name = (string)reader["companyname"];
+                        if (reader["org_num"] != DBNull.Value)
+                            cm.OrganisationNum = Convert.ToInt32(reader["org_num"]);
+
+                        cn.ContactID = Convert.ToInt32(reader["contactID"]);
+                        cn.CompanyID = Convert.ToInt32(reader["company_companyID"]);
+                        if (reader["name"] != DBNull.Value)
+                            cn.Name = (string)reader["name"];
+                        if (reader["title"] != DBNull.Value)
+                            cn.Title = (string)reader["title"];
+
+                        ci.ContactInfoID = Convert.ToInt32(reader["contact_infoID"]);
+                        ci.Value = (string)reader["value"];
+
+                        cit.ContactInfoTypeID = Convert.ToInt32(reader["type"]);
+                        cit.TypeName = (string)reader["type_name"];
+
+                        model.Company = cm;
+                        model.Contact = cn;
+                        model.ContactInfo = ci;
+                        model.ContactInfoType = cit;
+                    }
+                    reader.Close();
+                    //close connection
+                    this.CloseConnection();
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            return model;
+        }
+        //oppdaterer firma i db
+        public bool EditCompany(Company company)
+        {
+            string query = "UPDATE company SET companyname='" + company.Name + "', org_num='" + company.OrganisationNum + "' where companyID='" + company.CompanyID + "'";
+
+            //Open connection
+            if (this.OpenConnection())
+            {
+                //create mysql command with cmdtext and connection
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                try
+                {
+                    //Execute query
+                    cmd.ExecuteNonQuery();
+                    //close connection
+                    this.CloseConnection();
+                    return true;
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            return false;
+        }
         #endregion
         #region Connection Queries
         #endregion
@@ -157,6 +255,7 @@ namespace HovedOppgave.Models
         #region ConnectorTypeHasPin Queries
         #endregion
         #region Contact Queries
+        //henter alle kontakt personene til hvert firma
         public List<Contact> GetAllContacts()
         {
             string query = "select * from contact";
@@ -196,6 +295,7 @@ namespace HovedOppgave.Models
             }
             return list;
         }
+        //henter en kotakt person med en kontakt person
         public Contact GetContact(int contactId)
         {
             string query = "select * from contact where contactID = '" + contactId + "'";
@@ -232,12 +332,104 @@ namespace HovedOppgave.Models
             }
             return contact;
         }
+        //sletter kotakt personen fra db
+        public bool DeleteContact(Contact contact)
+        {
+            string query = "DELETE FROM contact WHERE contactID='" + contact.ContactID + "'";
+
+            if (this.OpenConnection())
+            {
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.ExecuteNonQuery();
+                this.CloseConnection();
+                return true;
+            }
+            this.CloseConnection();
+            return false;
+        }
+        //oppdaterer kontakt person i db
+        public bool EditContact(Contact contact)
+        {
+            string query = "UPDATE contact SET name='" + contact.Name + "', title='" + contact.Title + "' where contactID='" + contact.ContactID + "'";
+
+            //Open connection
+            if (this.OpenConnection())
+            {
+                //create mysql command with cmdtext and connection
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                try
+                {
+                    //Execute query
+                    cmd.ExecuteNonQuery();
+                    //close connection
+                    this.CloseConnection();
+                    return true;
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            return false;
+        }
         #endregion
         #region ContactInfo Queries
+        public bool EditContactInfo(ContactInfo contactInfo)
+        {
+            string query = "UPDATE contact_info SET value='" + contactInfo.Value + "' where contact_infoID='" + contactInfo.ContactInfoID + "'";
+
+            //Open connection
+            if (this.OpenConnection())
+            {
+                //create mysql command with cmdtext and connection
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                try
+                {
+                    //Execute query
+                    cmd.ExecuteNonQuery();
+                    //close connection
+                    this.CloseConnection();
+                    return true;
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            return false;
+        }
         #endregion
         #region ContactInfoType Queries
+        public bool EditContactInfoType(ContactInfoType contactInfoType)
+        {
+            string query = "UPDATE contact_info_type SET type_name='" +contactInfoType.TypeName + "' where type='" + contactInfoType.ContactInfoTypeID + "'";
+
+            //Open connection
+            if (this.OpenConnection())
+            {
+                //create mysql command with cmdtext and connection
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                try
+                {
+                    //Execute query
+                    cmd.ExecuteNonQuery();
+                    //close connection
+                    this.CloseConnection();
+                    return true;
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            return false;
+        }
         #endregion
         #region Device Queries
+        //henter alle enheter fra db
         public List<Device> GetAllDevices()
         {
             string query = "select * from device";
@@ -292,6 +484,7 @@ namespace HovedOppgave.Models
             }
             return list;
         }
+        //henter en enhet med en enhets id
         public Device GetDevice(int deviceId)
         {
             string query = "select * from device where idDevice = '" + deviceId + "'";
@@ -343,6 +536,7 @@ namespace HovedOppgave.Models
             }
             return device;
         }
+        //sjekker om en enhet er kassert eller ikke
         public string DeviceIsDiscarded(Device device)
         {
             string query = "select * from log_event where device_id = '" + device.DeviceID + "' and event_type='12'";
@@ -375,6 +569,7 @@ namespace HovedOppgave.Models
             }
             return message;
         }
+        //sjekker om en enhet er i bruk eller ikke
         public string DeviceIsInUse(Device device)
         {
             string query = "select * from device_connectors where device_id = '" + device.DeviceID + "'";
@@ -407,6 +602,7 @@ namespace HovedOppgave.Models
             }
             return message;
         }
+        //sjekker om en enhet er i lånt bort eller ikke
         public string DeviceIsBorrowed(Device device)
         {
             string query = "select * from log_event l, company c where device_id = '" + device.DeviceID + "' and event_type='15' or event_type='16' and c.companyID = event_company";
@@ -457,6 +653,7 @@ namespace HovedOppgave.Models
 
             return message;
         }
+        //henter en enhet med netverk informasjon
         public DeviceWithNetworkInfo GetDeviceWithNetworkInfo(int deviceId)
         {
             string query = "select * from device d, network_info n where idDevice = '" + deviceId + "' and d.idDevice = n.device_id";
@@ -523,6 +720,7 @@ namespace HovedOppgave.Models
             }
             return model;
         }
+        //henter en enhet med alle forbindelser til anre enheter
         public DeviceWithConnections GetDeviceWithConnections(int deviceId)
         {
             string query = "select * from device d, device_connectors dc, connector_type ct, connector_type_has_pin cthp, connection c, pin p, signal_standard ss where d.idDevice = '" + deviceId + "' and d.idDevice = dc.device_id and dc.connector_type = ct.connID and ct.connID = cthp.conn_type_connID and c.connector_1 = dc.connector_id or c.connector_2 = dc.connector_id and p.pinId = cthp.pin_pinId and p.signal_standard = ss.signal_standardID";
@@ -627,10 +825,52 @@ namespace HovedOppgave.Models
             }
             return model;
         }
+        //oppdatere en enhet i db
+        public bool EditDevice(Device device)
+        {
+            string query = "UPDATE device SET devicename='" + device.Name + "', default_localtion='" + device.RoomID + "', description='" + device.Description + "', type='" + device.DeviceTypeID + "', serial_num='" + device.SerialNum + "', height=" + device.Height + ", weigth='" + device.Weight + "', isRackMountable='" + device.IsRackMountable + "', model='" + device.Model + "', brand='" + device.Brand + "', input_voltage='" + device.InputVoltage + "' where idDevice='" + device.DeviceID + "'";
+
+            //Open connection
+            if (this.OpenConnection())
+            {
+                //create mysql command with cmdtext and connection
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                try
+                {
+                    //Execute query
+                    cmd.ExecuteNonQuery();
+                    //close connection
+                    this.CloseConnection();
+                    return true;
+                }
+                catch
+                {
+                    //close connection
+                    this.CloseConnection();
+                }
+            }
+            return false;
+        }
+        //sletter en enhet i db
+        public bool DeleteDevice(Device device)
+        {
+            string query = "DELETE FROM device WHERE idDevice='" + device.DeviceID + "'";
+
+            if (this.OpenConnection())
+            {
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.ExecuteNonQuery();
+                this.CloseConnection();
+                return true;
+            }
+            this.CloseConnection();
+            return false;
+        }
         #endregion
         #region DeviceConnector Queries
         #endregion
         #region DeviceType Queries
+        //henter alle enhet typer
         public List<DeviceType> GetAllDeviceTypes()
         {
             string query = "select * from device_type";
@@ -670,6 +910,7 @@ namespace HovedOppgave.Models
             }
             return list;
         }
+        //henter en enhet type med type id
         public DeviceType GetDeviceType(int deviceTypeId)
         {
             string query = "select * from device_type where iddevice_type = '" + deviceTypeId + "'";
@@ -708,6 +949,7 @@ namespace HovedOppgave.Models
         }
         #endregion
         #region EventType Queries
+        //henter alle log event typer
         public List<EventType> GetAllEventTypes()
         {
             string query = "select * from event_types";
@@ -748,6 +990,7 @@ namespace HovedOppgave.Models
             }
             return list;
         }
+        //henter en log event type med type id
         public EventType GetEventType(int eventTypeId)
         {
             string query = "select * from event_types where log_type = '" + eventTypeId + "'";
@@ -787,6 +1030,7 @@ namespace HovedOppgave.Models
         }
         #endregion
         #region FileQueries
+        //oppretter en fil i db
         public int CreateFile(Files file)
         {
             string query = "Insert into files (filename, filepath, filetype, filesize, date) values('" + file.FileName + "','" + file.FilePath + "','" + file.FileType + "','" + file.FileSize + "','" + file.Date.ToString("yyyy-MM-dd HH:mm:ss") + "'); select last_insert_id();";
@@ -814,6 +1058,7 @@ namespace HovedOppgave.Models
             }
             return 0;
         }
+        //henter absolutt alle filene i db
         public List<Files> GetAllFiles()
         {
             string query = "select * from files";
@@ -859,6 +1104,7 @@ namespace HovedOppgave.Models
             }
             return list;
         }
+        //henter alle filer som ikke er kassert
         public List<Files> GetAllFilesNotDiscarded()
         {
             string query = "select * from files where deleted = '0'";
@@ -904,6 +1150,7 @@ namespace HovedOppgave.Models
             }
             return list;
         }
+        //henter alle filer som er kassert
         public List<Files> GetAllDiscardedFiles()
         {
             string query = "select * from files where deleted = '1'";
@@ -949,6 +1196,7 @@ namespace HovedOppgave.Models
             }
             return list;
         }
+        //henter en fil med fil id
         public Files GetFile(int fileId)
         {
             string query = "select * from files where fileid = '" + fileId + "'";
@@ -990,6 +1238,7 @@ namespace HovedOppgave.Models
             }
             return file;
         }
+        //sletter en fil fra db
         public bool DeleteFile(Files file)
         {
             string query = "DELETE FROM files WHERE fileid='" + file.FileID + "'";
@@ -1004,6 +1253,7 @@ namespace HovedOppgave.Models
             this.CloseConnection();
             return false;
         }
+        //oppdatere en fil fra db
         public bool EditFile(Files file)
         {
             string query = "UPDATE files SET filename='" + file.FileName + "', filepath='" + file.FilePath + "', filetype='" + file.FileType + "', filesize='" + file.FileSize + "', date='" + file.Date.ToString("yyyy-MM-dd") + "', deleted=" + file.Kassert + " where fileid='" + file.FileID + "'";
@@ -1031,6 +1281,7 @@ namespace HovedOppgave.Models
         }
         #endregion
         #region LogEvent Queries
+        //oppretter et log event
         public bool CreateLogEvent(LogEvent logEvent)
         {
             string query = null;
@@ -1059,6 +1310,7 @@ namespace HovedOppgave.Models
             }
             return false;
         }
+        //henter alle log event fra db som ikke er kassert
         public List<LogEvent> GetAllLogEvent()
         {
             string query = "select * from log_event where event_id != '12'";
@@ -1109,6 +1361,7 @@ namespace HovedOppgave.Models
             }
             return list;
         }
+        //henter absolutt alle log event
         public List<LogEvent> GetAllLogEventWithDiscarded()
         {
             string query = "select * from log_event";
@@ -1159,6 +1412,7 @@ namespace HovedOppgave.Models
             }
             return list;
         }
+        //henter en log event fra db med event id
         public LogEvent GetLogEvent(int logEventId)
         {
             string query = "select * from log_event where event_id = '" + logEventId + "'";
@@ -1204,6 +1458,7 @@ namespace HovedOppgave.Models
             }
             return logEvent;
         }
+        //oppdaterer et event i db
         public bool EditLogEvent(LogEvent logEvent)
         {
             string query = null;
@@ -1235,6 +1490,7 @@ namespace HovedOppgave.Models
             }
             return false;
         }
+        //henter det siste eventet til en enhet
         public LogEvent GetLastEventForDevice(int deviceID)
         {
             string query = "select * from log_event where device_id = '" + deviceID + "' where event_start_date < CURDATE()";
@@ -1288,6 +1544,7 @@ namespace HovedOppgave.Models
 
             return logEvent;
         }
+        //henter alle event for en enhet
         public List<LogEvent> GetLogEventForDevice(int deviceID)
         {
             string query = "select * from log_event where device_id = '" + deviceID + "'";
@@ -1335,6 +1592,7 @@ namespace HovedOppgave.Models
             }
             return list;
         }
+        //henter det siste eventet til en fil
         public LogEvent GetLogEventByFileId(int fileId)
         {
             string query = "select * from log_event where data_file = '" + fileId + "'";
@@ -1386,6 +1644,7 @@ namespace HovedOppgave.Models
 
             return logEvent;
         }
+        //henter alle event til en event type
         public List<LogEvent> GetAllLogEventToEventType(int eventTypeId)
         {
             string query = "select * from log_event where event_type='" + eventTypeId + "'";
@@ -1436,6 +1695,7 @@ namespace HovedOppgave.Models
             }
             return list;
         }
+        //sletter en event i db
         public bool DeleteLogEvent(LogEvent logEvent)
         {
             string query = "DELETE FROM log_event WHERE event_id='" + logEvent.LogEventID + "'";
@@ -1450,6 +1710,7 @@ namespace HovedOppgave.Models
             this.CloseConnection();
             return false;
         }
+        //henter et event med rom, enhet, fil, event type og firma
         public JoinLogEventWithNames JoinQuery(LogEvent logevent)
         {
             JoinLogEventWithNames model = new JoinLogEventWithNames();
@@ -1517,6 +1778,7 @@ namespace HovedOppgave.Models
             model.Room = room;
             return model;
         }
+        //henter den neste kalibrering for en enhet
         public LogEvent GetNextCalibrationForDeivce(Device deivce)
         {
             string query = "select * from log_event where device_id = '" + deivce.DeviceID + "' and event_start_date > CURRENT_DATE";
@@ -1577,6 +1839,7 @@ namespace HovedOppgave.Models
         #region PostCode Queries
         #endregion
         #region Rights Queries
+        //henter rettigheten til en bruker
         public Rights GetRightToUser(User user)
         {
             string query = "select * from rights where rightsid =" + user.RightsID;
@@ -1608,6 +1871,7 @@ namespace HovedOppgave.Models
             }
             return right;
         }
+        //henter alle rettigheter
         public List<Rights> GetAllRights()
         {
             string query = "select * from rights";
@@ -1645,6 +1909,7 @@ namespace HovedOppgave.Models
         }
         #endregion
         #region Room Queries
+        //henter alle rommene
         public List<Room> GetAllRooms()
         {
             string query = "select * from room";
@@ -1665,7 +1930,7 @@ namespace HovedOppgave.Models
                         item.RoomID = Convert.ToInt32(reader["id"]);
                         item.BuildingID = Convert.ToInt32(reader["building_id"]);
                         if (reader["roomname"] != DBNull.Value)
-                            item.Name = (string)reader["name"];
+                            item.Name = (string)reader["roomname"];
                         if (reader["description"] != DBNull.Value)
                             item.Description = (string)reader["description"];
 
@@ -1683,6 +1948,7 @@ namespace HovedOppgave.Models
             }
             return list;
         }
+        //henter et rom med rom id
         public Room GetRoom(int roomId)
         {
             string query = "select * from room where id = '" + roomId + "'";
@@ -1722,6 +1988,7 @@ namespace HovedOppgave.Models
         #region SignalStandard Queries
         #endregion
         #region User Queries
+        //henter en bruker med rettigheten til brukeren
         public UserRight GetUserWithRights(int userID, Constant.Rights rights)
         {
             string query = "select * from user u, rights r where u.iduser='" + userID + "' and r.rightName='" + rights + "' and u.rightsid=r.rightsID";
@@ -1772,6 +2039,7 @@ namespace HovedOppgave.Models
             }
             return model;
         }
+        //henter en bruker med bruker id
         public User GetUser(int userID)
         {
             string query = "select * from user where iduser ='" + userID + "'";
@@ -1813,6 +2081,7 @@ namespace HovedOppgave.Models
             }
             return user;
         }
+        //henter en bruker med email
         public User GetUser(string email)
         {
             string query = "select * from user where email ='" + email + "'";
@@ -1854,6 +2123,7 @@ namespace HovedOppgave.Models
             }
             return user;
         }
+        //oppretter en bruker
         public int CreateUser(User user)
         {
             string query = null;
@@ -1885,6 +2155,7 @@ namespace HovedOppgave.Models
             }
             return 0;
         }
+        //henter alle brukere som har fått rettigheter av admin
         public List<User> GetAllUsers()
         {
             string query = "select * from user where checked='1'";
@@ -1929,6 +2200,7 @@ namespace HovedOppgave.Models
             }
             return userList;
         }
+        //henter alle brukere som ikke har fått rettigheter enda av admin
         public List<User> GetAllUsersUnchecked()
         {
             string query = "select * from user where checked='0'";
@@ -1973,6 +2245,7 @@ namespace HovedOppgave.Models
             }
             return userList;
         }
+        //oppdaterer en bruker i db
         public bool EditUser(User user)
         {
             string query = "UPDATE user SET name='" + user.Name + "', email='" + user.Email + "', passhash='" + user.PassHash + "', passsalt='" + user.PassSalt + "', rightsid='" + user.RightsID + "', checked=" + user.Checked + " where iduser='" + user.UserId + "'";

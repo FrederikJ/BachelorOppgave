@@ -13,12 +13,18 @@ namespace HovedOppgave.Controllers
     {
         SessionCheck check = new SessionCheck();
 
+        /**
+         * front siden 
+        */
         public ActionResult Index()
         {
-            string master = check.FindMaster();
-            return View("Index", master);
+            //string master = check.FindMaster();
+            return View();//"Index", master);
         }
 
+        /**
+         * kotakt info til narom 
+        */
         public ActionResult Contact()
         {
             string master = "~/Views/Shared/_LoggedOut.cshtml";

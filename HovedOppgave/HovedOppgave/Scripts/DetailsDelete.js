@@ -5,14 +5,21 @@
  * Date 04.05.2015
  */
 
+/**
+ * setter inn informasjon til et log event i en detlje side eller slette side
+ */
 var CalibrationViewsDetails = function (logevent, eventType, device, company, room, file) {
     //Log event
     if (logevent != null) {
+        //oppretter den ytteste div blokken
         var div = document.createElement("div");
         div.className = "col-lg-12";
+        //overskrift
         var h4 = document.createElement("h4");
         h4.textContent = "Kalibrering";
+        //skiller overskriften fra informasjonen
         var hr = document.createElement("hr");
+        //oppretter dl blokk hvor all infoen ligger
         var dl = document.createElement("dl");
         dl.className = "dl-horizontal";
         var dt = document.createElement("dt");
@@ -61,9 +68,11 @@ var CalibrationViewsDetails = function (logevent, eventType, device, company, ro
         dl.appendChild(dt);
         dl.appendChild(dd);
 
+        //legger alt til div blokken
         div.appendChild(h4);
         div.appendChild(hr);
         div.appendChild(dl);
+        //legger div blokken til viewet
         $("#fillDetails").append(div);
     }
     
@@ -103,7 +112,7 @@ var CalibrationViewsDetails = function (logevent, eventType, device, company, ro
         dd = document.createElement("dd");
         if (device["DeviceID"] != 0) {
             var a = document.createElement("a");
-            a.href = "/Global/Device/" + device["DeviceID"];
+            a.href = "/DeviceViews/DeviceDetIndex" + device["DeviceID"];
             a.textContent = device["Name"];
             dd.appendChild(a);
         }
@@ -130,7 +139,7 @@ var CalibrationViewsDetails = function (logevent, eventType, device, company, ro
         dd = document.createElement("dd");
         if (company["CompanyID"] != 0) {
             var a = document.createElement("a");
-            a.href = "/Global/Company/" + company["CompanyID"];
+            a.href = "/CompanyViews/Company/" + company["CompanyID"];
             a.textContent = company["Name"];
             dd.appendChild(a);
         }
@@ -188,6 +197,9 @@ var CalibrationViewsDetails = function (logevent, eventType, device, company, ro
     }
 }
 
+/**
+ * legger til informasjon til et fil details/delete view som trengs
+ */
 var FileDetailsDelete = function (device, company, file, filePath) {
     $("#filePath").text(filePath);
 

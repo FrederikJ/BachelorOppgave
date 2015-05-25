@@ -143,4 +143,12 @@ namespace HovedOppgave.Models
         public Pin Pin { get; set; }
         public SignalStandard SignaldStandard { get; set; }
     }
+
+    public class CompanyWithContact
+    {
+        public Contact Contact { get; set; }
+        public Company Company { get; set; }
+        public ContactInfo ContactInfo { get; set; }
+        public ContactInfoType ContactInfoType { get; set; }
+    }
 }

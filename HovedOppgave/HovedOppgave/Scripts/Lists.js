@@ -5,6 +5,9 @@
  * Date 04.05.2015
  */
 
+/**
+ * henter tittelene til hver eneste kolonne i en tabell og legger dem til en drop down meny
+ */
 var GetColName = function (thead) {
     var child = thead.children[0];
     var ddl;
@@ -31,11 +34,18 @@ var GetColName = function (thead) {
     }
 }
 
+/**
+ * når man har trykt på en av tittelene, så setter du en sjekk eller tar bort
+ * og den kolonnen vil gjemmes eller vises
+ */
 var CheckColName = function (colNumber, thead, tbody, checkInput) {
     if (checkInput[0].type === 'checkbox')
         checkInput[0].onchange = HideColumn(colNumber, thead, tbody);
 }
 
+/**
+ * gjemmer en hel kolonne til en tabell
+ */
 var HideColumn = function (colNumber, thead, tbody) {
     var childTH = thead.children[0];
     var hideTH = childTH.children[colNumber];
@@ -57,14 +67,19 @@ var HideColumn = function (colNumber, thead, tbody) {
     }
 }
 
+/**
+ * opprettet en tabell til en kalibreringer
+ */
 var GetCalibrationTable = function (type, deviceTypeList, deviceList, logEventList, companyList,
     fileList, roomList, dateObject) {
 
+    //setter dags dato uten klokkeslett
     var nowDate = new Date();
     nowDate.setHours(0);
     nowDate.setMinutes(0);
     nowDate.setSeconds(0);
 
+    //sortere tabellen i enhets typer
     jQuery.each(deviceTypeList, function (i, deviceType) {
         var h4 = document.createElement("h4");
         h4.textContent = String(deviceType["Type"]) + " - " + String(deviceType["Description"]);
@@ -76,6 +91,7 @@ var GetCalibrationTable = function (type, deviceTypeList, deviceList, logEventLi
         var tbody = document.createElement("tbody");
         tbody.setAttribute("id", "tbody")
 
+        //fyller kolonne tittlene
         FillTableHead(thead, "calibration");
 
         jQuery.each(deviceList, function (i, device) {
@@ -86,6 +102,7 @@ var GetCalibrationTable = function (type, deviceTypeList, deviceList, logEventLi
                         var startDate = new Date($.parseJSON(String(logEvent["StartDate"]).substr(6, 13)));
 
                         switch (type) {
+                            //de som er kalibrert
                             case "is":
                                 if (nowDate >= endDate)
                                 {
@@ -94,6 +111,7 @@ var GetCalibrationTable = function (type, deviceTypeList, deviceList, logEventLi
                                 }
                                 else
                                     break;
+                            //de som skal kalibreres innen den neste uke
                             case "goingTo":
                                 if (nowDate <= startDate && dateObject >= startDate) {
                                     FillCalibrationTableBoby(tbody, startDate, endDate, companyList, fileList, roomList, logEvent, device, null);
@@ -101,6 +119,7 @@ var GetCalibrationTable = function (type, deviceTypeList, deviceList, logEventLi
                                 }
                                 else
                                     break;
+                            //de som er planlagt til kalibrering fra en uke og mer
                             case "planed":
                                 if (startDate >= dateObject) {
                                     FillCalibrationTableBoby(tbody, startDate, endDate, companyList, fileList, roomList, logEvent, device, null);
@@ -113,13 +132,18 @@ var GetCalibrationTable = function (type, deviceTypeList, deviceList, logEventLi
                 });
             }
         });
+        //legger alt til i div blokken som inneholder alt
         AddTableToContainer(thead, tbody, h4, table, null, null, null, null);
     });
 }
 
+/**
+ * fyller kolonne tittlene
+ */
 var FillTableHead = function (thead, type) {
     var array = null;
 
+    //etter vilken type tabell det er 
     if (type == "calibration")
         array = {
             1: "Planlagt start dato",
@@ -173,6 +197,7 @@ var FillTableHead = function (thead, type) {
             3: "Rettighet"
         }
 
+    //går igjennom arrayet som blir bestemt ovenfor
     var tr = document.createElement("tr");
     jQuery.each(array, function (index, item) {
         var th = document.createElement("th");
@@ -182,6 +207,7 @@ var FillTableHead = function (thead, type) {
             input.type = "button";
             input.className = "btn btn-xs";
             input.onclick = function () {
+                //setter inn sortering og funksjonen til sorteringen
                 asc1 *= -1; asc2 *= 1; asc3 *= 1;
                 var rows = tbody.rows,
                 rlength = rows.length,
@@ -212,6 +238,7 @@ var FillTableHead = function (thead, type) {
             span.className = "glyphicon glyphicon-arrow-down";
             input.appendChild(span);
             th.appendChild(input);
+            //disse kolonnene skal være hidden, mindre viktige
             if (type != "otherCalibration")
                 if (th.textContent == "Data 1" || th.textContent == "Data 2" || th.textContent == "Rom" || th.textContent == "Høyde(m)" ||
                     th.textContent == "Vekt(kg)" || th.textContent == "Merke" || th.textContent == "Beskrivelse")
@@ -227,6 +254,9 @@ var FillTableHead = function (thead, type) {
     });
 }
 
+/**
+ * fyller inn kroppen på kalibrerings tabellen
+ */
 var FillCalibrationTableBoby = function (tbody, startDate, endDate, companyList, fileList, roomList, logEvent, device, deviceList) {
     tr = document.createElement("tr");
 
@@ -317,6 +347,9 @@ var FillCalibrationTableBoby = function (tbody, startDate, endDate, companyList,
     tbody.appendChild(tr);
 }
 
+/**
+ * fyller inn kroppen til en bruker tabell
+ */
 var FillUserTableBody = function(tbody, right, usersList) {
     jQuery.each(usersList, function (i, user) {
         if (String(user["RightsID"]).match(String(right["RightsID"]))) {
@@ -367,6 +400,9 @@ var FillUserTableBody = function(tbody, right, usersList) {
     });
 }
 
+/**
+ * legger inn tabllene inn i div blokken slik at dem synes i viewet
+ */
 var AddTableToContainer = function (thead, tbody, h4, table, hr, div, br, brr) {
     if (tbody != null && tbody.childElementCount !== 0) {
         table.appendChild(thead);
@@ -387,6 +423,9 @@ var AddTableToContainer = function (thead, tbody, h4, table, hr, div, br, brr) {
     }
 }
 
+/**
+ * fyller inn rommet i kalibrering og enhet tabeller
+ */
 var FillRoomTDInTR = function (logEvent, roomList, tr, device) {
     jQuery.each(roomList, function (i, room) {
         if (logEvent != null && String(room["RoomID"]).match(String(logEvent["RoomID"])) || device != null && String(room["RoomID"]).match(String(device["RoomID"]))) {
@@ -399,7 +438,11 @@ var FillRoomTDInTR = function (logEvent, roomList, tr, device) {
     return tr;
 }
 
+/**
+ * oppretter enhet tabell
+ */
 var GetDeviceTable = function (deviceTypeList, deviceList, roomList) {
+    //sortere på enhet typer hver for seg
     jQuery.each(deviceTypeList, function (i, deviceType) {
         if (String(deviceType["CanCalibrateID"]) === "1") {
             var h4 = document.createElement("h4");
@@ -412,6 +455,7 @@ var GetDeviceTable = function (deviceTypeList, deviceList, roomList) {
             var tbody = document.createElement("tbody");
             tbody.setAttribute("id", "tbody")
 
+            //fyller inn kolonne tittlene
             FillTableHead(thead, "device");
 
             jQuery.each(deviceList, function (i, device) {
@@ -484,14 +528,14 @@ var GetDeviceTable = function (deviceTypeList, deviceList, roomList) {
                     inputDet.className = "btn btn-success";
                     inputDet.textContent = "Detaljer";
                     inputDet.onclick = function () {
-                        window.location.replace("" + id);
+                        window.location.replace("/DeviceViews/DeviceDetIndex/" + id);
                     };
                     var inputEdit = document.createElement("button");
                     inputEdit.type = "button";
                     inputEdit.className = "btn btn-warning";
                     inputEdit.textContent = "Rediger enhet";
                     inputEdit.onclick = function () {
-                        window.location.replace("" + id);
+                        window.location.replace("/DeviceViews/EditDevice/" + id);
                     };
 
                     var group = document.createElement("div");
@@ -507,11 +551,16 @@ var GetDeviceTable = function (deviceTypeList, deviceList, roomList) {
                 }
             });
         }
+        //legger den til i div blokk i html koden slik at det vises
         AddTableToContainer(thead, tbody, h4, table, null, null, null, null);
     });
 }
 
+/**
+ * oppretter bruker tabell 
+ */
 var GetUserTable = function (usersList, rightsList) {
+    //sortere med henhold til rettigheter
     jQuery.each(rightsList, function (i, right) {
         var h4 = document.createElement("h4");
         h4.textContent = "Rettighet - " + String(right["Name"]);
@@ -521,14 +570,21 @@ var GetUserTable = function (usersList, rightsList) {
         var thead = document.createElement("thead");
         var tbody = document.createElement("tbody");
 
+        //fyller inn kolonne tittlene
         FillTableHead(thead, "user");
+        //fyller inn tabell kroppen
         FillUserTableBody(tbody, right, usersList);
 
+        //legger det til en div block i html koden
         AddTableToContainer(thead, tbody, h4, table, null, null, null, null);
     });
 }
 
+/**
+ * oppretter log event tabell for en enhet
+ */
 var GetDeviceEventTable = function (type, joinQuery) {
+    //dagens dato uten klokkeslett
     var nowDate = new Date();
     nowDate.setHours(0);
     nowDate.setMinutes(0);
@@ -539,13 +595,15 @@ var GetDeviceEventTable = function (type, joinQuery) {
     var thead = document.createElement("thead");
     var tbody = document.createElement("tbody");
     var next = joinQuery.length - 1;
+    //kommer ann på vilken log event det er
     if (type != "others")
         FillTableHead(thead, "calibration");
     else
         FillTableHead(thead, "otherCalibration");
-    //jQuery.each(joinQuery, function (i, item) {
+    
+    //mens det fortsatt er elementer i listen
     while (next >= 0) {
-        
+        //Setter forkjellige items fra listen
         var logEvent = joinQuery[next]["LogEvent"];
         var device = joinQuery[next]["Device"];
         var eventType = joinQuery[next]["EventType"];
@@ -557,6 +615,7 @@ var GetDeviceEventTable = function (type, joinQuery) {
         var startDate = new Date($.parseJSON(String(logEvent["StartDate"]).substr(6, 13)));
 
         switch (type) {
+            //de som skal kalibreres
             case "goingTo":
                 if (startDate.getFullYear() > 2000 && nowDate <= startDate) {
                     FillDeviceEventTableBoby(tbody, startDate, endDate, logEvent, device, file, company, room, type, eventType);
@@ -568,6 +627,7 @@ var GetDeviceEventTable = function (type, joinQuery) {
                     next -= 1;
                     break;
                 }
+            //de som kalibreres
             case "is":
                 if (startDate.getFullYear() > 2000 && endDate.getFullYear() > 2000 && nowDate >= startDate && nowDate <= endDate) {
                     FillDeviceEventTableBoby(tbody, startDate, endDate, logEvent, device, file, company, room, type, eventType);
@@ -579,6 +639,7 @@ var GetDeviceEventTable = function (type, joinQuery) {
                     next -= 1;
                     break;
                 }
+            //de som har kalibrert
             case "have":
                 if (endDate.getFullYear() > 2000 && nowDate >= endDate) {
                     FillDeviceEventTableBoby(tbody, startDate, endDate, logEvent, device, file, company, room, type, eventType);
@@ -590,6 +651,7 @@ var GetDeviceEventTable = function (type, joinQuery) {
                     next -= 1;
                     break;
                 }
+            //for de andre logeventene som ikke er kalibreringer
             case "others":
                 FillDeviceEventTableBoby(tbody, startDate, endDate, logEvent, device, file, company, room, type, eventType);
                 joinQuery.splice($.inArray(joinQuery[next], joinQuery), 1);
@@ -597,6 +659,7 @@ var GetDeviceEventTable = function (type, joinQuery) {
                 break;
         }
     }
+    //legger det i de forskjellige div blokkene i html koden
     switch (type) {
         case "goingTo":
             table.appendChild(thead);
@@ -619,12 +682,16 @@ var GetDeviceEventTable = function (type, joinQuery) {
             $("#others").append(table);
             break;
     }
+    //returnerer resten av listen som ikke ble brukt
     return joinQuery;
 }
 
+/**
+ * fyller inn kroppen til tabellen i metoden over
+ */
 var FillDeviceEventTableBoby = function (tbody, startDate, endDate, logEvent, device, file, company, room, type, eventType) {
     tr = document.createElement("tr");
-
+    //andre logeventer som ikke er kalibreringer har ikke start og slutt dato, dermed ikke viktig
     if (type != "others") {
         var td = document.createElement("td");
         var month = startDate.getMonth() + 1;
@@ -662,6 +729,7 @@ var FillDeviceEventTableBoby = function (tbody, startDate, endDate, logEvent, de
     td.textContent = String(device["Name"]);
     tr.appendChild(td);
 
+    //de log event som ikke er kalibreringer har heller ikke firma eller filer siden dem er intern
     if (type != "others") {
         var td = document.createElement("td");
         td.textContent = String(company["Name"]);
@@ -695,6 +763,7 @@ var FillDeviceEventTableBoby = function (tbody, startDate, endDate, logEvent, de
     };
     group.appendChild(inputDet);
 
+    //de som ikke er kalibreringer skal heller ikke kunne endres
     if (type != "others") {
         var inputEdit = document.createElement("button");
         inputEdit.type = "button";
@@ -706,6 +775,7 @@ var FillDeviceEventTableBoby = function (tbody, startDate, endDate, logEvent, de
         group.appendChild(inputEdit);
     }
 
+    //de kalibreringer som enda ikke har hent kan slettes med en gang
     if (type == "goingTo") {
         var inputDel = document.createElement("button");
         inputDel.type = "button";

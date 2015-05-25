@@ -13,6 +13,9 @@ namespace HovedOppgave.Classes
     {
         static IRepository myrep = new Repository();
 
+        /**
+         * oppretter et random passord med en gitt lengde 
+        */
         public static string CreatePassword(int length)
         {
             string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
@@ -23,6 +26,9 @@ namespace HovedOppgave.Classes
             return res;
         }
 
+        /**
+         * oppdaterer passordet til en bruker 
+        */
         public static bool UpdatePassword(User user, string password)
         {
             if (user != null)
@@ -36,6 +42,9 @@ namespace HovedOppgave.Classes
             return false;
         }
 
+        /**
+         * endrer passordet til den innloggede brukeren 
+        */
         public static bool ChangePassword(string password)
         {
             HttpContext http = HttpContext.Current;
@@ -49,6 +58,9 @@ namespace HovedOppgave.Classes
                 return false;
         }
 
+        /**
+         * sjekker om den innloggede brukere har et passord 
+        */
         public static bool HasPassword()
         {
             HttpContext http = HttpContext.Current;
@@ -59,6 +71,9 @@ namespace HovedOppgave.Classes
                 return false;
         }
 
+        /**
+         * setter session objektene for innloggede bruker og finner master pagen 
+        */
         public static void LoggingIn(User loggedIn)
         {
             HttpContext http = HttpContext.Current;
@@ -78,6 +93,9 @@ namespace HovedOppgave.Classes
                 http.Session["Rights"] = Constant.Rights.Guest.ToString();
         }
 
+        /**
+         * sletter alle session objekt ved utlogging 
+        */
         public static void DeleteSessions()
         {
             HttpContext http = HttpContext.Current;

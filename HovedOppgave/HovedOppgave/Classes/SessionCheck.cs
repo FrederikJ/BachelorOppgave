@@ -17,6 +17,9 @@ namespace HovedOppgave.Classes
     {
         static IRepository myrep = new Repository();
 
+        /**
+         * sjekker om en bruker er innlogget med bruker id 
+        */
         public static void CheckForUserID()
         {
             HttpContext http = HttpContext.Current;
@@ -28,6 +31,9 @@ namespace HovedOppgave.Classes
             }
         }
 
+        /**
+         * sjekker rettighet til innlogget bruker 
+        */
         public static void CheckForRightsOnLogInUser(Constant.Rights rettighet)
         {
             CheckForUserID();

@@ -8,7 +8,8 @@ namespace HovedOppgave.Classes
     /// <summary>
     /// Setter opp parametre som går over hele prosjektet
     /// 
-    /// Gjeste forfatter: 
+    /// Gjeste forfatter: Fant ikke, men kommer fra prosjekt som Frederik har vært med i
+    /// selv om konstant navnene har blitt endret til å passe inn i vårt system
     /// </summary>
     
     public class Constant

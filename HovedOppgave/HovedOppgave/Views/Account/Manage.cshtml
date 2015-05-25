@@ -15,14 +15,13 @@
 <br />
 @using (Html.BeginForm("Manage", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
 {
-    @Html.AntiForgeryToken()
     <h4>Administrer kontoen din</h4>
     <hr />
     @Html.ValidationSummary(true)
     <div class="form-group">
         @Html.Label("Bruker navn", new { @class = "col-md-2 control-label" })
         <div class="col-md-10">
-            @Html.EditorFor(m => m.ChangeUser.Name, new { @class = "form-control" })
+            @Html.TextBoxFor(m => m.ChangeUser.Name, new { @class = "form-control" })
             @Html.ValidationMessageFor(m => m.ChangeUser.Name, "", new { @class = "text-danger" })
         </div>
     </div>
@@ -34,21 +33,19 @@
         </div>
     </div>
     <div hidden id="partial">
-        @Html.Partial("_UserGuestAccountManager")
+        @Html.Partial("_ChangePasswordPartial")
     </div>
     if (Model.AdminUser != null)
     {
         <div class="form-group">
             @Html.Label("Rettighet", new { @class = "col-md-2 control-label" })
             <div class="col-md-10">
-                @Html.EditorFor(m => m.Right.Name, new { @class = "form-control", readOnly = true })
+                @Html.TextBoxFor(m => m.Right.Name, new { @class = "form-control", readOnly = true })
                 @Html.ValidationMessageFor(m => m.Right.Name, "", new { @class = "text-danger" })
                 <a href="#showInFancy" id="floating">Sett inn rettighet</a>
             </div>
         </div>
     }
-    <br />
-    <button type="button" id="showPass" class="btn btn-default">Endre passord?</button>
     <div hidden>
         @Html.HiddenFor(model => model.Right.RightsID, new { htmlAttributes = new { readOnly = true } })
         @Html.TextAreaFor(model => model.ChangeUser.PassHash, new { htmlAttributes = new { readOnly = true } });
@@ -59,16 +56,30 @@
     
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10">
-            <input type="submit" value="Endre konto" class="btn btn-default" />
+            <div class="btn-group">
+                <button type="button" id="showPass" class="btn btn-default">Endre passord?</button>
+                <input type="submit" value="Endre konto" class="btn btn-default" />
+            </div>
         </div>
     </div>
 }
 <div id="showInFancy" style="display:none">
     <h5>Rettigheter</h5>
-    <input type="text" class="form-control" id="searchBox" />
     <table class="table">
         <thead><tr><th>@Html.DisplayName("Rettighet")</th><th>@Html.DisplayName("Velg")</th></tr></thead>
-        <tbody><tr id="tr"></tr></tbody>
+        <tbody>
+            @foreach (var item in Model.Rights)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        <input type="radio" name="group" value="@item.RightsID" />
+                    </td>
+                </tr>
+            }
+        </tbody>
     </table>
     <button type="submit" id="putIn" class="btn btn-default">Sett inn</button>
 </div>
@@ -77,33 +88,32 @@
     $(window).ready(function () {
         $("#floating").fancybox();
         var rightList = @Html.Raw(Json.Encode(Model.Rights));
-        if(@Model.AdminUser != null)
+        var admin = @Html.Raw(Json.Encode(Model.AdminUser));
+        var changeUser = @Html.Raw(Json.Encode(Model.ChangeUser));
+        if(admin != null)
         {
             $("#buttonGroup").hidden = false;
-            $("#Right_RightID").val(@Model.ChangeUser.RightsID);
+            $("#Right_RightID").val(changeUser["RightsID"]);
             jQuery.each(rightList, function (i, item) {
-                if (item["RightsID"] == (@Model.ChangeUser.RightsID)) {
-                    $("#Rights_Name").val(item["Name"]);
+                if (item["RightsID"] == (changeUser["RightsID"])) {
+                    $("#Right_Name").val(item["Name"]);
                 }
             });
         }
 
-        UserAccount.FancyboxTable(rightList);
-
         $("#putIn").click(function() {
             var radioGroupeVal = $("input:radio[name='group']:checked").val();
-            Calibration.FancyboxPutIn(radioGroupeVal, rightList);
+            UserAccount.FancyboxPutIn(radioGroupeVal, rightList);
 
-            $("#tbody").empty();
             radioGroupeVal = null;
             $.fancybox.close()
         });
 
         $("#showPass").click(function() {
-            if($("#partial").hidden == true)
-                $("#partial").hidden = false;
+            if($("#partial")[0].hidden == true)
+                $("#partial")[0].hidden = false;
             else
-                $("#partial").hidden = true;
+                $("#partial")[0].hidden = true;
 
         });
 

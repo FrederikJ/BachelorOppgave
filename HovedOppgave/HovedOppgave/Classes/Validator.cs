@@ -19,6 +19,9 @@ namespace HovedOppgave.Classes
     {
         static IRepository myrep = new Repository();
 
+        /**
+         * konventerer en string til tall 
+        */
         public static int ConvertToNumbers(string tekst)
         {
             string onlyNumber = Regex.Replace(tekst, @"\D", "");
@@ -30,6 +33,9 @@ namespace HovedOppgave.Classes
                 return -1;
         }
 
+        /**
+         * sjekker om en string er en dato 
+        */
         public static bool IsDateTime(string date)
         {
             DateTime result;
@@ -37,6 +43,9 @@ namespace HovedOppgave.Classes
             return convert;
         }
 
+        /**
+         * sjekker rettigheten til innlogget bruker 
+        */
         public static bool CheckRights(Constant.Rights rights)
         {
             HttpContext http = HttpContext.Current;
@@ -49,6 +58,9 @@ namespace HovedOppgave.Classes
                 return true;
         }
 
+        /**
+         * sjekker en brukers rettighet 
+        */
         public static bool CheckRights(int UserID, Constant.Rights rights)
         {
             UserRight model = myrep.GetUserWithRights(UserID, rights);
@@ -59,18 +71,10 @@ namespace HovedOppgave.Classes
                 return true;
         }
 
-        //Forfatter: Frederik Johnsen
-        public static string TextValditor(string input)
-        {
-            if (input == null)
-                return "Vennligst fyll inn feltet";
-
-            if (Regex.IsMatch(input,"^[0-9a-åA-Å'.\t\n\f\t]$"))
-                return null;
-            else
-                return "Du har skrevet inn ugyldige tegn";
-        }
-
+        /**
+         * sjekker om en email faktisk er en email
+         * forfatter: frederik
+        */
         public static bool ValidateEmail(string input)
         {
             //Hentet regex uttrykket her i fra http://stackoverflow.com/questions/5342375/c-sharp-regex-email-validation
@@ -80,8 +84,12 @@ namespace HovedOppgave.Classes
             return false;
         }
 
+        /**
+         * sjekker om en fil er gyldig 
+        */
         public static bool IsValidFile(HttpPostedFileBase file, double maxFileSize)
         {
+            //om filen eksisterer
             HttpContext http = HttpContext.Current;
             if(file == null)
             {
@@ -93,6 +101,7 @@ namespace HovedOppgave.Classes
             //parametere man setter for max fil størrelse i MB. 
             var max = maxFileSize * 1024 * 1024;
 
+            //om den er liten nok
             if (file.ContentLength > max)
             {
                 http.Session["flashMessage"] = "Filstørrelse er for stor";
@@ -100,6 +109,7 @@ namespace HovedOppgave.Classes
                 return false;
             }
 
+            //og formatet på filen
             var format = Path.GetExtension(file.FileName);
 
             var validExtensions = new [] { ".csv", ".pdf" };

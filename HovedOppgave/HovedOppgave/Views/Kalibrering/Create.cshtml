@@ -180,7 +180,7 @@
             var radioGroupeVal = $("input:radio[name='group']:checked").val();
             var searchVal = $("#searchBox").val().toLowerCase();
 
-            Calibration.FancyboxSearch(radioGroupeVal, searchVal, roomList, companyList, eventTypeList, deviceList, fileList);
+            Calibration.FancyboxSearch(radioGroupeVal, searchVal, roomList, companyList, eventTypeList, deviceList, fileList, null);
             searchVal = null;
         });
 
@@ -188,7 +188,7 @@
             var radioGroupeVal = $("input:radio[name='group']:checked").val();
             var checkBoxGroupeVal = $("input:checkbox[name='Checked']:checked").val();
 
-            Calibration.FancyboxPutIn(radioGroupeVal, checkBoxGroupeVal, roomList, companyList, eventTypeList, deviceList, fileList);
+            Calibration.FancyboxPutIn(radioGroupeVal, checkBoxGroupeVal, roomList, companyList, eventTypeList, deviceList, fileList, null);
 
             $("#tbody").empty();
             radioGroupeVal = null;

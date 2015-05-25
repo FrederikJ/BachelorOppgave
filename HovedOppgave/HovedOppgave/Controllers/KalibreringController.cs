@@ -16,17 +16,20 @@ namespace HovedOppgave.Controllers
         IRepository myrep = new Repository();
         SessionCheck sessionCheck = new SessionCheck();
 
+        /**
+         * hvem som kan få adgang til denne siden
+        */
         public KalibreringController()
         {
             //SessionCheck.CheckForRightsOnLogInUser(Constant.Rights.Administrator);
             //SessionCheck.CheckForRightsOnLogInUser(Constant.Rights.User);
         }
+
+        /**
+         * oversikt over alle event som skal skje, planlagt i framtien, dem som skjer og de som har skjedd
+         * samt en oversikt over alle enheter som kan kalibreres
+        */
         // GET: Kalibrering
-        /// <summary>
-        /// SETT INN WINDOWS.LOCATION.REPLACE VERDI FOR DETALJE KNAPPEN I "KAN KALIBRERES" KNAPPEN
-        /// detalje om enheten
-        /// </summary>
-        /// <returns></returns>
         public ActionResult Overview()
         {
             CalibrationViews model = new CalibrationViews();
@@ -53,7 +56,10 @@ namespace HovedOppgave.Controllers
             string master = sessionCheck.FindMaster();
             return View("Overview", master, model);
         }
-        #region funker
+
+        /**
+         * oppretter en log event her, kan få inn en enhet id som gjør at enheten og envent typen blir automatisk fylt inn
+        */
         // GET: Kalibrering/Create
         public ActionResult Create(int id)
         {
@@ -82,10 +88,14 @@ namespace HovedOppgave.Controllers
             return View("Create", master, model);
         }
 
+        /**
+         * får inn modellen og evt en opplastet sertifikat til log eventet
+        */
         // POST: Kalibrering/Create
         [HttpPost]
         public ActionResult Create(CalibrationViews model, HttpPostedFileBase file)
         {
+            //fyller inn log eventet med det som trengs og sjekker at den ikke er null
             LogEvent calibration = CreatEditFillLogEvent(model, file);
 
             if (calibration == null)
@@ -93,6 +103,7 @@ namespace HovedOppgave.Controllers
 
             try
             {
+                //oppdaterer og sender deg videre
                 myrep.CreateLogEvent(calibration);
                 return RedirectToAction("Overview");
             }
@@ -101,7 +112,11 @@ namespace HovedOppgave.Controllers
                 return View(model);
             }
         }
-        
+
+        /**
+         * endrer logeventet, får inn en log event id, fyller inn modellen av det som trengs
+         * og sender deg til viewet ferdig utfylt
+        */
         // GET: Kalibrering/Edit/5
         public ActionResult EditCalibration(int id)
         {
@@ -117,24 +132,23 @@ namespace HovedOppgave.Controllers
             return View("EditCalibration", master, model);
         }
 
+        /**
+         * oppdatere db med de nye endringene til log eventet, får inn modelen og evt. en 
+         * opplastet fil
+        */
         // POST: Kalibrering/Edit/5
         [HttpPost]
         public ActionResult EditCalibration(CalibrationViews model, HttpPostedFileBase file)
         {
+            //fyller inn log eventet med det som trengs og sjekker at den ikke er null
             LogEvent calibration = CreatEditFillLogEvent(model, file);
 
             if (calibration != null)
                 return View(model);
 
-            //siden man evt skifter filen sjekke om det filnavnet ligger i systemet, viss ikke
-            //kasseres filen
-            if (file != null && calibration.FileID  != 0 && calibration.FileID != model.LogEvent.FileID)
-            {
-                var tempFile = myrep.GetFile(calibration.FileID);
-                tempFile.Kassert = true;
-                myrep.EditFile(tempFile);
-            }
-            else if(model.FileTo != null && model.FileTo.FileID != model.LogEvent.FileID)
+            //sjekker om den filen som var i log eventet er det samme som den som er nu, viss den
+            //ikke er det så kasserer man den gamle filen
+            if (calibration.FileID  != 0 && calibration.FileID != model.LogEvent.FileID)
             {
                 var tempFile = myrep.GetFile(model.LogEvent.FileID);
                 tempFile.Kassert = true;
@@ -143,6 +157,7 @@ namespace HovedOppgave.Controllers
 
             try
             {
+                //oppdaterer db og sender deg videre
                 myrep.EditLogEvent(calibration);
                 return RedirectToAction("Overview");
             }
@@ -151,13 +166,18 @@ namespace HovedOppgave.Controllers
                 return View(model);
             }
         }
-        
+
+        /**
+         * her importere man sertifikat fra directory også kan man evt ta og sette det til
+         * siste log event til en bestemt enhet
+        */
         // GET: Kalibrering/Import
         public ActionResult Import(int id)
         {
             CalibrationViews model = new CalibrationViews();
             //Hard kodet inn id for kalibrering
             List<LogEvent> logEvents = myrep.GetAllLogEventToEventType(11);
+            //sortere listen
             logEvents = logEvents.GroupBy(t => t.DeviceID).Select(g => g.Last()).ToList();
             List<Device> devices = new List<Device>();
             List<Company> companies = new List<Company>();
@@ -172,7 +192,7 @@ namespace HovedOppgave.Controllers
                 companies.Add(company);
                 rooms.Add(room);
             }
-            //Device id
+            //Device id, viss man allerede har valgt enheten, så blir alt fylt inn med en gang
             if (id != 0)
             {
                 Device deviceModel = myrep.GetDevice(id);
@@ -194,25 +214,35 @@ namespace HovedOppgave.Controllers
             return View("Import", master, model);
         }
 
+        /**
+         * post medtoden for importering, oppdaterer db, får inn modellen og en fil fra 
+         * directory
+        */
         // POST: Kalibrering/Import
         [HttpPost]
         public ActionResult Import(HttpPostedFileBase file, CalibrationViews model)
         {
+            //lagrer filen til db og directory
             int id = this.SaveFileToDirectoryAndDB(file);
 
             try
             {
+                //viss man har valgt en enhet til sertifikatet
                 if (model.LogEvent.LogEventID != 0)
                 {
+                    //henter siste kalibrering til enheten
                     LogEvent logEvent = myrep.GetLogEvent(model.LogEvent.LogEventID);
                     if (logEvent.FileID != 0)
                     {
+                        //kasserer forrige fil som ligger
                         Files tempFile = myrep.GetFile(logEvent.FileID);
                         tempFile.Kassert = true;
                         myrep.EditFile(tempFile);
                     }
+                    //legger til ny
                     logEvent.FileID = id;
 
+                    //oppdaterer db og sender deg videre
                     myrep.EditLogEvent(logEvent);
                     return RedirectToAction("License");
                 }
@@ -227,11 +257,15 @@ namespace HovedOppgave.Controllers
             }
         }
 
+        /**
+         * lister ut alle filene som er i systemet. 
+        */
         // GET: Kalibrering/License
         public ActionResult License()
         {
             List<Files> list = myrep.GetAllFilesNotDiscarded();
             CalibrationViews model = new CalibrationViews();
+            //for å kunne vise filene i fancybox. 
             model.ExtraStringHelp = Url.Content("~/Sertifikat");
             model.Files = list;
 
@@ -239,6 +273,9 @@ namespace HovedOppgave.Controllers
             return View("License", master, model);
         }
 
+        /**
+         * skriver ut all istorie som har skjedd i hele systemet 
+        */
         // GET: Kalibrering/History
         public ActionResult History()
         {
@@ -261,7 +298,10 @@ namespace HovedOppgave.Controllers
             string master = sessionCheck.FindMaster();
             return View("History", master, model);
         }
-        
+
+        /**
+         * detalje om et log event 
+        */
         // GET: Kalibrering/CalibrationViewDetails
         public ActionResult CalibrationViewDetails(int id)
         {
@@ -271,6 +311,9 @@ namespace HovedOppgave.Controllers
             return View("CalibrationViewDetails", master, model);
         }
 
+        /**
+         * detaljer om en fil
+        */
         // GET: Kalibrering/Detailsfile
         public ActionResult Detailsfile(int id)
         {
@@ -279,7 +322,10 @@ namespace HovedOppgave.Controllers
             string master = sessionCheck.FindMaster();
             return View("Detailsfile", master, model);
         }
-        
+
+        /**
+         * får detaljer om en fil og spør deg igjen om du vil slette filen
+        */
         // GET: Kalibrering/Deletefile
         public ActionResult Deletefile(int id)
         {
@@ -307,8 +353,11 @@ namespace HovedOppgave.Controllers
 
             try
             {
+                //setter filen til kassert
                 myrep.EditFile(file);
+                //oppretter et logevent
                 myrep.CreateLogEvent(logevent);
+                //redirekte deg til oversikt over alle filer
                 return RedirectToAction("License");
             }
             catch 
@@ -317,8 +366,10 @@ namespace HovedOppgave.Controllers
                 return View(model);
             }
         }
-        #endregion
-        
+
+        /**
+         * brukes av en get metode for å fylle inn i viewet 
+        */
         public CalibrationViews CreateCalibrationView()
         {
             List<Device> deviceList = myrep.GetAllDevices();
@@ -338,7 +389,10 @@ namespace HovedOppgave.Controllers
 
             return model;
         }
-        
+
+        /**
+         * brukes av en get metode for å fylle inn i modellen
+        */
         public CalibrationViews CalibrationViews(int id)
         {
             var logEvent = myrep.GetLogEvent(id);
@@ -359,6 +413,10 @@ namespace HovedOppgave.Controllers
             return model;
         }
 
+        /**
+         * brukes av post metode for å fylle inn log eventet som skal settes inn i db
+         * får inn modellen fra viewet og evt. en opplastet fil fra directory
+        */
         public LogEvent CreatEditFillLogEvent(CalibrationViews model, HttpPostedFileBase file)
         {
             LogEvent calibration = new LogEvent();
@@ -375,10 +433,12 @@ namespace HovedOppgave.Controllers
                 calibration.RoomID = model.Room.RoomID;
                 if (model.FileTo != null)
                     calibration.FileID = model.FileTo.FileID;
+                //sjekker først om start date og end date er satt inn default verdi på .year er 1
                 if (model.LogEvent.StartDate.Year != 1 || model.LogEvent.EndDate.Year != 1)
                 {
                     calibration.StartDate = model.LogEvent.StartDate;
                     calibration.EndDate = model.LogEvent.EndDate;
+                    //viss start date er større enn enddate, så retuneres det null og du går tilbake til viewet
                     if (model.LogEvent.StartDate.Year != 1 && model.LogEvent.EndDate.Year != 1 && model.LogEvent.EndDate < model.LogEvent.StartDate)
                         return null;
                 }
@@ -388,6 +448,7 @@ namespace HovedOppgave.Controllers
                     calibration.Data2 = model.LogEvent.Data2;
                 try
                 {
+                    //lagrer filen i db og directory og retunerer fil id som blir satt inn i log eventet
                     calibration.FileID = this.SaveFileToDirectoryAndDB(file);
                     return calibration;
                 }
@@ -398,12 +459,17 @@ namespace HovedOppgave.Controllers
             }
         }
 
+        /**
+         * lagrer filen i directory og db 
+        */
         public int SaveFileToDirectoryAndDB(HttpPostedFileBase file)
         {
             if (file != null)
             {
+                //gjør en sjekk på filen
                 if (Validator.IsValidFile(file, 5))
                 {
+                    //vilken mappe og navn hvor filen skal lagres
                     string path = Path.Combine(Server.MapPath("~/Sertifikat"), file.FileName);
                     file.SaveAs(path);
                     Files dbFile = new Files()
@@ -414,6 +480,7 @@ namespace HovedOppgave.Controllers
                         FileType = file.ContentType,
                         Date = DateTime.Now
                     };
+                    //lagrer filen i db og retunere iden
                     int fileId = myrep.CreateFile(dbFile);
                     return fileId;
                 }
@@ -421,6 +488,9 @@ namespace HovedOppgave.Controllers
             return 0;
         }
 
+        /**
+         * brukes av get metode hvor man fyller inn modellen for 2 like views 
+        */
         public CalibrationViews DeleteDetailsFile(int id)
         {
             Files file = myrep.GetFile(id);

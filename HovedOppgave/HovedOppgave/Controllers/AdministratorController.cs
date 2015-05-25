@@ -8,17 +8,29 @@ using System.Web.Mvc;
 using System.Data;
 using System.IO;
 
+/**
+ * Alle sidene for administrator, som han kan vedlike holde systemet. oversikt over alt
+ * 
+ * Forfatter: Frederik Johnsen
+*/
 namespace HovedOppgave.Controllers
 {
     public class AdministratorController : Controller
     {
         IRepository myrep = new Repository();
         SessionCheck sessionCheck = new SessionCheck();
+
+        /**
+         * Sjekker rettigheten til brukeren
+        */
         public AdministratorController()
         {
             //SessionCheck.CheckForRightsOnLogInUser(Constant.Rights.Administrator);
         }
 
+        /**
+         * Bruker oversikt til alle brukerene i hele systemet. Kan endre på dem som han vil
+        */
         // GET: Administrator
         public ActionResult OverViewUsers()
         {
@@ -32,6 +44,10 @@ namespace HovedOppgave.Controllers
             return View("OverViewUsers", master, model);
         }
 
+        /**
+         * En ny bruker har registrert seg på systemet, så admin må sette rettigheten på brukeren
+         * default rettighet som har blitt satt er gjest
+        */
         // GET: Administrator/CheckNewUsers/5
         public ActionResult CheckNewUsers()
         {
@@ -50,6 +66,12 @@ namespace HovedOppgave.Controllers
             return View("CheckNewUsers", master, model);
         }
 
+        /**
+         * får inn bruker id, henter brukeren, setter rettighet på brukeren, sjekker han ut av denne
+         * delen av systemet, oppdatere brukeren og sende email til brukeren om rettigheten han har fått
+         * når man kommer tilbake til viewet, så slettes brukeren fra den eksisterende listen så man
+         * har den oppdatert
+        */
         // POST: Administrator/CheckUser/5
         [HttpPost]
         public JsonResult CheckUser(User user)
@@ -68,6 +90,10 @@ namespace HovedOppgave.Controllers
             return Json(false);
         }
 
+        /**
+         * får inn alle filer og event som har blitt slettet av bruker(kassert) i systemet
+         * så kan admin slette dem fra db viss han vil det
+        */
         // GET: Administrator/DeleteDeleteDiscarded/5
         public ActionResult DeleteDiscarded()
         {
@@ -84,6 +110,9 @@ namespace HovedOppgave.Controllers
             return View(/*"DeleteDiscarded", master,*/ model);
         }
 
+        /**
+         *  sletter filen fra db og fra directory
+        */
         // POST: Administrator/DeleteDeleteDiscardedFile/5
         [HttpPost]
         public JsonResult DeleteDiscardedFile(Files file)
@@ -98,6 +127,9 @@ namespace HovedOppgave.Controllers
                 return Json(false);
         }
 
+        /**
+         * sletter event fra db 
+        */
         [HttpPost]
         public JsonResult DeleteDiscardedEvent(LogEvent logEvent)
         {
@@ -108,6 +140,9 @@ namespace HovedOppgave.Controllers
                 return Json(false);
         }
 
+        /**
+         * sletter filer fra directory
+        */
         public void DeleteFileFromDirectory(Files file)
         {
             //Går igjennom alle filer vi har, sjekker om det er flere med samme fil navn

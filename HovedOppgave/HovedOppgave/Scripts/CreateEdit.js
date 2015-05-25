@@ -6,7 +6,11 @@
  */
 
 var Calibration = {
-    FancyboxSearch: function (radioGroupeVal, searchVal, roomList, companyList, eventTypeList, deviceList, fileList) {
+    /**
+     * når man bruker fancybox så søker man etter rom, firma, event type, enhet eller enhet type
+     * så legger man resultatet i en liten tabell i fancybox viewet
+     */
+    FancyboxSearch: function (radioGroupeVal, searchVal, roomList, companyList, eventTypeList, deviceList, fileList, deviceTypes) {
         if (radioGroupeVal === "room" && roomList != null) {
             jQuery.each(roomList, function(i, item) {
                 var str = String(item["Name"]).toLowerCase();
@@ -47,9 +51,21 @@ var Calibration = {
                 }
             });
         }
+        else if (radioGroupeVal === "devicetype" && deviceTypes != null) {
+            jQuery.each(deviceTypes, function (i, item) {
+                var str = String(item["Type"]).toLowerCase();
+                if (str.match(searchVal)) {
+                    $("#tbody").append("<tr><td>" + str + "</td><td><input id='" + str + "' name='Checked' type='checkbox' value='" + item["DeviceTypeID"] + "' /><input name='Checked' type='hidden' value='" + item["DeviceTypeID"] + "' /></td></tr>");
+                }
+            });
+        }
     },
 
-    FancyboxPutIn: function (radioGroupeVal, checkBoxGroupeVal, roomList, companyList, eventTypeList, deviceList, fileList) {
+    /**
+     *  når man har funnet det man vil ha velger man den i tabellen og trykker ok, så blir infoen til det 
+     * man har valgt til en readOnly textbox slik at man får det med seg videre
+     */
+    FancyboxPutIn: function (radioGroupeVal, checkBoxGroupeVal, roomList, companyList, eventTypeList, deviceList, fileList, deviceTypes) {
         if (radioGroupeVal === "room" && roomList != null) {
             jQuery.each(roomList, function (i, item) {
                 var str = String(item["RoomID"]);
@@ -95,8 +111,20 @@ var Calibration = {
                 }
             });
         }
+        else if (radioGroupeVal === "devicetype" && deviceTypes != null) {
+            jQuery.each(deviceTypes, function (i, item) {
+                var str = String(item["DeviceTypeID"]);
+                if (str.match(checkBoxGroupeVal)) {
+                    $("#DeviceType_DeviceTypeID").val(item["DeviceTypeID"]);
+                    $("#DeviceType_Type").val(item["Type"]);
+                }
+            });
+        }
     },
 
+    /**
+     * når man trykker submit, så sjekker at alt er med 
+     */
     SaveButton: function (radioGroupeVal) {
         var test = $("#fileInput").val();
         var test2 = $("#File_FileName")[0];
@@ -110,6 +138,9 @@ var Calibration = {
 }
 
 var UserAccount = {
+    /**
+     * setter inn alle rettigheter inn i en tabell
+     */
     FancyboxTable: function (rightList) {
         jQuery.each(rightList, function (i, item) {
             var tr = document.createElement("tr");
@@ -129,6 +160,10 @@ var UserAccount = {
         });
     },
 
+    /**
+     *  når man har funnet det man vil ha velger man den i tabellen og trykker ok, så blir infoen til det 
+     * man har valgt til en readOnly textbox slik at man får det med seg videre
+     */
     FancyboxPutIn: function (radioGroupeVal, rightList) {
         jQuery.each(rightList, function (i, item) {
             if (String(item["RightsID"]).match(String(radioGroupeVal))) {

@@ -1,0 +1,164 @@
+﻿@model HovedOppgave.Models.CalibrationViews
+
+@{
+    ViewBag.Title = "EditDevice";
+}
+
+<h2>Endring av enhet</h2>
+
+@using (Html.BeginForm("EditDevice", "DeviceViews", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <h4>Enhet</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.Label("Navn", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Device.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Device.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Beskrivelse", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Device.Description, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Device.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Serie nummeret", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Device.SerialNum, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Device.SerialNum, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Høyde (m)", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Device.Height, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Device.Height, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Vekt (kg)", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Device.Weight, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Device.Weight, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Er monterbar", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.CheckBoxFor(model => model.Device.IsRackMountable, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Device.IsRackMountable, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Modell", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Device.Model, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Device.Model, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Merke", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Device.Brand, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Device.Brand, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Spenning inn", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Device.InputVoltage, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Device.InputVoltage, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Enhet type", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.DeviceType.Type, new { htmlAttributes = new { @class = "form-control", required = true, readOnly = true } })
+                <a href="#showInFancy" id="floating">Søk</a>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Rom", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Room.Name, new { htmlAttributes = new { @class = "form-control", required = true, readOnly = true } })
+                <a href="#showInFancy" id="floating">Søk</a>
+            </div>
+        </div>
+
+        <div>
+            @Html.HiddenFor(model => model.Room.RoomID, htmlAttributes: new { required = true, readOnly = true })
+            @Html.HiddenFor(model => model.DeviceType.DeviceTypeID, htmlAttributes: new { required = true, readOnly = true })
+            @Html.HiddenFor(model => model.Device.DeviceID, htmlAttributes: new { required = true, readOnly = true })
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div id="showInFancy" style="display:none">
+    <h5>Søk i...</h5>
+    <div align="center">
+        <input type="radio" name="group" value="room" /> Rom &nbsp;
+        <input type="radio" name="group" value="devicetype" /> Enhets type &nbsp;
+    </div><br />
+    <input type="text" class="form-control" id="searchBox" />
+    <table class="table">
+        <thead id="thead"><tr><th>@Html.DisplayName("Name")</th><th>@Html.DisplayName("Velg enhet")</th></tr></thead>
+        <tbody id="tbody"></tbody>
+    </table>
+    <button type="submit" id="putIn" class="btn btn-default">Sett inn</button>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var roomList = @Html.Raw(Json.Encode(Model.Rooms));
+        var deviceTypeList = @Html.Raw(Json.Encode(Model.DeviceTypes));
+
+        $("#floating").fancybox();
+
+        $("#searchBox").keyup(function() {
+            var radioGroupeVal = $("input:radio[name='group']:checked").val();
+            var searchVal = $("#searchBox").val().toLowerCase();
+
+            Calibration.FancyboxSearch(radioGroupeVal, searchVal, roomList, null, null, null, null, deviceTypeList);
+            searchVal = null;
+        });
+
+        $("#putIn").click(function() {
+            var radioGroupeVal = $("input:radio[name='group']:checked").val();
+            var checkBoxGroupeVal = $("input:checkbox[name='Checked']:checked").val();
+
+            Calibration.FancyboxPutIn(radioGroupeVal, checkBoxGroupeVal, roomList, null, null, null, null, deviceTypeList);
+
+            $("#tbody").empty();
+            radioGroupeVal = null;
+            checkBoxGroupeVal = null;
+            $.fancybox.close()
+        });
+    });
+</script>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
