@@ -7,16 +7,6 @@
 <h2>Fil detaljer</h2>
 
 <br />
-<div class="col-lg-offset-2">
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default" onclick="Overview()">Oversikt</button>
-        <button type="button" class="btn btn-default" onclick="Create()">Registrer ny enhet</button>
-        <button type="button" class="btn btn-default" onclick="History()">Logg</button>
-        <button type="button" class="btn btn-default" onclick="License()">Sertifikat</button>
-        <button type="button" class="btn btn-default" onclick="Import()">Importering</button>
-    </div>
-</div>
-<br />
 
 <div class="col-lg-12">
     <h4>Sertifikat</h4>
@@ -111,24 +101,4 @@
             window.location.replace("/Kalibrering/Import/" + @Model.Device.DeviceID);
         });
     });
-
-    function Overview() {
-        window.location.replace("/Kalibrering/Overview");
-    };
-
-    function Create() {
-        window.location.replace("/Kalibrering/Create/" + 0);
-    };
-
-    function Import() {
-        window.location.replace("/Kalibrering/Import/" + 0);
-    };
-
-    function History() {
-        window.location.replace("/Kalibrering/History");
-    };
-
-    function License() {
-        window.location.replace("/Kalibrering/License");
-    };
 </script>

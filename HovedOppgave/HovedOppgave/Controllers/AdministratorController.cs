@@ -25,7 +25,7 @@ namespace HovedOppgave.Controllers
         */
         public AdministratorController()
         {
-            //SessionCheck.CheckForRightsOnLogInUser(Constant.Rights.Administrator);
+            SessionCheck.CheckForRightsOnLogInUser(Constant.Rights.Administrator);
         }
 
         /**
@@ -40,7 +40,8 @@ namespace HovedOppgave.Controllers
             model.Users = users;
             model.Rights = rights;
 
-            string master = sessionCheck.FindMaster();
+            SessionCheck check = new SessionCheck();
+            string master = check.FindMaster();
             return View("OverViewUsers", master, model);
         }
 
@@ -62,7 +63,8 @@ namespace HovedOppgave.Controllers
             model.Rights = rights;
             model.Right = right;
 
-            string master = sessionCheck.FindMaster();
+            SessionCheck check = new SessionCheck();
+            string master = check.FindMaster();
             return View("CheckNewUsers", master, model);
         }
 
@@ -106,8 +108,9 @@ namespace HovedOppgave.Controllers
             {
                 model.JoinQuery.Add(myrep.JoinQuery(item));
             }
-            //string master = SessionCheck.FindMaster();
-            return View(/*"DeleteDiscarded", master,*/ model);
+            SessionCheck check = new SessionCheck();
+            string master = check.FindMaster();
+            return View("DeleteDiscarded", master, model);
         }
 
         /**

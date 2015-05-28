@@ -52,7 +52,7 @@ namespace HovedOppgave.Controllers
             model.LogEvents = logEvents;
             if (files.Count != 0)
                 model.Files = files;
-
+            var test = Session["UserID"];
             string master = sessionCheck.FindMaster();
             return View("Overview", master, model);
         }
@@ -71,20 +71,9 @@ namespace HovedOppgave.Controllers
                 model.Device = device;
                 model.EventType = eventType;
             }
-            
-            
-            string master = "";
-            int userId = Validator.ConvertToNumbers(Session["UserID"].ToString());
-            User user = myrep.GetUser(userId);
-            Rights rights = myrep.GetRightToUser(user);
-
-            if (rights.Name == Constant.Rights.Administrator.ToString())
-                master = "~/Views/Shared/_AdminLayout.cshtml";
-            else if (rights.Name == Constant.Rights.User.ToString())
-                master = "~/Views/Shared/_UserLayout.cshtml";
-            else if (rights.Name == Constant.Rights.Guest.ToString())
-                master = "~/Views/Shared/_GuestLayout.cshtml";
-
+            var test = Session["UserID"];
+            SessionCheck check = new SessionCheck();
+            string master = check.FindMaster();
             return View("Create", master, model);
         }
 

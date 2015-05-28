@@ -8,17 +8,11 @@
 
 <br />
 <div class="col-lg-offset-3">
-    <div class="btn-group" role="group">
-        <button class="btn btn-default dropdown-toggle" onclick="getColName()" id="menu" data-toggle="dropdown">
-            Gjem Kolonner
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu" role="menu" aria-labelledby="menu" id="ddm" onclick="checkColName()"></ul>
-        <button type="button" class="btn btn-default" onclick="Overview()">Oversikt</button>
-        <button type="button" class="btn btn-default" onclick="Create()">Registrer ny enhet</button>
-        <button type="button" class="btn btn-default" onclick="History()">Logg</button>
-        <button type="button" class="btn btn-default" onclick="Import()">Importering</button>
-    </div>
+    <button class="btn btn-default dropdown-toggle" id="menu" data-toggle="dropdown">
+        Gjem Kolonner
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="menu" id="ddm"></ul>
 </div>
 <br />
 <h4>Filer</h4><br />
@@ -62,6 +56,8 @@
         var thead = document.createElement("thead");
         thead.setAttribute("id", "thead");
         FillTableHead(thead, "file");
+        th = thead;
+        tb = $("#tbody")[0];
         $("#tableFill").append(thead);
         
         $("#ddm").click(function() {
@@ -89,20 +85,4 @@
     function btnDelete(id) {
         window.location.replace("/Kalibrering/Detailsfile/" + id);
     }
-
-    function Overview() {
-        window.location.replace("/Kalibrering/Overview");
-    };
-
-    function Create() {
-        window.location.replace("/Kalibrering/Create/" + 0);
-    };
-
-    function Import() {
-        window.location.replace("/Kalibrering/Import/" + 0);
-    };
-
-    function History() {
-        window.location.replace("/Kalibrering/History");
-    };
 </script>

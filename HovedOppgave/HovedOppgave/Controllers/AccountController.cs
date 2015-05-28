@@ -268,12 +268,12 @@ namespace HovedOppgave.Controllers
         public ActionResult Manage(int id)
         {
             ManageUserViewModel model = new ManageUserViewModel();
-            SessionCheck.CheckForUserID();
-            
+                        
             //henter personen som er logget inn
-            User loggedIn = myrep.GetUser(Validator.ConvertToNumbers(Session["UserID"].ToString()));
+            User loggedIn = null;
             User change = null;
-
+            if (Session["UserID"] != null)
+                loggedIn = myrep.GetUser(Validator.ConvertToNumbers(Session["UserID"].ToString()));
             //viss id = 0 (altså ikke en admin) så settes brukeren som skal endres til innlogget bruker
             if (id != 0)
                 change = myrep.GetUser(id);

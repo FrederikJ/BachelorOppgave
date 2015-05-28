@@ -18,8 +18,8 @@ namespace HovedOppgave.Controllers
         */
         public ActionResult Index()
         {
-            //string master = check.FindMaster();
-            return View();//"Index", master);
+            string master = check.FindMaster();
+            return View("Index", master);
         }
 
         /**

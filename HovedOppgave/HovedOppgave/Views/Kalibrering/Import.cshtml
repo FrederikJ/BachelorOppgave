@@ -6,15 +6,6 @@
 
 <h2>Importer Sertifikat</h2>
 <br />
-<div class="col-lg-offset-3">
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default" onclick="Overview()">Oversikt</button>
-        <button type="button" class="btn btn-default" onclick="Create()">Registrer ny enhet</button>
-        <button type="button" class="btn btn-default" onclick="History()">Logg</button>
-        <button type="button" class="btn btn-default" onclick="License()">Sertifikat</button>
-    </div>
-</div>
-<br />
 @using (Html.BeginForm("Import", "Kalibrering", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     <input type="file" class="btn btn-default" id="fileInput" name="file" />
@@ -141,22 +132,6 @@
             $.fancybox.close()
         });
     });
-
-    function Create() {
-        window.location.replace("/Kalibrering/Create/" + 0);
-    };
-
-    function Overview() {
-        window.location.replace("/Kalibrering/Overview");
-    };
-
-    function License() {
-        window.location.replace("/Kalibrering/License");
-    };
-
-    function History() {
-        window.location.replace("/Kalibrering/History");
-    };
 
     $(window).load(function() {
         var device = @Html.Raw(Json.Encode(Model.Device));

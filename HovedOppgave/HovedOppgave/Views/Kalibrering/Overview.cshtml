@@ -6,23 +6,6 @@
 
 <h2>Kalibrerings oversikt</h2>
 <br />
-<div class="col-lg-offset-2">
-    <div class="dropdown">
-        <button class="btn btn-default dropdown-toggle" type="button" id="menu" data-toggle="dropdown">
-            Gjem Kolonner
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu" role="menu" aria-labelledby="menu" id="ddm"></ul>
-        <div class="btn-group" role="group">
-            <button type="button" class="btn btn-default" onclick="Create()">Registrer ny enhet</button>
-            <button type="button" class="btn btn-default" onclick="History()">Logg</button>
-            <button type="button" class="btn btn-default" onclick="License()">Sertifikat</button>
-            <button type="button" class="btn btn-default" onclick="Import()">Importering</button>
-        </div>
-    </div>
-</div>
-<br /><br /><br />
-
 <button class="btn btn-default dropdown-toggle" type="button" id="planed" data-toggle="dropdown" aria-expanded="true">
     Planlagte kalibreringer om <span class="caret"></span>
 </button>
@@ -41,7 +24,15 @@
     <button type="button" class="btn btn-default" id="isCalibrated">Er kalibrert</button>
     <button type="button" class="btn btn-default" id="goingToCalibrate">Skal kalibreres</button>
     <button type="button" class="btn btn-default" id="canCalibrate">Kan kalibreres</button>
-    <button type="button" class="btn btn-default" id="create">Opprett kalibrering</button>
+    <button type="button" class="btn btn-default" id="btnCreate">Opprett kalibrering</button>
+</div>
+<br /><br />
+<div class="col-lg-offset-5">
+    <button class="btn btn-default dropdown-toggle" type="button" id="menu" data-toggle="dropdown">
+        Gjem Kolonner
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="menu" id="ddm"></ul>
 </div>
 <h3 id="h3"></h3>
 <br />
@@ -73,7 +64,6 @@
         $("#goingToCalibrate").click(function () {
             $("#tableContainer").empty();
             h3.textContent = "Skal kalibreres";
-
 
             var nextWeek = new Date;
             nextWeek.setDate(nextWeek.getDate() + 7);
@@ -129,24 +119,8 @@
             GetColName(th);
         });
 
-        $("#create").click(function () {
+        $("#btnCreate").click(function () {
             window.location.replace("/Kalibrering/Create/" + 0);
         });
     });
-
-    function Create() {
-        window.location.replace("/Kalibrering/Create/" + 0);
-    };
-
-    function Import() {
-        window.location.replace("/Kalibrering/Import/" + 0);
-    };
-
-    function History() {
-        window.location.replace("/Kalibrering/History");
-    };
-
-    function License() {
-        window.location.replace("/Kalibrering/License");
-    };
 </script>

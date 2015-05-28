@@ -7,16 +7,6 @@
 <h2>Fil sletting...</h2>
 
 <br />
-<div class="col-lg-offset-2">
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default" onclick="Overview()">Oversikt</button>
-        <button type="button" class="btn btn-default" onclick="Create()">Registrer ny enhet</button>
-        <button type="button" class="btn btn-default" onclick="History()">Logg</button>
-        <button type="button" class="btn btn-default" onclick="License()">Sertifikat</button>
-        <button type="button" class="btn btn-default" onclick="Import()">Importering</button>
-    </div>
-</div>
-<br />
 
 <h3>Sikker på at du vil slette denne filen?</h3>
 
@@ -114,24 +104,4 @@
 
         FileDetailsDelete(device, company, file, filePath);
     });
-
-    function Overview() {
-        window.location.replace("/Kalibrering/Overview");
-    };
-
-    function Create() {
-        window.location.replace("/Kalibrering/Create/" + 0);
-    };
-
-    function Import() {
-        window.location.replace("/Kalibrering/Import/" + 0);
-    };
-
-    function History() {
-        window.location.replace("/Kalibrering/History");
-    };
-
-    function License() {
-        window.location.replace("/Kalibrering/License");
-    };
 </script>

@@ -6,15 +6,6 @@
 
 <h2>Opprett et event</h2>
 <br />
-<div class="col-lg-offset-3">
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default" onclick="Overview()">Oversikt</button>
-        <button type="button" class="btn btn-default" onclick="History()">Logg</button>
-        <button type="button" class="btn btn-default" onclick="License()">Sertifikat</button>
-        <button type="button" class="btn btn-default" onclick="Import()">Importering</button>
-    </div>
-</div>
-<br />
 
 @using (Html.BeginForm("Create", "Kalibrering", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
@@ -213,24 +204,6 @@
             $("#EventType_Name").val(eventType["Name"]);
         }
     });
-
-    function Import() {
-        window.location.replace("/Kalibrering/Import/" + 0);
-    };
-
-    function Overview() {
-        window.location.replace("/Kalibrering/Overview");
-    };
-
-    function License() {
-        window.location.replace("/Kalibrering/License");
-    };
-
-    function History() {
-        window.location.replace("/Kalibrering/History");
-    };
-
-
 </script>
 
 @section Scripts {

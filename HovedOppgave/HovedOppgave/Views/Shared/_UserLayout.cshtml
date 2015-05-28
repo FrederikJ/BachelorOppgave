@@ -29,19 +29,30 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    @Html.ActionLink("NAROM", "Index", "Home", null, new { @class = "navbar-brand" })
+                    @Html.ActionLink("ASC", "Index", "Home", null, new { @class = "navbar-brand" })
                     <li role="presentation" class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                            Oversikt <span class="caret"></span>
+                            Enheter <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu" role="menu">
-                            <li>@Html.ActionLink("Utstyr", "Index", "Home")</li>
-                            <li>@Html.ActionLink("Kalibrering", "Index", "Home")</li>
+                            <li>@Html.ActionLink("Oversikt", "Index", "Home")</li>
+                            <li>@Html.ActionLink("Registrer enhet", "Index", "Home")</li>
                         </ul>
                     </li>
-                    <li>@Html.ActionLink("Kalibrering", "Index", "Home")</li>
-                    <li>@Html.ActionLink("Kabler", "Index", "Home")</li>
-                    <li>@Html.ActionLink("Om NAROM", "Contact", "Home")</li>
+                    <li role="presentation" class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                            Kalibrering<span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>@Html.ActionLink("Oversikt", "Overview", "Kalibrering")</li>
+                            <li><a href="" id="create">Registrer kalibrering</a></li>
+                            <li>@Html.ActionLink("Logg", "History", "Kalibrering")</li>
+                            <li>@Html.ActionLink("Sertifikat", "License", "Kalibrering")</li>
+                            <li><a href="" id="import">Importer sertifikat</a></li>
+                        </ul>
+                    </li>
+                    <li>@Html.ActionLink("Om ASC", "Contact", "Home")</li>
+                    <li><a href="" id="accountManage">Konto administrering</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li>
@@ -67,6 +78,16 @@
             $("#userName").text(name.toLowerCase().replace(/^(.)|(\s|\-)(.)/g, function (c) {
                 return String(c).toUpperCase();
             }));
+
+            var userId = parseInt(@Html.Raw(Json.Encode(Session["UserID"].ToString())));
+            var manage = $("#accountManage");
+            manage[0].href = "/Account/Manage/" + userId;
+
+            var createEvent = $("#create");
+            createEvent[0].href = "/Kalibrering/Create/0";
+
+            var imp = $("#import");
+            imp[0].href = "/Kalibrering/Import/0";
         });
     </script>
 </body>

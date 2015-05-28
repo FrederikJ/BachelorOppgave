@@ -26,10 +26,10 @@ var GetColName = function (thead) {
     ddl.innerHTML = "";
     for (var i = 0; i < child.children.length; i++) {
         if (child.children[i].hidden) {
-            ddl.innerHTML += "<li id='" + i + "'><a><input type='checkbox' disabled/>" + child.children[i].textContent; + "</a></li>";
+            ddl.innerHTML += "<li id='" + i + "'><a><input type='checkbox' disabled/>" + child.children[i].textContent + "</a></li>";
         }
         else {
-            ddl.innerHTML += "<li id='" + i + "'><a><input type='checkbox'checked='checked' disabled/>" + child.children[i].textContent; + "</a></li>";
+            ddl.innerHTML += "<li id='" + i + "'><a><input type='checkbox'checked='checked' disabled/>" + child.children[i].textContent + "</a></li>";
         }
     }
 }

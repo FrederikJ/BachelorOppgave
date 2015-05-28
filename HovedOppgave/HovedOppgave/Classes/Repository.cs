@@ -452,7 +452,7 @@ namespace HovedOppgave.Models
                         item.DeviceTypeID = Convert.ToInt32(reader["type"]);
                         item.RoomID = Convert.ToInt32(reader["default_location"]);
                         if (reader["devicename"] != DBNull.Value)
-                            item.Name = (string)reader["name"];
+                            item.Name = (string)reader["devicename"];
                         if (reader["description"] != DBNull.Value)
                             item.Description = (string)reader["description"];
                         if (reader["serial_num"] != DBNull.Value)
