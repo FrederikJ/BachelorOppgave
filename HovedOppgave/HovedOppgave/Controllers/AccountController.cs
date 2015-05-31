@@ -1,148 +1,258 @@
-﻿using System;
+﻿using HovedOppgave.Classes;
+using HovedOppgave.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
-using HovedOppgave.Models;
 using System.Net.Mail;
-using HovedOppgave.Classes;
+using System.Collections;
+using System.Web.UI.WebControls;
+
+/**
+ * Alle sider som har med innlogging er her. 
+ * 
+ * Forfatter: Frederik Johnsen
+*/
 
 namespace HovedOppgave.Controllers
 {
     [Authorize]
     public class AccountController : Controller
     {
-        public AccountController()
-            : this(new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext())))
-        {
-        }
+        //Få tilgang til alle spørringer opp i mot db
+        IRepository myrep = new Repository();
 
-        public AccountController(UserManager<ApplicationUser> userManager)
-        {
-            UserManager = userManager;
-        }
-
-        public UserManager<ApplicationUser> UserManager { get; private set; }
-
-        //
+        /**
+         * Get metoden til logg inn siden. setter master
+        */
         // GET: /Account/Login
         [AllowAnonymous]
-        public ActionResult Login(string returnUrl)
+        public ActionResult Login()
         {
-            ViewBag.ReturnUrl = returnUrl;
-            return View();
+            string master = "~/Views/Shared/_LoggedOut.cshtml";
+            return View("Login", master);
         }
 
-        //
+        /**
+         *  får inn login modellen med en autentiserings event args. modellen består simpelt av 
+         *  brukernavn passord og en bolsk verdi om den skal huske brukeren eller ikke.
+        */
         // POST: /Account/Login
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
+        public ActionResult Login(LoginViewModel model, AuthenticateEventArgs e)
         {
             if (ModelState.IsValid)
             {
-                var user = await UserManager.FindAsync(model.UserName, model.Password);
-                if (user != null)
+                //henter brukeren
+                User loggingIn = myrep.GetUser(model.Email);
+                //Sjekkker om brukeren eksisterer og om det innskrevene passord stemmer med db
+                if(loggingIn.UserId != 0 && Hash.CheckPassword(model.Password, loggingIn.PassHash, loggingIn.PassSalt))
                 {
-                    await SignInAsync(user, model.RememberMe);
-                    return RedirectToLocal(returnUrl);
-                }
-                else
-                {
-                    ModelState.AddModelError("", "Invalid username or password.");
-                }
-            }
-
-            // If we got this far, something failed, redisplay form
-            return View(model);
-        }
-
-        //
-        // GET: /Account/Register
-        [AllowAnonymous]
-        public ActionResult Register()
-        {
-            return View();
-        }
-
-        //
-        // POST: /Account/Register
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Register(RegisterViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = new ApplicationUser() { UserName = model.UserName };
-                var result = await UserManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    await SignInAsync(user, isPersistent: false);
+                    //autensiserer og setter diverse session objekt som blir brukt senere med diverse bruker sjekk
+                    e.Authenticated = true;
+                    SmallClasses.LoggingIn(loggingIn);
+                    //viss den boslke verdien er true, lagrer han en cookie i browseren som skal vare en månde
+                    if (model.RememberMe)
+                    {
+                        // viss brukeren vil at systemet skal huske han 
+                        // http://stackoverflow.com/questions/3140341/how-to-create-persistent-cookies-in-asp-net
+                        HttpCookie persist = new HttpCookie("persist");
+                        persist.Values.Add("UserID", loggingIn.UserId.ToString());
+                        persist.Expires = DateTime.Now.AddMonths(1); // Husker bruker i 1 månde
+                        Response.Cookies.Add(persist);
+                    }
+                    //forflytte seg til hjemme siden
                     return RedirectToAction("Index", "Home");
                 }
                 else
                 {
-                    AddErrors(result);
+                    //emailen eller passordet var feil
+                    e.Authenticated = false;
+                    ModelState.AddModelError("", "Feil innloggings legitimasjon, vennligst prøv på nytt.");
                 }
             }
-
-            // If we got this far, something failed, redisplay form
+            // kommer vi så langt, noe har failet, vise formen igjen
+            Session["flashMelding"] = "Feil innloggings legitimasjon, vennligst prøv på nytt.";
+            Session["flashStatus"] = Constant.NotificationType.danger.ToString();
+            SmallClasses.DeleteSessions();
             return View(model);
         }
 
-        //
+        /**
+         * folk kan selv registrere seg om dem har lyst eller admmin kan gjøre det for dem.
+         * er det admin vil det også bli tatt med bruker rettigheter som admin kan sette
+        */
+        // GET: /Account/Register
+        [AllowAnonymous]
+        public ActionResult Register()
+        {
+            string master = null;
+            CreatUserViewModel model = new CreatUserViewModel();
+            if(Session["UserID"] != null && Validator.CheckRights(Constant.Rights.Administrator))
+            {
+                List<Rights> list = myrep.GetAllRights();
+                model.Rights = list;
+                master = "~/Views/Shared/_AdminLayout.cshtml";
+                return View("Register", master, model);
+            }
+            master = "~/Views/Shared/_LoggedOut.cshtml";
+            return View("Register", master, model);
+        }
+
+        /**
+         *  får inn register modellen med en autentiserings event args. modellen består simpelt av 
+         *  brukernavn, epost, passord, bekreft passord og evt en rettighet
+        */
+        // POST: /Account/Register
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public ActionResult Register(CreatUserViewModel model, AuthenticateEventArgs e)
+        {
+            //om alt stemer i henhold til modellen og om emailen faktisk er en email
+            if (ModelState.IsValid && Validator.ValidateEmail(model.Email))
+            {
+                //henter alle brukere som eksisterer og ser om eposten allerede eksisterer
+                List<User> userList = myrep.GetAllUsers();
+                foreach(var item in userList)
+                {
+                    if(item.Email.Equals(model.Email))
+                    {
+                        Session["flashMelding"] = "Emailen eksisterer fra før";
+                        Session["flashStatus"] = Constant.NotificationType.danger.ToString();
+                        SmallClasses.DeleteSessions();
+                        return View(model);
+                    }
+                }
+                
+                //hasher og sette salt på passordet før det blir lagret i db
+                Hashtable table = Hash.GetHashAndSalt(model.Password);
+                //setter div. bruker preferanser
+                User user = null;
+                //melding som blir sent i en epost som kommer til den registrerte brukeren
+                string message = null;
+                //viss dette er en admin eller ikke
+                if (model.Right != null)
+                {
+                    user = new User()
+                    {
+                        Email = model.Email,
+                        Name = model.Name,
+                        PassHash = (string)table["hash"],
+                        PassSalt = (string)table["salt"],
+                        RightsID = model.Right.RightsID,
+                        Checked = false
+                    };
+                    message = "Velkommen til vårres system. Du har nu registrert deg her hos oss. Administrator har gitt deg rettigheten " + model.Right.Name + " og med passord " + model.Password + ". Du kan logger deg bare inn med eposten din og evt. endre på bruker detaljene dine";
+                }
+                else
+                {
+                    user = new User()
+                    {
+                        Email = model.Email,
+                        Name = model.Name,
+                        PassHash = (string)table["hash"],
+                        PassSalt = (string)table["salt"],
+                        RightsID = 3,
+                        Checked = false
+                    };
+                    message = "Velkommen til vårres system. Du har nu registrert deg her hos oss. Du vil foreløbig bare få bruker rettighet gjest til administrator har evt gitt deg en annen rettighet";
+                }
+
+                //oppretter brukeren og får sent tilbake id til brukeren
+                int id = myrep.CreateUser(user);
+
+                //sende eposten
+                SendEmail send = new SendEmail();
+                send.SendEpost(model.Email, message, "Opprettelse av konto");
+
+                //en sjekk på at brukeren faktisk ble opprettet, setter id til brukeren, 
+                //setter div. session objekt, autentiserer login og redirekte til hovedsiden
+                //blir ikke godkjent, så sendes du tilbake til der du kom fra
+                if (id != 0)
+                {
+                    user.UserId = id;
+                    SmallClasses.LoggingIn(user);
+                    e.Authenticated = true;
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                    e.Authenticated = false;
+            }
+            
+            // kommer vi så langt, noe har failet, vise formen igjen
+            Session["flashMelding"] = "Emailen din er ikke godkjent";
+            Session["flashStatus"] = Constant.NotificationType.danger.ToString();
+            SmallClasses.DeleteSessions();
+            return View(model);
+        }
+
+        /**
+         * Get metoden til mistet passord siden. setter master
+        */
         // GET: /Account/LostPassword
         [AllowAnonymous]
         public ActionResult LostPassword()
         {
-            return View();
+            string master = "~/Views/Shared/_LoggedOut.cshtml";
+            return View("LostPassword", master);
         }
 
-        //
+        /**
+         * om brukere har mistet passordet sitt, så skriver dem inn emailen, også blir det opprettet
+         * et nytt passord og sent som epost til brukeren
+        */
         // POST: /Account/LostPassword
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> LostPassword(LostPasswordViewModel model)
+        public ActionResult LostPassword(LostPasswordViewModel model)
         {
-            if (ModelState.IsValid)
+            //om alt stemer i henhold til modellen og om emailen faktisk er en email
+            if (ModelState.IsValid && Validator.ValidateEmail(model.Email))
             {
-                MailMessage msg = new MailMessage();
-                SendEmail sendMsg = null;
-                string newPassword;
-                var user = new ApplicationUser() { Email = model.Email };
-                var result = await UserManager.CreateAsync(user);
-                if (result.Succeeded)
+                //henter brukeren og sjekker om den eksisterer
+                User user = myrep.GetUser(model.Email);
+                if(user.UserId == 0)
                 {
-                    newPassword = CreatRandomPassword.CreatePassword(10);
-                    string email = user.Email;
+                    Session["flashMessage"] = "Eposten eksisterer ikke!";
+                    Session["flashStatus"] = Classes.Constant.NotificationType.danger.ToString();
+                    return View(model);
+                }
+
+                MailMessage msg = new MailMessage();
+                SendEmail sendMsg = new SendEmail();
+                //lager et nytt passord med en lengde 10
+                string newPassword = SmallClasses.CreatePassword(10);
+
+                //oppdatere brukeren, viss det blir sukksessfult sender han en epost med nytt passord til brukeren og redirekte brukeren til login siden
+                if (SmallClasses.UpdatePassword(user, newPassword))
+                {
                     msg.Subject = "Tilsendt nytt passord";
-                    msg.Body = "Hei " + user.UserName + "!\n" + "Her har du et nytt passord for din bruker: " + newPassword + "\nVi vil anbefale deg å å skifte passord når du får logget deg inn til noe som er mer personlig";
-                    if(UpdatePassword.updatePassword(email, newPassword))
+                    msg.Body = "Hei " + user.Name + "!\n" + "Her har du et nytt passord for din bruker " + newPassword + ".\nVi vil anbefale deg å å skifte passord når du får logget deg inn til noe som er mer personlig";
+                    if (sendMsg.SendEpost(model.Email, msg.Body, msg.Subject))
                     {
-                        sendMsg.SendEpost(email, msg.Body, msg.Subject);
                         Session["flashMessage"] = "Du har nu fått en epost om ditt nye passord";
-                        Session["flashStatus"] = Classes.Constants.NotificationType.success.ToString();
-                        return RedirectToAction("Login", "Account");
+                        Session["flashStatus"] = Classes.Constant.NotificationType.success.ToString();
+                        return RedirectToAction("Login");
                     }
                     else
                     {
-                        Session["flashMessage"] = "Ville ikke oppdateres i databasen";
-                        Session["flashStatus"] = Classes.Constants.NotificationType.danger.ToString();
+                        Session["flashMessage"] = "Klarte ikke å sende en epost";
+                        Session["flashStatus"] = Classes.Constant.NotificationType.danger.ToString();
                     }
                 }
                 else
                 {
-                    Session["flashMessage"] = "Eposten eksisterer ikke!";
-                    Session["flashStatus"] = Classes.Constants.NotificationType.danger.ToString();
-                    AddErrors(result);
+                    Session["flashMessage"] = "Ville ikke oppdateres i databasen";
+                    Session["flashStatus"] = Classes.Constant.NotificationType.danger.ToString();
                 }
             }
 
@@ -150,314 +260,120 @@ namespace HovedOppgave.Controllers
             return View(model);
         }
 
-        //
-        // POST: /Account/Disassociate
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Disassociate(string loginProvider, string providerKey)
-        {
-            ManageMessageId? message = null;
-            IdentityResult result = await UserManager.RemoveLoginAsync(User.Identity.GetUserId(), new UserLoginInfo(loginProvider, providerKey));
-            if (result.Succeeded)
-            {
-                message = ManageMessageId.RemoveLoginSuccess;
-            }
-            else
-            {
-                message = ManageMessageId.Error;
-            }
-            return RedirectToAction("Manage", new { Message = message });
-        }
-
-        //
+        /**
+        * Get metoden til endring av bruker info siden. setter master setter 
+        */
         // GET: /Account/Manage
-        public ActionResult Manage(ManageMessageId? message)
+        [AllowAnonymous]
+        public ActionResult Manage(int id)
         {
-            ViewBag.StatusMessage =
-                message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
-                : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
-                : message == ManageMessageId.RemoveLoginSuccess ? "The external login was removed."
-                : message == ManageMessageId.Error ? "An error has occurred."
-                : "";
-            ViewBag.HasLocalPassword = HasPassword();
-            ViewBag.ReturnUrl = Url.Action("Manage");
-            return View();
+            ManageUserViewModel model = new ManageUserViewModel();
+                        
+            //henter personen som er logget inn
+            User loggedIn = null;
+            User change = null;
+            if (Session["UserID"] != null)
+                loggedIn = myrep.GetUser(Validator.ConvertToNumbers(Session["UserID"].ToString()));
+            //viss id = 0 (altså ikke en admin) så settes brukeren som skal endres til innlogget bruker
+            if (id != 0)
+                change = myrep.GetUser(id);
+            else
+                change = loggedIn;
+
+            //brukeren er en admin og får med rettigheter som man kan endre på brukeren
+            if(loggedIn.RightsID == 1)
+            {
+                List<Rights> rights = myrep.GetAllRights();
+                model.Rights = rights;
+                model.AdminUser = loggedIn;
+            }
+            model.ChangeUser = change;
+
+            //setter master page og sender deg til viewet
+            SessionCheck check = new SessionCheck();
+            string master = check.FindMaster();
+            return View("Manage", master, model);
         }
 
-        //
+        /**
+         *  får inn register modellen. modellen består simpelt av 
+         *  brukernavn, epost, passord, bekreft passord og evt en rettighet
+        */
         // POST: /Account/Manage
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Manage(ManageUserViewModel model)
+        public ActionResult Manage(ManageUserViewModel model)
         {
-            bool hasPassword = HasPassword();
-            ViewBag.HasLocalPassword = hasPassword;
-            ViewBag.ReturnUrl = Url.Action("Manage");
-            if (hasPassword)
+            //sjekker at modellen er godkjent og emailen faktisk er en email
+            if (ModelState.IsValid && Validator.ValidateEmail(model.ChangeUser.Email))
             {
-                if (ModelState.IsValid)
+                //setter brukeren som skal endres på.
+                User edit = model.ChangeUser;
+                //melding som sendes til brukerens epost
+                string message = null;
+                //viss innlogget bruker er admin, så blir rettigheten satt også
+                if (model.Right.RightsID != 0)
                 {
-                    IdentityResult result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
-                    if (result.Succeeded)
+                    edit.RightsID = model.Right.RightsID;
+                    if (model.AdminUser.UserId != 0 && model.AdminUser.UserId != model.ChangeUser.UserId)
                     {
-                        return RedirectToAction("Manage", new { Message = ManageMessageId.ChangePasswordSuccess });
+                        message = "Administrator har endret på kontoen din. bruker informasjonen din er nu... Navn: " + edit.Name + ", Epost: " + edit.Email + ", Rettighet: " + edit.RightsID +  ".";
+                    }
+                }
+                // sjekker at det gamle passordet og det nye passordet ikke er tom(input) og sjekker at dem stemmer over ens
+                //stemmer dem så legges det til hash og salt på passordet ogh setter det til brukeren
+                if (model.OldPassword != "" &&  model.NewPassword != "" &&
+                    Hash.CheckPassword(model.OldPassword, model.ChangeUser.PassHash, model.ChangeUser.PassSalt))
+                {
+                    Hashtable table = Hash.GetHashAndSalt(model.NewPassword);
+                    edit.PassHash = (string)table["hash"];
+                    edit.PassSalt = (string)table["salt"];
+                    if (model.AdminUser.UserId != 0 && model.AdminUser.UserId != model.ChangeUser.UserId)
+                    {
+                        message = "Administrator har endret på kontoen din. bruker informasjonen din er nu... Navn: " + edit.Name + ", Epost: " + edit.Email + ", Rettighet: " + edit.RightsID + ", Passord: " + model.NewPassword + ".";
+                    }
+                }
+                
+                //sender eposten
+                if(message != null)
+                {
+                    SendEmail send = new SendEmail();
+                    send.SendEpost(edit.Email, message, "Bruker detaljer endret");
+                }
+
+                //bruekren blir oppdatert i db. viss det er en admin blir man sent tilbake til 
+                //oversikt over alle brukere, mens vanlige brukere blir sent over til samme side
+                //bare at alt er begynt på nytt igjen
+                if(myrep.EditUser(edit))
+                    if (model.Right.RightsID != 0)
+                    {
+                        Session["flashMelding"] = "Suksessfult";
+                        Session["flashStatus"] = Constant.NotificationType.success.ToString();
+                        return RedirectToAction("OverViewUsers", "Administrator");
                     }
                     else
                     {
-                        AddErrors(result);
+                        Session["flashMelding"] = "Suksessfult";
+                        Session["flashStatus"] = Constant.NotificationType.danger.ToString();
+                        return RedirectToAction("Manage");
                     }
-                }
-            }
-            else
-            {
-                // User does not have a password so remove any validation errors caused by a missing OldPassword field
-                ModelState state = ModelState["OldPassword"];
-                if (state != null)
-                {
-                    state.Errors.Clear();
-                }
-
-                if (ModelState.IsValid)
-                {
-                    IdentityResult result = await UserManager.AddPasswordAsync(User.Identity.GetUserId(), model.NewPassword);
-                    if (result.Succeeded)
-                    {
-                        return RedirectToAction("Manage", new { Message = ManageMessageId.SetPasswordSuccess });
-                    }
-                    else
-                    {
-                        AddErrors(result);
-                    }
-                }
             }
 
-            // If we got this far, something failed, redisplay form
+            // kommer vi så langt, noe har failet, vise formen igjen
+            Session["flashMelding"] = "Emailen din er ikke godkjent";
+            Session["flashStatus"] = Constant.NotificationType.danger.ToString();
             return View(model);
         }
 
-        //
-        // POST: /Account/ExternalLogin
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public ActionResult ExternalLogin(string provider, string returnUrl)
+        /**
+         *  logger av brukeren og sletter alle session objekt, og setter autentiseringen til false
+        */
+        // Get: /Account/LogOff
+        public ActionResult LogOff(AuthenticateEventArgs e)
         {
-            // Request a redirect to the external login provider
-            return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
+            SmallClasses.DeleteSessions();
+            e.Authenticated = false;
+            return RedirectToAction("Login");
         }
-
-        //
-        // GET: /Account/ExternalLoginCallback
-        [AllowAnonymous]
-        public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
-        {
-            var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
-            if (loginInfo == null)
-            {
-                return RedirectToAction("Login");
-            }
-
-            // Sign in the user with this external login provider if the user already has a login
-            var user = await UserManager.FindAsync(loginInfo.Login);
-            if (user != null)
-            {
-                await SignInAsync(user, isPersistent: false);
-                return RedirectToLocal(returnUrl);
-            }
-            else
-            {
-                // If the user does not have an account, then prompt the user to create an account
-                ViewBag.ReturnUrl = returnUrl;
-                ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
-                return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { UserName = loginInfo.DefaultUserName });
-            }
-        }
-
-        //
-        // POST: /Account/LinkLogin
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult LinkLogin(string provider)
-        {
-            // Request a redirect to the external login provider to link a login for the current user
-            return new ChallengeResult(provider, Url.Action("LinkLoginCallback", "Account"), User.Identity.GetUserId());
-        }
-
-        //
-        // GET: /Account/LinkLoginCallback
-        public async Task<ActionResult> LinkLoginCallback()
-        {
-            var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(XsrfKey, User.Identity.GetUserId());
-            if (loginInfo == null)
-            {
-                return RedirectToAction("Manage", new { Message = ManageMessageId.Error });
-            }
-            var result = await UserManager.AddLoginAsync(User.Identity.GetUserId(), loginInfo.Login);
-            if (result.Succeeded)
-            {
-                return RedirectToAction("Manage");
-            }
-            return RedirectToAction("Manage", new { Message = ManageMessageId.Error });
-        }
-
-        //
-        // POST: /Account/ExternalLoginConfirmation
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl)
-        {
-            if (User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Manage");
-            }
-
-            if (ModelState.IsValid)
-            {
-                // Get the information about the user from the external login provider
-                var info = await AuthenticationManager.GetExternalLoginInfoAsync();
-                if (info == null)
-                {
-                    return View("ExternalLoginFailure");
-                }
-                var user = new ApplicationUser() { UserName = model.UserName };
-                var result = await UserManager.CreateAsync(user);
-                if (result.Succeeded)
-                {
-                    result = await UserManager.AddLoginAsync(user.Id, info.Login);
-                    if (result.Succeeded)
-                    {
-                        await SignInAsync(user, isPersistent: false);
-                        return RedirectToLocal(returnUrl);
-                    }
-                }
-                AddErrors(result);
-            }
-
-            ViewBag.ReturnUrl = returnUrl;
-            return View(model);
-        }
-
-        //
-        // POST: /Account/LogOff
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult LogOff()
-        {
-            AuthenticationManager.SignOut();
-            return RedirectToAction("Index", "Home");
-        }
-
-        //
-        // GET: /Account/ExternalLoginFailure
-        [AllowAnonymous]
-        public ActionResult ExternalLoginFailure()
-        {
-            return View();
-        }
-
-        [ChildActionOnly]
-        public ActionResult RemoveAccountList()
-        {
-            var linkedAccounts = UserManager.GetLogins(User.Identity.GetUserId());
-            ViewBag.ShowRemoveButton = HasPassword() || linkedAccounts.Count > 1;
-            return (ActionResult)PartialView("_RemoveAccountPartial", linkedAccounts);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && UserManager != null)
-            {
-                UserManager.Dispose();
-                UserManager = null;
-            }
-            base.Dispose(disposing);
-        }
-
-        #region Helpers
-        // Used for XSRF protection when adding external logins
-        private const string XsrfKey = "XsrfId";
-
-        private IAuthenticationManager AuthenticationManager
-        {
-            get
-            {
-                return HttpContext.GetOwinContext().Authentication;
-            }
-        }
-
-        private async Task SignInAsync(ApplicationUser user, bool isPersistent)
-        {
-            AuthenticationManager.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-            var identity = await UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
-            AuthenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent }, identity);
-        }
-
-        private void AddErrors(IdentityResult result)
-        {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError("", error);
-            }
-        }
-
-        private bool HasPassword()
-        {
-            var user = UserManager.FindById(User.Identity.GetUserId());
-            if (user != null)
-            {
-                return user.PasswordHash != null;
-            }
-            return false;
-        }
-
-        public enum ManageMessageId
-        {
-            ChangePasswordSuccess,
-            SetPasswordSuccess,
-            RemoveLoginSuccess,
-            Error
-        }
-
-        private ActionResult RedirectToLocal(string returnUrl)
-        {
-            if (Url.IsLocalUrl(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-            else
-            {
-                return RedirectToAction("Index", "Home");
-            }
-        }
-
-        private class ChallengeResult : HttpUnauthorizedResult
-        {
-            public ChallengeResult(string provider, string redirectUri) : this(provider, redirectUri, null)
-            {
-            }
-
-            public ChallengeResult(string provider, string redirectUri, string userId)
-            {
-                LoginProvider = provider;
-                RedirectUri = redirectUri;
-                UserId = userId;
-            }
-
-            public string LoginProvider { get; set; }
-            public string RedirectUri { get; set; }
-            public string UserId { get; set; }
-
-            public override void ExecuteResult(ControllerContext context)
-            {
-                var properties = new AuthenticationProperties() { RedirectUri = RedirectUri };
-                if (UserId != null)
-                {
-                    properties.Dictionary[XsrfKey] = UserId;
-                }
-                context.HttpContext.GetOwinContext().Authentication.Challenge(properties, LoginProvider);
-            }
-        }
-        #endregion
     }
 }

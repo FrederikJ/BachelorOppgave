@@ -16,7 +16,7 @@ namespace HovedOppgave.Classes
 
     public class SendEmail : System.Web.UI.Page
     {
-        public void SendEpost(string email, string message, string subject)
+        public bool SendEpost(string email, string message, string subject)
         {
             try
             {
@@ -31,39 +31,43 @@ namespace HovedOppgave.Classes
                 smtp.Port = 587;
                 smtp.Host = "smtp.gmail.com";
                 smtp.EnableSsl = true;
+                smtp.UseDefaultCredentials = false;
+                smtp.Credentials = new NetworkCredential("bacheloroppgavehingr6@gmail.com", "BacOpp06");
                 smtp.Send(msg);
+                return true;
             }
             catch (Exception ex)
             {
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "Message", "alert('Error occured : " + ex.Message.ToString() + "');", true);
-                return;
+                return false;
             }
         }
-        public void SendEpost(string message, string subject, List<User> users)
+        public bool SendEpost(string message, string subject, List<User> users)
         {
             try
             {
-                for (int i = 0; i < users.Count; i++)
-                {
-                    MailMessage msg = new MailMessage();
-                    SmtpClient smtp = new SmtpClient();
+                MailMessage msg = new MailMessage();
+                SmtpClient smtp = new SmtpClient();
 
-                    //bruker gruppe eposten som avsender
-                    msg.From = new MailAddress("Admin@gmail.com"); //Avsender
-                    msg.To.Add(users[i].Email); // Sendes til
-                    msg.Subject = subject;  //Tittelen
-                    msg.Body = message; //Beskjeden
-                    msg.IsBodyHtml = true;
-                    smtp.Port = 587;
-                    smtp.Host = "smtp.gmail.com";
-                    smtp.EnableSsl = true;
-                    smtp.Send(msg);
-                }
+                //bruker gruppe eposten som avsender
+                msg.From = new MailAddress("Admin@gmail.com"); //Avsender
+                foreach(var user in users)
+                    msg.To.Add(user.Email); // Sendes til
+                msg.Subject = subject; // Tittelen
+                msg.Body = message; // Beskjeden
+                msg.IsBodyHtml = true;
+                smtp.Port = 587;
+                smtp.Host = "smtp.gmail.com";
+                smtp.EnableSsl = true;
+                smtp.UseDefaultCredentials = false;
+                smtp.Credentials = new NetworkCredential("bacheloroppgavehingr6@gmail.com", "BacOpp06");
+                smtp.Send(msg);
+                return true;
             }
             catch (Exception ex)
             {
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "Message", "alert('Error occured : " + ex.Message.ToString() + "');", true);
-                return;
+                return false;
             }
         }
     }

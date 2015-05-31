@@ -1,0 +1,201 @@
+﻿@model HovedOppgave.Models.CalibrationViews
+
+@{
+    ViewBag.Title = "Edit calibration";
+}
+
+<h2>Endre på kalibrering</h2>
+<br />
+
+@using (Html.BeginForm("EditCalibration", "Kalibrering", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <h4>Calibration type</h4>
+    <hr />
+    <div class="col-lg-offset-3">
+        <input type="radio" name="calibrationType" value="internal" checked>Internt
+        &nbsp;
+        <input type="radio" name="calibrationType" value="external">Ekstern
+    </div>
+        
+    <div class="form-horizontal">
+        <h4>Utstyrs enhet</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.Device.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Device.Name, new { htmlAttributes = new { @class = "form-control", placeholder = "Enhet", required = true, readOnly = true } })
+                @Html.ValidationMessageFor(model => model.Device.Name, "", new { @class = "text-danger" })
+                <a href="#showInFancy" id="floating">Søk i eksisterende filer</a>
+            </div>
+        </div>
+
+        <h4>Event</h4>
+        <hr />
+        <div class="form-group">
+            @Html.LabelFor(model => model.LogEvent.RegisteredDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.LogEvent.RegisteredDate, new { htmlAttributes = new { @class = "form-control", placeholder = " eks: åååå.mm.dd", required = true } })
+                @Html.ValidationMessageFor(model => model.LogEvent.RegisteredDate, "", new { @class = "text-danger" })
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.LogEvent.StartDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.LogEvent.StartDate, new { htmlAttributes = new { @class = "form-control", placeholder = " eks: åååå.mm.dd" } })
+                @Html.ValidationMessageFor(model => model.LogEvent.StartDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.LogEvent.EndDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.LogEvent.EndDate, new { htmlAttributes = new { @class = "form-control", placeholder = " eks: åååå.mm.dd" } })
+                @Html.ValidationMessageFor(model => model.LogEvent.EndDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.LogEvent.Data1, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.LogEvent.Data1, new { htmlAttributes = new { @class = "form-control", placeholder = " eks: data" } })
+                @Html.ValidationMessageFor(model => model.LogEvent.Data1, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.LogEvent.Data2, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.LogEvent.Data2, new { htmlAttributes = new { @class = "form-control", placeholder = " eks: data" } })
+                @Html.ValidationMessageFor(model => model.LogEvent.Data2, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <h4>Type event</h4>
+        <hr />
+        <div class="form-group">
+            @Html.LabelFor(model => model.EventType.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.EventType.Name, new { htmlAttributes = new { @class = "form-control", placeholder = "Type event", required = true, readOnly = true } })
+                @Html.ValidationMessageFor(model => model.EventType.Name, "", new { @class = "text-danger" })
+                <a href="#showInFancy" id="floating">Søk i eksisterende filer</a>
+            </div>
+        </div>
+
+        <h4>Organisasjon</h4>
+        <hr />
+        <div class="form-group">
+            @Html.LabelFor(model => model.Company.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Company.Name, new { htmlAttributes = new { @class = "form-control", placeholder = "Organisasjon", required = true, readOnly = true } })
+                @Html.ValidationMessageFor(model => model.Company.Name, "", new { @class = "text-danger" })
+                <a href="#showInFancy" id="floating">Søk i eksisterende filer</a>
+            </div>
+        </div>
+
+        <h4>Rom</h4>
+        <hr />
+        <div class="form-group">
+            @Html.LabelFor(model => model.Room.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Room.Name, new { htmlAttributes = new { @class = "form-control", placeholder = "Rom", required = true, readOnly = true } })
+                @Html.ValidationMessageFor(model => model.Room.Name, "", new { @class = "text-danger" })
+                <a href="#showInFancy" id="floating">Søk i eksisterende filer</a>
+            </div>
+        </div>
+
+        <h4>Sertifikat</h4>
+        <hr />
+        <div class="form-group">
+            @Html.LabelFor(model => model.FileTo.FileName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <input type="file" class="btn btn-default" id="fileInput" name="file" />
+                <br />
+                @Html.EditorFor(model => model.FileTo.FileName, new { htmlAttributes = new { @class = "form-control", placeholder = "Fil", readOnly = true } })
+                @Html.ValidationMessageFor(model => model.FileTo.FileName, "", new { @class = "text-danger" })
+                <a href="#showInFancy" id="floating">Søk i eksisterende filer</a>
+            </div>
+        </div>
+
+        <div hidden>
+            @Html.HiddenFor(model => model.Device.DeviceID, new { htmlAttributes = new { readOnly = true } })
+            @Html.HiddenFor(model => model.EventType.EventTypeID, new { htmlAttributes = new { readOnly = true } })
+            @Html.HiddenFor(model => model.Company.CompanyID, new { htmlAttributes = new { readOnly = true } })
+            @Html.HiddenFor(model => model.Room.RoomID, new { htmlAttributes = new { readOnly = true } })
+            @Html.HiddenFor(model => model.FileTo.FileID, new { htmlAttributes = new { readOnly = true } })
+            @Html.HiddenFor(model => model.LogEvent.FileID, new { htmlAttributes = new { readOnly = true } })
+        </div>
+
+        <br />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Endre" class="btn btn-default" id="save" />
+            </div>
+        </div>
+    </div>
+}
+
+<div id="showInFancy" style="display:none">
+    <h5>Søk i...</h5>
+    <div align="center">
+        <input type="radio" name="group" value="room" /> Rom &nbsp;
+        <input type="radio" name="group" value="company" /> Organisasjon &nbsp;
+        <input type="radio" name="group" value="eventType" />Event type &nbsp;
+        <input type="radio" name="group" value="device" /> Enhet &nbsp;
+        <input type="radio" name="group" value="file" /> Fil
+    </div><br />
+    <input type="text" class="form-control" id="searchBox" />
+    <table class="table">
+        <thead id="thead"><tr><th>@Html.DisplayName("Name")</th><th>@Html.DisplayName("Velg enhet")</th></tr></thead>
+        <tbody id="tbody"></tbody>
+    </table>
+    <button type="submit" id="putIn" class="btn btn-default">Sett inn</button>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var endDate = new Date($.parseJSON(String(logEvent["EndDate"]).substr(6, 13)));
+        var staDate = new Date($.parseJSON(String(logEvent["StartDate"]).substr(6, 13)));
+        var regDate = new Date($.parseJSON(String(logEvent["RegisteredDate"]).substr(6, 13)));
+        $("#LogEvent_RegisteredDate").val(regDate.getFullYear() + "." + regDate.getMonth + "." + regDate.getDate());
+        $("#LogEvent_StartDate").val(staDate.getFullYear() + "." + staDate.getMonth + "." + staDate.getDate());
+        $("#LogEvent_EndDate").val(endDate.getFullYear() + "." + endDate.getMonth + "." + endDate.getDate());
+
+        var roomList = @Html.Raw(Json.Encode(Model.Rooms));
+        var fileList = @Html.Raw(Json.Encode(Model.Files));
+        var companyList = @Html.Raw(Json.Encode(Model.Companys));
+        var eventTypeList = @Html.Raw(Json.Encode(Model.EventTypes));
+        var deviceList = @Html.Raw(Json.Encode(Model.Devices));
+
+        $("#floating").fancybox();
+
+        $("#searchBox").keyup(function() {
+            var radioGroupeVal = $("input:radio[name='group']:checked").val();
+            var searchVal = $("#searchBox").val().toLowerCase();
+
+            Calibration.FancyboxSearch(radioGroupeVal, searchVal, roomList, companyList, eventTypeList, deviceList, fileList, null);
+            searchVal = null;
+        });
+
+        $("#putIn").click(function() {
+            var radioGroupeVal = $("input:radio[name='group']:checked").val();
+            var checkBoxGroupeVal = $("input:checkbox[name='Checked']:checked").val();
+
+            Calibration.FancyboxPutIn(radioGroupeVal, checkBoxGroupeVal, roomList, companyList, eventTypeList, deviceList, fileList, null);
+
+            $("#tbody").empty();
+            radioGroupeVal = null;
+            checkBoxGroupeVal = null;
+            $.fancybox.close()
+        });
+
+        $("#save").click(function () {
+            var radioGroupeVal = $("input:radio[name='calibrationType']:checked").val();
+            Calibration.SaveButton(radioGroupeVal);
+        });
+    });
+</script>

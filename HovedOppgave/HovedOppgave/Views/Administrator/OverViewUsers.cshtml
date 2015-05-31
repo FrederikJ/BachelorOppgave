@@ -1,0 +1,42 @@
+﻿@model HovedOppgave.Models.AdminViews
+
+@{
+    ViewBag.Title = "OverViewUsers";
+}
+
+<h2>Oversikt over alle brukere</h2>
+<br />
+<div class="col-lg-offset-3">
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default" id="check">Sjekk nye brukere</button>
+        <button type="button" class="btn btn-default" id="delete">Slett kasserte enheter</button>
+        <button type="button" class="btn btn-default" id="manage">Endre egen konto</button>
+    </div>
+</div>
+<br />
+<div id="tableContainer"></div>
+
+<script type="text/javascript">
+    var th, tb;
+    var asc1 = 1, asc2 = 1, asc3 = 1;
+
+    $(document).ready(function () {
+        var rightsList = @Html.Raw(Json.Encode(Model.Rights));
+        var usersList = @Html.Raw(Json.Encode(Model.Users));
+
+        $("#tableContainer").empty();
+        GetUserTable(usersList, rightsList);
+
+        $("manage").click(function () {
+            window.location.replace("/Account/Manage/0");
+        });
+
+        $("delete").click(function () {
+            window.location.replace("/Administrator/DeleteDiscarded");
+        });
+
+        $("#check").click(function () {
+            window.location.replace("/Administrator/CheckNewUsers");
+        });
+    });
+</script>

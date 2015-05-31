@@ -17,6 +17,8 @@ C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\H
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\bin\Microsoft.Owin.Security.OAuth.dll
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\bin\Microsoft.Owin.Security.Twitter.dll
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\bin\MySql.Data.Entity.EF6.dll
+C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\bin\MySql.Fabric.Plugin.dll
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\bin\Newtonsoft.Json.dll
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\bin\Owin.dll
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\bin\System.Net.Http.Formatting.dll
@@ -56,6 +58,6 @@ C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\H
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\bin\System.Web.WebPages.xml
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\bin\System.Web.WebPages.Deployment.xml
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\bin\System.Web.WebPages.Razor.xml
-C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\obj\Debug\HovedOppgave.csprojResolveAssemblyReference.cache
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\obj\Debug\HovedOppgave.dll
 C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\obj\Debug\HovedOppgave.pdb
+C:\Users\Frederik\Documents\Bachelor Oppgave\Kode\BachelorOppgave\HovedOppgave\HovedOppgave\obj\Debug\HovedOppgave.csprojResolveAssemblyReference.cache

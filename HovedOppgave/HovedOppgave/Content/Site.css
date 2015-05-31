@@ -40,3 +40,38 @@ input[type="checkbox"].input-validation-error {
 .validation-summary-valid {
     display: none;
 }
+
+#planedCalibration{
+    top: auto;
+    left: auto;
+}
+
+#ddm {
+    top: auto;
+    left: auto;
+}
+
+#ddmFile {
+    top: auto;
+    left: auto;
+}
+
+#ddmEvent {
+    top: auto;
+    left: auto;
+}
+
+#ddmIs {
+    top: auto;
+    left: auto;
+}
+
+#ddmHave {
+    top: auto;
+    left: auto;
+}
+
+#ddmGoingTo {
+    top: auto;
+    left: auto;
+}

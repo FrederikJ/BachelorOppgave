@@ -15,64 +15,57 @@ namespace HovedOppgave.Classes
     
     public class SessionCheck : System.Web.HttpApplication
     {
+        static IRepository myrep = new Repository();
+
+        /**
+         * sjekker om en bruker er innlogget med bruker id 
+        */
         public static void CheckForUserID()
         {
             HttpContext http = HttpContext.Current;
-            if (http.Session["UserID"] == null)
+            if (http.Session["UserID"] == null || http.Session.Keys.Count == 0)
             {
                 http.Session["flashMessage"] = "Du må logge deg inn";
-                http.Session["flashStatus"] = Constants.NotificationType.danger.ToString();
-                http.Response.Redirect("~/login", true);
+                http.Session["flashStatus"] = Constant.NotificationType.danger.ToString();
+                http.Response.Redirect("~/Account/LogOff", true);
             }
         }
 
-        public static void CheckForRightsOnLogInUser(Constants.Rights rettighet)
+        /**
+         * sjekker rettighet til innlogget bruker 
+        */
+        public static void CheckForRightsOnLogInUser(Constant.Rights rettighet)
         {
-            HttpContext http = HttpContext.Current;
             CheckForUserID();
-            int UserID = Validator.ConvertToNumbers(http.Session["UserID"].ToString());
 
-            if (!Validator.CheckRights(UserID, rettighet))
+            if (!Validator.CheckRights(rettighet))
             {
+                HttpContext http = HttpContext.Current;
                 http.Session["flashMessage"] = "Du har ikke korrekte rettighet for aksessere siden du prøvde å nå";
-                http.Session["flashStatus"] = Constants.NotificationType.danger.ToString();
-                http.Response.Redirect(("~/Loggut"), true);
+                http.Session["flashStatus"] = Constant.NotificationType.danger.ToString();
+                http.Response.Redirect("~/Account/LogOff", true);
             }
         }
 
         //sjekker hvilken masterpage den skal velge etter hvilken rettighet man har
-        public static string FindMaster()
+        public string FindMaster()
         {
-            IRepository queries = new Repository();
             HttpContext http = HttpContext.Current;
-            CheckForUserID();
-            int UserID = Validator.ConvertToNumbers(http.Session["UserID"].ToString());
-            Rights rights = queries.GetRights(UserID);
-
+            
             string master = "";
+            CheckForUserID();
+            int userId = Validator.ConvertToNumbers(http.Session["UserID"].ToString());
+            User user = myrep.GetUser(userId);
+            Rights rights = myrep.GetRightToUser(user);
 
-
-            if (rights.RightsName == Constants.Rights.Administrator.ToString())
-                master = "~/Views/Shared/_AdminLayout";
-            else if (rights.RightsName == Constants.Rights.User.ToString())
-                master = "~/Views/Shared/_UserLayout";
-            else if (rights.RightsName == Constants.Rights.Guest.ToString())
-                master = "~/Views/Shared/_GuestLayout";
+            if (rights.Name == Constant.Rights.Administrator.ToString())
+                master = "~/Views/Shared/_AdminLayout.cshtml";
+            else if (rights.Name == Constant.Rights.User.ToString())
+                master = "~/Views/Shared/_UserLayout.cshtml";
+            else if (rights.Name == Constant.Rights.Guest.ToString())
+                master = "~/Views/Shared/_GuestLayout.cshtml";
 
             return master;
-        }
-
-        public static void LogOutWrongRights()
-        {
-            HttpContext http = HttpContext.Current;
-            http.Session["UserID"] = null;
-            http.Session["User"] = null;
-            http.Session["FirstName"] = null;
-            http.Session["UserName"] = null;
-            http.Session["loggedIn"] = null;
-            http.Session["flashMessage"] = "Du har ikke korrekte rettighet for aksessere siden du prøvde å nå";
-            http.Session["flashStatus"] = Constants.NotificationType.danger.ToString();
-            http.Response.Redirect(("~/Login.aspx"), true);
         }
     }
 }

@@ -5,8 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title Andøya Space Center</title>
     @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/jquery.fancybox.css")
     @Scripts.Render("~/bundles/modernizr")
-
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/Scripts/Lists.js")
+    @Scripts.Render("~/Scripts/jquery.fancybox.pack.js")
+    @Scripts.Render("~/Scripts/CreateEdit.js")
+    @Scripts.Render("~/Scripts/DetailsDelete.js")
+    @RenderSection("Scripts", required: false)
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -19,35 +26,54 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
                 </button>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    @Html.ActionLink("Andøya Space Center", "Index", "Home", null, new { @class = "navbar-brand" })
+                    @Html.ActionLink("ASC", "Index", "Home", null, new { @class = "navbar-brand" })
                     <li role="presentation" class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                            Oversikt <span class="caret"></span>
+                            Enheter <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu" role="menu">
-                            <li>@Html.ActionLink("Utstyr", "Index", "Home")</li>
-                            <li>@Html.ActionLink("Kalibrering", "Index", "Home")</li>
+                            <li>@Html.ActionLink("Oversikt", "Index", "Home")</li>
+                            <li>@Html.ActionLink("Registrer enhet", "Index", "Home")</li>
                         </ul>
                     </li>
-                    <li>@Html.ActionLink("Kalibrering", "Index", "Home")</li>
-                    <li>@Html.ActionLink("Kabler", "Index", "Home")</li>
+                    <li role="presentation" class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                            Kalibrering <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>@Html.ActionLink("Oversikt", "Overview", "Kalibrering")</li>
+                            <li><a href="" id="create">Registrer kalibrering</a></li>
+                            <li>@Html.ActionLink("Logg", "History", "Kalibrering")</li>
+                            <li>@Html.ActionLink("Sertifikat", "License", "Kalibrering")</li>
+                            <li><a href="" id="import">Importer sertifikat</a></li>
+                        </ul>
+                    </li>
+                    <li>@Html.ActionLink("Om ASC", "Contact", "Home")</li>
                     <li role="presentation" class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
                             Bruker admin <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu" role="menu">
-                            <li>@Html.ActionLink("Legge til", "AddUser", "Home")</li>
-                            <li>@Html.ActionLink("Oversikt", "ListUsers", "Home")</li>
+                            <li>@Html.ActionLink("Opprett bruker", "Register", "Account")</li>
+                            <li><a href="" id="accountManage">Konto administrering</a></li>
+                            <li>@Html.ActionLink("Oversikt alle brukere", "OverViewUsers", "Administrator")</li>
+                            <li>@Html.ActionLink("Sjekk nylige registrerte brukere", "CheckNewUsers", "Administrator")</li>
+                            <li>@Html.ActionLink("Slett kasserte enheter", "DeleteDiscarded", "Administrator")</li>
                         </ul>
                     </li>
-                    <li>@Html.ActionLink("Andøya Space Center", "Contact", "Home")</li>
                 </ul>
-                @Html.Partial("_LoginPartial")
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <p class="navbar-text" id="userName"></p>
+                    </li>
+                    <li>
+                        @Html.ActionLink("Logg ut", "LogOff", "Account")
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
@@ -55,12 +81,26 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - Nasjonalt senter for romrelatert opplæring</p>
+            <p>&copy; @DateTime.Now.Year - NAROM</p>
         </footer>
     </div>
+    <script type="text/javascript">
+    $(document).ready(function () {
+        var name = String("bruker: " + @Html.Raw(Json.Encode(Session["Name"].ToString())));
+        $("#userName").text(name.toLowerCase().replace(/^(.)|(\s|\-)(.)/g, function (c) {
+            return String(c).toUpperCase();
+        }));
+            
+        var userId = parseInt(@Html.Raw(Json.Encode(Session["UserID"].ToString())));
+        var manage = $("#accountManage");
+        manage[0].href = "/Account/Manage/" + userId;
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @RenderSection("Scripts", required: false)
+        var createEvent = $("#create");
+        createEvent[0].href = "/Kalibrering/Create/0";
+
+        var imp = $("#import");
+        imp[0].href = "/Kalibrering/Import/0";
+    });
+    </script>
 </body>
 </html>

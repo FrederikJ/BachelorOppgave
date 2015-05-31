@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
+/**
+ * Model klasse for pinner til en konnektor
+*/
+
 namespace HovedOppgave.Models
 {
     public class Pin

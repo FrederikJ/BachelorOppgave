@@ -1,0 +1,70 @@
+﻿@model HovedOppgave.Models.CalibrationViews
+
+@{
+    ViewBag.Title = "Kalibrering logg";
+}
+
+<h2>Event logg</h2>
+
+<br />
+<div class="col-lg-offset-3">
+    <button class="btn btn-default dropdown-toggle" id="menu" data-toggle="dropdown">
+        Gjem Kolonner
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="menu" id="ddm"></ul>
+</div>
+<br />
+<div id="tableContainer"></div>
+
+<script type="text/javascript">
+    var th, tb;
+    var asc1 = 1, asc2 = 1, asc3 = 1;
+
+    $(document).ready(function () {
+        $("#tableContainer").empty();
+        var roomList = @Html.Raw(Json.Encode(Model.Rooms));
+        var logEventList = @Html.Raw(Json.Encode(Model.LogEvents));
+        var eventTypeList = @Html.Raw(Json.Encode(Model.EventTypes));
+        var deviceList = @Html.Raw(Json.Encode(Model.Devices));
+        var companyList = @Html.Raw(Json.Encode(Model.Companys));
+        var fileList = @Html.Raw(Json.Encode(Model.Files));
+
+        jQuery.each(eventTypeList, function(i, eventType) {
+            var h4 = document.createElement("h4");
+            h4.textContent = eventType["Name"];
+
+            var table = document.createElement("table");
+            table.className = "table";
+            var thead = document.createElement("thead");
+            thead.setAttribute("id", "thead");
+            var tbody = document.createElement("tbody");
+            tbody.setAttribute("id", "tbody")
+            th = thead;
+            tb = tbody;
+
+            FillTableHead(thead, "calibration");
+
+            jQuery.each(logEventList, function(i, logEvent) {
+                if(String(eventType["EventTypeID"]).match(logEvent["EventTypeID"])) {
+                    var startDate = new Date($.parseJSON(String(logEvent["StartDate"]).substr(6, 13)));
+                    var endDate = new Date($.parseJSON(String(logEvent["EndDate"]).substr(6, 13)));
+                    
+                    FillCalibrationTableBoby(tbody, startDate, endDate, companyList, fileList, roomList, logEvent, null, deviceList);
+                }
+            });
+            AddTableToContainer(thead, tbody, h4, table, null, null, null, null);
+        });
+
+        $("#ddm").click(function() {
+            var colNumber = event.path[1].id;
+            var el = document.getElementById(colNumber);
+            var checkInput = el.getElementsByTagName('input');
+            CheckColName(colNumber, th, tb, checkInput);
+        });
+
+        $("#menu").click(function() {
+            GetColName(th);
+        });
+    });
+</script>

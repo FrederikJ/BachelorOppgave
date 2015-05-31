@@ -1,0 +1,29 @@
+﻿@model HovedOppgave.Models.CalibrationViews
+
+@{
+    ViewBag.Title = "Kalibrering logg detaljer";
+}
+
+<h2>Kalibrering logg detaljer</h2>
+
+<br />
+<div id="fillDetails"></div>
+
+<button class="btn btn-default" type="button" id="button">Rediger kalibrering</button>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var device = @Html.Raw(Json.Encode(Model.Device));
+        var company = @Html.Raw(Json.Encode(Model.Company));
+        var file = @Html.Raw(Json.Encode(Model.FileTo));
+        var room = @Html.Raw(Json.Encode(Model.Room));
+        var eventType = @Html.Raw(Json.Encode(Model.EventType));
+        var logEvent = @Html.Raw(Json.Encode(Model.LogEvent));
+
+        CalibrationViewsDetails(logEvent, eventType, device, company, room, file);
+
+        $("#button").click(function() {
+            window.location.replace("/Kalibrering/EditCalibration/" + @Model.LogEvent.LogEventID)
+        });
+    });
+</script>

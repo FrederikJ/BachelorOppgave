@@ -1,0 +1,104 @@
+﻿@model HovedOppgave.Models.CalibrationViews
+
+@{
+    ViewBag.Title = "Fil detaljer";
+}
+
+<h2>Fil detaljer</h2>
+
+<br />
+
+<div class="col-lg-12">
+    <h4>Sertifikat</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayName("Fil navn")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FileTo.FileName)
+        </dd>
+        <dt>
+            @Html.DisplayName("Fil plassering")
+        </dt>
+        <dd id="filePath"></dd>
+        <dt>
+            @Html.DisplayName("Fil type")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FileTo.FileType)
+        </dd>
+        <dt>
+            @Html.DisplayName("Fil størrelse")
+        </dt>
+        <dd id="fileSize"></dd>
+        <dt>
+            @Html.DisplayName("Dato lagt inn")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FileTo.Date)
+        </dd>
+    </dl>
+</div>
+
+<div class="col-lg-12">
+    <h4>Kalibrering</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayName("Planlagt dato")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LogEvent.StartDate.Date)
+        </dd>
+        <dt id="endDate"></dt>
+        <dd>
+            @Html.DisplayFor(model => model.LogEvent.EndDate.Date)
+        </dd>
+        <dt>
+            @Html.DisplayName("Event type")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.EventType.Name)
+        </dd>
+    </dl>
+</div>
+
+<div class="col-lg-12">
+    <h4>Utstyrsenhet</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayName("Enhet")
+        </dt>
+        <dd id="device"></dd>
+    </dl>
+</div>
+
+<div class="col-lg-12">
+    <h4>Organisasjon</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayName("Kalibreres av")
+        </dt>
+        <dd id="company"></dd>
+    </dl>
+</div>
+<br />
+<button class="btn btn-default" type="button" id="button">Endre fil til enhet</button>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var filePath = @Html.Raw(Json.Encode(Model.ExtraStringHelp));
+        var file = @Html.Raw(Json.Encode(Model.FileTo));
+        var device = @Html.Raw(Json.Encode(Model.Device));
+        var company = @Html.Raw(Json.Encode(Model.Company));
+
+        FileDetailsDelete(device, company, file, filePath);
+
+        $("#button").click(function() {
+            window.location.replace("/Kalibrering/Import/" + @Model.Device.DeviceID);
+        });
+    });
+</script>

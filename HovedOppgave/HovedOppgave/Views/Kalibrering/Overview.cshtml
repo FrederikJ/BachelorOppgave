@@ -1,0 +1,126 @@
+﻿@model HovedOppgave.Models.CalibrationViews
+
+@{
+    ViewBag.Title = "Kalibrerings oversikt";
+}
+
+<h2>Kalibrerings oversikt</h2>
+<br />
+<button class="btn btn-default dropdown-toggle" type="button" id="planed" data-toggle="dropdown" aria-expanded="true">
+    Planlagte kalibreringer om <span class="caret"></span>
+</button>
+<ul class="dropdown-menu" role="menu" id="planedCalibration" aria-labelledby="planed">
+    <li role="presentation"><a><input type="radio" value="1week" name="planedIn">1 Uke</a></li>
+    <li role="presentation"><a><input type="radio" value="2week" name="planedIn">2 Uke</a></li>
+    <li role="presentation" class="divider"></li>
+    <li role="presentation"><a><input type="radio" value="1month" name="planedIn">1 Månde</a></li>
+    <li role="presentation"><a><input type="radio" value="2month" name="planedIn">2 Månde</a></li>
+    <li role="presentation"><a><input type="radio" value="3month" name="planedIn">3 Månde</a></li>
+    <li role="presentation"><a><input type="radio" value="6month" name="planedIn">6 Månde</a></li>
+    <li role="presentation" class="divider"></li>
+    <li role="presentation"><a><input type="radio" value="1year" name="planedIn">1 År</a></li>
+</ul>
+<div class="btn-group" role="group">
+    <button type="button" class="btn btn-default" id="isCalibrated">Er kalibrert</button>
+    <button type="button" class="btn btn-default" id="goingToCalibrate">Skal kalibreres</button>
+    <button type="button" class="btn btn-default" id="canCalibrate">Kan kalibreres</button>
+    <button type="button" class="btn btn-default" id="btnCreate">Opprett kalibrering</button>
+</div>
+<br /><br />
+<div class="col-lg-offset-5">
+    <button class="btn btn-default dropdown-toggle" type="button" id="menu" data-toggle="dropdown">
+        Gjem Kolonner
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="menu" id="ddm"></ul>
+</div>
+<h3 id="h3"></h3>
+<br />
+<div id="tableContainer"></div>
+
+<script type="text/javascript">
+    var th, tb;
+    var asc1 = 1, asc2 = 1, asc3 = 1;
+
+    $(document).ready(function () {
+        var deviceTypeList = @Html.Raw(Json.Encode(Model.DeviceTypes));
+        var deviceList = @Html.Raw(Json.Encode(Model.Devices));
+        var logEventList = @Html.Raw(Json.Encode(Model.LogEvents));
+        var companyList = @Html.Raw(Json.Encode(Model.Companys));
+        var fileList = @Html.Raw(Json.Encode(Model.Files));
+        var roomList = @Html.Raw(Json.Encode(Model.Rooms));
+
+        jQuery(function(){
+            jQuery("#isCalibrated").trigger("click");
+        });
+
+        $("#isCalibrated").click(function () {
+            $("#tableContainer").empty();
+            h3.textContent = "Er kalibrert";
+
+            GetCalibrationTable("is", deviceTypeList, deviceList, logEventList, companyList, fileList, roomList, null);
+        });
+
+        $("#goingToCalibrate").click(function () {
+            $("#tableContainer").empty();
+            h3.textContent = "Skal kalibreres";
+
+            var nextWeek = new Date;
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            nextWeek.setHours(23);
+            nextWeek.setMinutes(59);
+            nextWeek.setSeconds(59);
+
+            GetCalibrationTable("goingTo", deviceTypeList, deviceList, logEventList, companyList, fileList, roomList, nextWeek);
+        });
+
+        $("#planedCalibration").click(function () {
+            $("#tableContainer").empty();
+            h3.textContent = "Planlagt kalibreringer";
+            var radioGroupeVal = $("input:radio[name='planedIn']:checked").val();
+            var choosenDate = new Date();
+            if(String(radioGroupeVal).match("1week"))
+                choosenDate.setDate(choosenDate.getDate() + 7);
+            else if(String(radioGroupeVal).match("2week"))
+                choosenDate.setDate(choosenDate.getDate() + 14);
+            else if(String(radioGroupeVal).match("1month"))
+                choosenDate.setMonth(choosenDate.getMonth() + 1);
+            else if(String(radioGroupeVal).match("2month"))
+                choosenDate.setMonth(choosenDate.getMonth() + 2);
+            else if(String(radioGroupeVal).match("3month"))
+                choosenDate.setMonth(choosenDate.getMonth() + 3);
+            else if(String(radioGroupeVal).match("6month"))
+                choosenDate.setMonth(choosenDate.getMonth() + 6);
+            else if(String(radioGroupeVal).match("1year"))
+                choosenDate.setFullYear(choosenDate.getFullYear() + 1);
+
+            choosenDate.setHours(0);
+            choosenDate.setMinutes(0);
+            choosenDate.setSeconds(0);
+
+            GetCalibrationTable("planed", deviceTypeList, deviceList, logEventList, companyList, fileList, roomList, choosenDate);
+        });
+
+        $("#canCalibrate").click(function () {
+            $("#tableContainer").empty();
+            h3.textContent = "Kan kalibreres";
+
+            GetDeviceTable(deviceTypeList, deviceList, roomList, logEventList);
+        });
+
+        $("#ddm").click(function() {
+            var colNumber = event.path[1].id;
+            var el = document.getElementById(colNumber);
+            var checkInput = el.getElementsByTagName('input');
+            CheckColName(colNumber, th, tb, checkInput);
+        });
+
+        $("#menu").click(function() {
+            GetColName(th);
+        });
+
+        $("#btnCreate").click(function () {
+            window.location.replace("/Kalibrering/Create/" + 0);
+        });
+    });
+</script>

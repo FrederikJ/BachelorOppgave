@@ -1,0 +1,113 @@
+﻿@model HovedOppgave.Models.AdminViews
+
+@{
+    ViewBag.Title = "CheckNewUsers";
+}
+
+<h2>Oversikt over alle brukere som ikke er godkjent enda</h2>
+<br />
+<h4 id="message"></h4>
+<table class="table" id="checkUsersTable">
+    <thead id="thead">
+        <tr>
+            <td>
+                @Html.Label("Navn")
+            </td>
+            <td>
+                @Html.Label("Epost")
+            </td>
+            <td>
+                @Html.Label("Rettighet")
+            </td>
+        </tr>
+    </thead>
+    <tbody id="tbody">
+        @foreach(var item in Model.Users)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td class="rightsTD"></td>
+                <td>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default" value="@item.UserId">Sett rettighet</button>
+                        <button type="button" class="btn btn-warning" value="@item.UserId">Endre bruker</button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var right = @Html.Raw(Json.Encode(Model.Right));
+        var rightsList = @Html.Raw(Json.Encode(Model.Rights));
+
+        checkBody(tbody);
+
+        var lable = document.createElement("lable");
+        lable.textContent = "@Model.Right.Name";
+        $(".rightsTD").append(lable);
+
+        $(".btn-default").click(function () {
+            var rights = this.parentElement.parentElement.parentElement.children[2];
+            var dropDown = document.createElement("select");
+            dropDown.className = "form-control";
+            dropDown.id = "dropdown";
+            jQuery.each(rightsList, function (i, rightSelected) {
+                var option = document.createElement("option");
+                option.value = rightSelected["RightsID"];
+                option.textContent = rightSelected["Name"];
+                dropDown.appendChild(option);
+            });
+            rights.replaceChild(dropDown, rights.children[0]);
+            var btn = document.createElement("button");
+            btn.type = "button";
+            btn.textContent = "Godkjenn rettigheten";
+            btn.id = this.value;
+            btn.className = "btn btn-success";
+            btn.onclick = function () {
+                var tr = this.parentElement.parentElement.parentElement;
+                var userId = this.id;
+                var rightId = $("#dropdown option:selected").val();
+                $.ajax({
+                    type: 'POST',
+                    url: 'CheckUser',
+                    data: JSON.stringify({ user:{ 
+                        UserId : userId, 
+                        RightsID : rightId 
+                    }}),
+                    cache: false,
+                    contentType: 'application/json; charset=utf-8',
+                    success: function() {
+                        var test = tr;
+                        tbody.removeChild(tr);
+                        message.textContent = "Suksessfult";
+                        checkBody(tbody);
+                    },
+                    error: function() {
+                        message.textContent = "Klarte ikke å sette rettighet";
+                    }
+                });
+            }
+            this.parentElement.replaceChild(btn, this);
+        });
+        
+        $(".btn-warning").click(function () {
+            var userId = this.value;
+            window.location.replace("/Account/Manage/" + userId);
+        });
+
+        var checkBody = function(tbody) {
+            if(tbody.childElementCount == 0) {
+                message.textContent = "Det er ingen brukere som ikke er sjekket";
+                checkUsersTable.hidden = true;
+            }
+        };
+    });
+</script>

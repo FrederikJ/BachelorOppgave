@@ -1,0 +1,226 @@
+﻿@model HovedOppgave.Models.CalibrationViews
+
+@{
+    ViewBag.Title = "DeleteDiscarded";
+}
+<h2>Slett ting for godt</h2>
+<br /><br />
+<div id="fileDiv">
+    <h4 id="h4File" class="col-md-4">Slett kasserte filer</h4>
+    <div class="dropdown" id="dropFile">
+        <button class="btn btn-default dropdown-toggle" type="button" id="file" data-toggle="dropdown">
+            Gjem Kolonner
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="file" id="ddmFile"></ul>
+    </div>
+</div>
+<br />
+<table class="table" id="tableFileFill">
+    <tbody id="tbodyFiles">
+        @foreach (var item in Model.Files)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FileName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FileType)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FileSize)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Date)
+                </td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn btn-success" type="button" value="@item.FileName">Vis fil</button>
+                        <button class="btn btn-danger" type="button" value="@item.FileID">Slett fil</button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<br />
+<div id="eventDiv">
+    <h4 class="col-md-4">Slett kasserte events</h4>
+    <div class="dropdown">
+        <button class="btn btn-default dropdown-toggle" type="button" id="event" data-toggle="dropdown">
+            Gjem Kolonner
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="event" id="ddmEvent"></ul>
+    </div>
+</div>
+<br />
+<table class="table" id="tableEventFill">
+    <tbody id="tbodyEvents">
+        @foreach (var item in Model.JoinQuery)
+        {
+            <tr>
+                <td>
+                    @if (item.LogEvent.StartDate.Year != 1)
+                    {
+                        @Html.DisplayFor(modelItem => item.LogEvent.StartDate);
+                    }
+                </td>
+                <td>
+                    @if (item.LogEvent.EndDate.Year != 1)
+                    {
+                        @Html.DisplayFor(modelItem => item.LogEvent.EndDate);
+                    }
+                </td>
+                <td hidden>
+                    @Html.DisplayFor(modelItem => item.LogEvent.Data1)
+                </td>
+                <td hidden>
+                    @Html.DisplayFor(modelItem => item.LogEvent.Data2)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Device.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Company.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.File.FileName)
+                </td>
+                <td hidden>
+                    @Html.DisplayFor(modelItem => item.Room.Name)
+                </td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn btn-success" type="button" value="@item.LogEvent.LogEventID">Detaljer om</button>
+                        <button class="btn btn-danger" type="button" value="@item.LogEvent.LogEventID">Slett event</button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<a class="fancybox" id="showFile" data-fancybox-type="iframe" href="" hidden></a>
+<a class="fancybox" id="showDet" href="#fillDetails" hidden></a>
+<div id="fillDetails" style="display:none"></div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".fancybox").fancybox();
+
+        if(@Model.JoinQuery.Count == 0 && @Model.Files.Count == 0)
+        {
+            tableEventFill.hidden = true;
+            tableFileFill.hidden = true;
+            eventDiv.hidden = true;
+            dropFile.hidden = true;
+            var h3 = document.createElement("h3");
+            h3.textContent = "Det finnes ingen event eller filer som er blitt kassert";
+            fileDiv.replaceChild(h3, h4File);
+        }
+
+        var thead = document.createElement("thead");
+        thead.setAttribute("id", "theadFiles");
+        FillTableHead(thead, "file");
+        $("#tableFileFill").append(thead);
+
+        thead = document.createElement("thead");
+        thead.setAttribute("id", "theadEvents");
+        FillTableHead(thead, "calibration");
+        $("#tableEventFill").append(thead);
+
+        var tb, th;
+
+        $(".dropdown-menu").click(function () {
+            if(this.id == "ddmFile") {
+                tb = document.getElementById("tbodyFiles");
+                th = document.getElementById("theadFiles");
+            }
+            else {
+                tb = document.getElementById("tbodyEvents");
+                th = document.getElementById("theadEvents");
+            }
+            var colNumber = event.path[1].id;
+            var el = document.getElementById(colNumber);
+            var checkInput = el.getElementsByTagName('input');
+            CheckColName(colNumber, th, tb, checkInput);
+        });
+
+        $(".btn-default").click(function () {
+            if(this.id == "file")
+                th = document.getElementById("theadFiles");
+            else
+                th = document.getElementById("theadEvents");
+            GetColName(th);
+        });
+
+        $(".btn-success").click(function () {
+            //sjekker om value er et nummer eller ikke
+            if (String(this.value).match(/^\d+$/)) {
+                var id = this.value;
+                $("#fillDetails").empty();
+                var file, logEvent, device, company, room, file;
+                var joinquery = @Html.Raw(Json.Encode(Model.JoinQuery));
+                jQuery.each(joinquery, function(i, item) {
+                    var logevent = item["LogEvent"];
+                    if(id == logevent["LogEventID"]) {
+                        logEvent = logevent;
+                        device = item["Device"];
+                        file = item["File"];
+                        company = item["Company"];
+                        room = item["Room"];
+                    }
+                });
+                CalibrationViewsDetails(logEvent, null, device, company, room, file);
+                $("#showDet").trigger('click');
+            }
+            else {
+                var href = @Html.Raw(Json.Encode(Model.ExtraStringHelp)) + "/" + this.value;
+                showFile.href = href;
+                $("#showFile").trigger('click');
+            }
+        });
+
+        $(".btn-danger").click(function () {
+            var tr = this.parentElement.parentElement.parentElement;
+            var tbody = tr.parentElement;
+            var id = this.value;
+            var data, url;
+            if (tbody.id == "tbodyFiles") {
+                url = 'DeleteDiscardedFile';
+                data = JSON.stringify({ file: { FileID: id } });
+            }
+            else {
+                url = 'DeleteDiscardedEvent';
+                data = JSON.stringify({ logEvent: { LogEventID: id } });
+            }
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: data,
+                cache: false,
+                contentType: 'application/json; charset=utf-8',
+                success: function () {
+                    tbody.removeChild(tr);
+                    checkBody(tbody);
+                },
+                error: function () { }
+            });
+        });
+
+        var checkBody = function (tbody) {
+            if (tbody.childElementCount == 0) {
+                if(tbody.id == "tbodyEvents")
+                {
+                    tableEventFill.hidden = true;
+                    eventDiv.hidden = true;
+                }
+                else
+                {
+                    tableFileFill.hidden = true;
+                    fileDiv.hidden = true;
+                }
+            }
+        };
+    });
+</script>

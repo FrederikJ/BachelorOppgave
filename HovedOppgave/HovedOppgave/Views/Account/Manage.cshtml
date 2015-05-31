@@ -1,29 +1,135 @@
-﻿@using HovedOppgave.Models;
-@using Microsoft.AspNet.Identity;
+﻿@model HovedOppgave.Models.ManageUserViewModel
 @{
-    ViewBag.Title = "Manage Account";
+    ViewBag.Title = "Konto administrasjon";
 }
 
-<h2>@ViewBag.Title.</h2>
-
-<p class="text-success">@ViewBag.StatusMessage</p>
-<div class="row">
-    <div class="col-md-12">
-        @if (ViewBag.HasLocalPassword)
-        {
-            @Html.Partial("_ChangePasswordPartial")
-        }
-        else
-        {
-            @Html.Partial("_SetPasswordPartial")
-        }
-
-        <section id="externalLogins">
-            @Html.Action("RemoveAccountList")
-            @Html.Partial("_ExternalLoginsListPartial", new { Action = "LinkLogin", ReturnUrl = ViewBag.ReturnUrl })
-        </section>
+<h2>Konto administrasjon</h2>
+<br />
+<div class="col-lg-offset-3" id="buttonGroup" hidden>
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default" id="overview">Oversikt over brukere</button>
+        <button type="button" class="btn btn-default" id="check">Sjekk nye brukere</button>
+        <button type="button" class="btn btn-default" id="delete">Slett kasserte enheter</button>
     </div>
 </div>
+<br />
+@using (Html.BeginForm("Manage", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    <h4>Administrer kontoen din</h4>
+    <hr />
+    @Html.ValidationSummary(true)
+    <div class="form-group">
+        @Html.Label("Bruker navn", new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(m => m.ChangeUser.Name, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.ChangeUser.Name, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.Label("Epost", new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(m => m.ChangeUser.Email, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.ChangeUser.Email, "Vennligst bruk riktig format: noe@noe.domene uten ulovlige tegn", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div hidden id="partial">
+        @Html.Partial("_ChangePasswordPartial")
+    </div>
+    if (Model.AdminUser != null)
+    {
+        <div class="form-group">
+            @Html.Label("Rettighet", new { @class = "col-md-2 control-label" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(m => m.Right.Name, new { @class = "form-control", readOnly = true })
+                @Html.ValidationMessageFor(m => m.Right.Name, "", new { @class = "text-danger" })
+                <a href="#showInFancy" id="floating">Sett inn rettighet</a>
+            </div>
+        </div>
+    }
+    <div hidden>
+        @Html.HiddenFor(model => model.Right.RightsID, new { htmlAttributes = new { readOnly = true } })
+        @Html.TextAreaFor(model => model.ChangeUser.PassHash, new { htmlAttributes = new { readOnly = true } });
+        @Html.TextAreaFor(model => model.ChangeUser.PassSalt, new { htmlAttributes = new { readOnly = true } });
+        @Html.HiddenFor(model => model.AdminUser.UserId, new { htmlAttributes = new { readOnly = true } })
+        @Html.HiddenFor(model => model.ChangeUser.UserId, new { htmlAttributes = new { readOnly = true } })
+    </div>
+    
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <div class="btn-group">
+                <button type="button" id="showPass" class="btn btn-default">Endre passord?</button>
+                <input type="submit" value="Endre konto" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+<div id="showInFancy" style="display:none">
+    <h5>Rettigheter</h5>
+    <table class="table">
+        <thead><tr><th>@Html.DisplayName("Rettighet")</th><th>@Html.DisplayName("Velg")</th></tr></thead>
+        <tbody>
+            @foreach (var item in Model.Rights)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        <input type="radio" name="group" value="@item.RightsID" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button type="submit" id="putIn" class="btn btn-default">Sett inn</button>
+</div>
+
+<script type="text/javascript">
+    $(window).ready(function () {
+        $("#floating").fancybox();
+        var rightList = @Html.Raw(Json.Encode(Model.Rights));
+        var admin = @Html.Raw(Json.Encode(Model.AdminUser));
+        var changeUser = @Html.Raw(Json.Encode(Model.ChangeUser));
+        if(admin != null)
+        {
+            $("#buttonGroup").hidden = false;
+            $("#Right_RightID").val(changeUser["RightsID"]);
+            jQuery.each(rightList, function (i, item) {
+                if (item["RightsID"] == (changeUser["RightsID"])) {
+                    $("#Right_Name").val(item["Name"]);
+                }
+            });
+        }
+
+        $("#putIn").click(function() {
+            var radioGroupeVal = $("input:radio[name='group']:checked").val();
+            UserAccount.FancyboxPutIn(radioGroupeVal, rightList);
+
+            radioGroupeVal = null;
+            $.fancybox.close()
+        });
+
+        $("#showPass").click(function() {
+            if($("#partial")[0].hidden == true)
+                $("#partial")[0].hidden = false;
+            else
+                $("#partial")[0].hidden = true;
+
+        });
+
+        $("overView").click(function() {
+            window.location.replace("/Administrator/OverViewUsers");
+        });
+
+        $("delete").click(function() {
+            window.location.replace("/Administrator/DeleteDiscarded");
+        });
+
+        $("#check").click(function() {
+            window.location.replace("/Administrator/CheckNewUsers");
+        });
+    });
+</script>
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }

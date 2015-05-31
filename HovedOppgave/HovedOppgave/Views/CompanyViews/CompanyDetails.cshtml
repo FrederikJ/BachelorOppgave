@@ -1,0 +1,139 @@
+﻿@model HovedOppgave.Models.CompanyWithContact
+
+@{
+    ViewBag.Title = "CompanyDetails";
+}
+
+<h2>Detaljer om selskap med kontakt person</h2>
+
+<div>
+    <h4>Selskap</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayName("Navn")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Company.Name)
+        </dd>
+        <dt>
+            @Html.DisplayName("Organisasjons nr")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Company.OrganisationNum)
+        </dd>
+    </dl>
+</div>
+<div>
+    <h4>Kontakt person</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayName("Navn")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Contact.Name)
+        </dd>
+        <dt>
+            @Html.DisplayName("Tittel")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Contact.Title)
+        </dd>
+        <dt>
+            @Html.DisplayName("kontaktes via")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ContactInfoType.TypeName)
+        </dd>
+        <dt></dt>
+        <dd>
+            @Html.DisplayFor(model => model.ContactInfo.Value)
+        </dd>
+    </dl>
+</div>
+<button type="button" class="btn btn-warning" id="edit">Endre detaljer</button>
+
+<a class="fancybox" id="showEdit" href="#editContactCompany" hidden></a>
+<div id="editContactCompany" style="display:none">
+    @using (Html.BeginForm("EditContactCompany", "CompanyViews", FormMethod.Post))
+    {
+        <div class="form-horizontal">
+            <h4>Selskap</h4>
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="form-group">
+                @Html.Label("Navn", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Company.Name, new { htmlAttributes = new { @class = "form-control", placeholder = "eks: NAROM", required = true } })
+                    @Html.ValidationMessageFor(model => model.Company.Name, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("Organisasjons nr", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Company.OrganisationNum, new { htmlAttributes = new { @class = "form-control", placeholder = "", required = true } })
+                    @Html.ValidationMessageFor(model => model.Company.OrganisationNum, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <br />
+            <h4>Kontakt person</h4>
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="form-group">
+                @Html.Label("Navn", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Contact.Name, new { htmlAttributes = new { @class = "form-control", placeholder = "eks: Tom Svensen", required = true } })
+                    @Html.ValidationMessageFor(model => model.Contact.Name, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("Tittel", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Contact.Title, new { htmlAttributes = new { @class = "form-control", placeholder = "eks: Ingeniør", required = true } })
+                    @Html.ValidationMessageFor(model => model.Contact.Title, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("Kan kotaktes via", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.ContactInfoType.TypeName, new { htmlAttributes = new { @class = "form-control", placeholder = "eks: epost", required = true } })
+                    @Html.ValidationMessageFor(model => model.ContactInfoType.TypeName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.Label("", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.ContactInfo.Value, new { htmlAttributes = new { @class = "form-control", placeholder = "eks: noe_noe@noe.com", required = true } })
+                    @Html.ValidationMessageFor(model => model.ContactInfo.Value, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div>
+                @Html.HiddenFor(model => model.Contact.ContactID, new { htmlAttributes = new { readOnly = true } })
+                @Html.HiddenFor(model => model.ContactInfo.ContactInfoID, new { htmlAttributes = new { readOnly = true } })
+                @Html.HiddenFor(model => model.ContactInfoType.ContactInfoTypeID, new { htmlAttributes = new { readOnly = true } })
+                @Html.HiddenFor(model => model.Company.CompanyID, new { htmlAttributes = new { readOnly = true } })
+            </div>
+            <br />
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Endre" class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".fancybox").fancybox();
+
+        $("#edit").click(function () {
+            $("#showEdit").trigger('click');
+        });
+    });
+</script>

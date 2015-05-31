@@ -1,0 +1,88 @@
+﻿@model HovedOppgave.Models.CalibrationViews
+
+@{
+    ViewBag.Title = "Kalibrerings sertifikat";
+}
+
+<h2>Kalibrering sertifikat</h2>
+
+<br />
+<div class="col-lg-offset-3">
+    <button class="btn btn-default dropdown-toggle" id="menu" data-toggle="dropdown">
+        Gjem Kolonner
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="menu" id="ddm"></ul>
+</div>
+<br />
+<h4>Filer</h4><br />
+<table class="table" id="tableFill">
+    <tbody id="tbody">
+        @foreach(var item in Model.Files)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FileName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FileType)
+                </td>
+                <td id="fileType">
+                    @Html.DisplayFor(modelItem => item.FileSize)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Date)
+                </td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn btn-success" type="button" onclick="btnShowFile('@item.FileName')">Vis fil</button>
+                        <button class="btn btn-warning" type="button" onclick="btnDetails('@item.FileID')">Detaljer</button>
+                        <button class="btn btn-danger" type="button" onclick="btnDelete('@item.FileID')">Slett fil</button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a class="fancybox" id="showFile" data-fancybox-type="iframe" href="" hidden></a>
+<script type="text/javascript">
+    var th, tb;
+    var asc1 = 1, asc2 = 1, asc3 = 1;
+
+    $(document).ready(function () {
+        $(".fancybox").fancybox();
+
+        var thead = document.createElement("thead");
+        thead.setAttribute("id", "thead");
+        FillTableHead(thead, "file");
+        th = thead;
+        tb = $("#tbody")[0];
+        $("#tableFill").append(thead);
+        
+        $("#ddm").click(function() {
+            var colNumber = event.path[1].id;
+            var el = document.getElementById(colNumber);
+            var checkInput = el.getElementsByTagName('input');
+            CheckColName(colNumber, th, tb, checkInput);
+        });
+
+        $("#menu").click(function() {
+            GetColName(th);
+        });
+    });
+
+    function btnShowFile(name) {
+        var href = @Html.Raw(Json.Encode(Model.ExtraStringHelp)) + "/" + name;
+        showFile.href = href;
+        $("#showFile").trigger('click');
+    }
+
+    function btnDetails(id) {
+        window.location.replace("/Kalibrering/Deletefile/" + id);
+    }
+
+    function btnDelete(id) {
+        window.location.replace("/Kalibrering/Detailsfile/" + id);
+    }
+</script>
