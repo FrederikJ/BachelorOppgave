@@ -28,9 +28,9 @@ namespace HovedOppgave.Controllers
         public ActionResult CompanyDetails(int id)
         {
             CompanyWithContact model = myrep.GetCompanyWithContactInfo(id);
-            SessionCheck check = new SessionCheck();
-            //string master = check.FindMaster();
-            return View(/*"CompanyDetails", master, */model);
+            
+            string master = SessionCheck.FindMaster();
+            return View("CompanyDetails", master, model);
         }
 
         /**

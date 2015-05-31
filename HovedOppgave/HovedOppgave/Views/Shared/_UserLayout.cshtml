@@ -45,14 +45,14 @@
                         </a>
                         <ul class="dropdown-menu" role="menu">
                             <li>@Html.ActionLink("Oversikt", "Overview", "Kalibrering")</li>
-                            <li><a href="" id="create">Registrer kalibrering</a></li>
+                            <li>@Html.ActionLink("Registrer kalibrering", "Create", "Kalibrering", new { id = 0 }, null)</li>
                             <li>@Html.ActionLink("Logg", "History", "Kalibrering")</li>
                             <li>@Html.ActionLink("Sertifikat", "License", "Kalibrering")</li>
-                            <li><a href="" id="import">Importer sertifikat</a></li>
+                            <li>@Html.ActionLink("Importering sertifikat", "Import", "Kalibrering", new { id = 0 }, null)</li>
                         </ul>
                     </li>
                     <li>@Html.ActionLink("Om ASC", "Contact", "Home")</li>
-                    <li><a href="" id="accountManage">Konto administrering</a></li>
+                    <li>@Html.ActionLink("Konto administrering", "Manage", "Account", new { id = Session["UserID"].ToString() }, null)</li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li>
@@ -78,16 +78,6 @@
             $("#userName").text(name.toLowerCase().replace(/^(.)|(\s|\-)(.)/g, function (c) {
                 return String(c).toUpperCase();
             }));
-
-            var userId = parseInt(@Html.Raw(Json.Encode(Session["UserID"].ToString())));
-            var manage = $("#accountManage");
-            manage[0].href = "/Account/Manage/" + userId;
-
-            var createEvent = $("#create");
-            createEvent[0].href = "/Kalibrering/Create/0";
-
-            var imp = $("#import");
-            imp[0].href = "/Kalibrering/Import/0";
         });
     </script>
 </body>

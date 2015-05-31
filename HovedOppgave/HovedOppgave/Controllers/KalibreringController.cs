@@ -14,7 +14,6 @@ namespace HovedOppgave.Controllers
     public class KalibreringController : Controller
     {
         IRepository myrep = new Repository();
-        SessionCheck sessionCheck = new SessionCheck();
 
         /**
          * hvem som kan få adgang til denne siden
@@ -52,8 +51,8 @@ namespace HovedOppgave.Controllers
             model.LogEvents = logEvents;
             if (files.Count != 0)
                 model.Files = files;
-            var test = Session["UserID"];
-            string master = sessionCheck.FindMaster();
+            
+            string master = SessionCheck.FindMaster();
             return View("Overview", master, model);
         }
 
@@ -71,9 +70,8 @@ namespace HovedOppgave.Controllers
                 model.Device = device;
                 model.EventType = eventType;
             }
-            var test = Session["UserID"];
-            SessionCheck check = new SessionCheck();
-            string master = check.FindMaster();
+            
+            string master = SessionCheck.FindMaster();
             return View("Create", master, model);
         }
 
@@ -117,7 +115,7 @@ namespace HovedOppgave.Controllers
             model.Files = model1.Files;
             model.Companys = model1.Companys;
 
-            string master = sessionCheck.FindMaster();
+            string master = SessionCheck.FindMaster();
             return View("EditCalibration", master, model);
         }
 
@@ -199,7 +197,7 @@ namespace HovedOppgave.Controllers
             model.Devices = devices;
             model.Rooms = rooms;
 
-            string master = sessionCheck.FindMaster();
+            string master = SessionCheck.FindMaster();
             return View("Import", master, model);
         }
 
@@ -258,7 +256,7 @@ namespace HovedOppgave.Controllers
             model.ExtraStringHelp = Url.Content("~/Sertifikat");
             model.Files = list;
 
-            string master = sessionCheck.FindMaster();
+            string master = SessionCheck.FindMaster();
             return View("License", master, model);
         }
 
@@ -284,7 +282,7 @@ namespace HovedOppgave.Controllers
             if (files.Count != 0)
                 model.Files = files;
 
-            string master = sessionCheck.FindMaster();
+            string master = SessionCheck.FindMaster();
             return View("History", master, model);
         }
 
@@ -296,7 +294,7 @@ namespace HovedOppgave.Controllers
         {
             CalibrationViews model = this.CalibrationViews(id);
 
-            string master = sessionCheck.FindMaster();
+            string master = SessionCheck.FindMaster();
             return View("CalibrationViewDetails", master, model);
         }
 
@@ -308,7 +306,7 @@ namespace HovedOppgave.Controllers
         {
             CalibrationViews model = this.DeleteDetailsFile(id);
 
-            string master = sessionCheck.FindMaster();
+            string master = SessionCheck.FindMaster();
             return View("Detailsfile", master, model);
         }
 
@@ -320,7 +318,7 @@ namespace HovedOppgave.Controllers
         {
             CalibrationViews model = this.DeleteDetailsFile(id);
 
-            string master = sessionCheck.FindMaster();
+            string master = SessionCheck.FindMaster();
             return View("Deletefile", master, model);
         }
         

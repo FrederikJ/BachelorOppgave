@@ -46,10 +46,10 @@
                         </a>
                         <ul class="dropdown-menu" role="menu">
                             <li>@Html.ActionLink("Oversikt", "Overview", "Kalibrering")</li>
-                            <li><a href="" id="create">Registrer kalibrering</a></li>
+                            <li>@Html.ActionLink("Registrer kalibrering", "Create", "Kalibrering", new  { id = 0 }, null)</li>
                             <li>@Html.ActionLink("Logg", "History", "Kalibrering")</li>
                             <li>@Html.ActionLink("Sertifikat", "License", "Kalibrering")</li>
-                            <li><a href="" id="import">Importer sertifikat</a></li>
+                            <li>@Html.ActionLink("Importering sertifikat", "Import", "Kalibrering", new { id = 0 }, null)</li>
                         </ul>
                     </li>
                     <li>@Html.ActionLink("Om ASC", "Contact", "Home")</li>
@@ -59,7 +59,7 @@
                         </a>
                         <ul class="dropdown-menu" role="menu">
                             <li>@Html.ActionLink("Opprett bruker", "Register", "Account")</li>
-                            <li><a href="" id="accountManage">Konto administrering</a></li>
+                            <li>@Html.ActionLink("Konto administrering", "Manage", "Account", new { id = Session["UserID"].ToString() }, null)</li>
                             <li>@Html.ActionLink("Oversikt alle brukere", "OverViewUsers", "Administrator")</li>
                             <li>@Html.ActionLink("Sjekk nylige registrerte brukere", "CheckNewUsers", "Administrator")</li>
                             <li>@Html.ActionLink("Slett kasserte enheter", "DeleteDiscarded", "Administrator")</li>
@@ -85,22 +85,12 @@
         </footer>
     </div>
     <script type="text/javascript">
-    $(document).ready(function () {
-        var name = String("bruker: " + @Html.Raw(Json.Encode(Session["Name"].ToString())));
-        $("#userName").text(name.toLowerCase().replace(/^(.)|(\s|\-)(.)/g, function (c) {
-            return String(c).toUpperCase();
-        }));
-            
-        var userId = parseInt(@Html.Raw(Json.Encode(Session["UserID"].ToString())));
-        var manage = $("#accountManage");
-        manage[0].href = "/Account/Manage/" + userId;
-
-        var createEvent = $("#create");
-        createEvent[0].href = "/Kalibrering/Create/0";
-
-        var imp = $("#import");
-        imp[0].href = "/Kalibrering/Import/0";
-    });
+        $(document).ready(function () {
+            var name = String("bruker: " + @Html.Raw(Json.Encode(Session["Name"].ToString())));
+            $("#userName").text(name.toLowerCase().replace(/^(.)|(\s|\-)(.)/g, function (c) {
+                return String(c).toUpperCase();
+            }));
+        });
     </script>
 </body>
 </html>

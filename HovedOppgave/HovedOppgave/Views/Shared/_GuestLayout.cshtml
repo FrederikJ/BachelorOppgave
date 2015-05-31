@@ -29,7 +29,7 @@
                 <ul class="nav navbar-nav">
                     @Html.ActionLink("ASC", "Index", "Home", null, new { @class = "navbar-brand" })
                     <li>@Html.ActionLink("Om ASC", "Contact", "Home")</li>
-                    <li><a href="" id="accountManage">Konto administrering</a></li>
+                    <li>@Html.ActionLink("Konto administrering", "Manage", "Account", new { id = Session["UserID"].ToString() }, null)</li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li>
@@ -50,15 +50,11 @@
         </footer>
     </div>
     <script type="text/javascript">
-    $(document).ready(function () {
-        var name = String("bruker: " + @Html.Raw(Json.Encode(Session["Name"].ToString())));
+        $(document).ready(function () {
+            var name = String("bruker: " + @Html.Raw(Json.Encode(Session["Name"].ToString())));
             $("#userName").text(name.toLowerCase().replace(/^(.)|(\s|\-)(.)/g, function (c) {
                 return String(c).toUpperCase();
             }));
-
-            var userId = parseInt(@Html.Raw(Json.Encode(Session["UserID"].ToString())));
-            var manage = $("#accountManage");
-            manage[0].href = "/Account/Manage/" + userId;
         });
     </script>
 </body>

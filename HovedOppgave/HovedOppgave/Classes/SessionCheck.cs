@@ -48,7 +48,7 @@ namespace HovedOppgave.Classes
         }
 
         //sjekker hvilken masterpage den skal velge etter hvilken rettighet man har
-        public string FindMaster()
+        public static string FindMaster()
         {
             HttpContext http = HttpContext.Current;
             

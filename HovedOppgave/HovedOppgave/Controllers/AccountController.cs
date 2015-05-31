@@ -290,8 +290,7 @@ namespace HovedOppgave.Controllers
             model.ChangeUser = change;
 
             //setter master page og sender deg til viewet
-            SessionCheck check = new SessionCheck();
-            string master = check.FindMaster();
+            string master = SessionCheck.FindMaster();
             return View("Manage", master, model);
         }
 

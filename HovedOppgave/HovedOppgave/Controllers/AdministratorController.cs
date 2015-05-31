@@ -40,8 +40,7 @@ namespace HovedOppgave.Controllers
             model.Users = users;
             model.Rights = rights;
 
-            SessionCheck check = new SessionCheck();
-            string master = check.FindMaster();
+            string master = SessionCheck.FindMaster();
             return View("OverViewUsers", master, model);
         }
 
@@ -63,8 +62,7 @@ namespace HovedOppgave.Controllers
             model.Rights = rights;
             model.Right = right;
 
-            SessionCheck check = new SessionCheck();
-            string master = check.FindMaster();
+            string master = SessionCheck.FindMaster();
             return View("CheckNewUsers", master, model);
         }
 
@@ -108,8 +106,8 @@ namespace HovedOppgave.Controllers
             {
                 model.JoinQuery.Add(myrep.JoinQuery(item));
             }
-            SessionCheck check = new SessionCheck();
-            string master = check.FindMaster();
+
+            string master = SessionCheck.FindMaster();
             return View("DeleteDiscarded", master, model);
         }
 
