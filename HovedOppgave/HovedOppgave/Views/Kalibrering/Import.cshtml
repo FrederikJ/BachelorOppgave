@@ -1,9 +1,5 @@
 ﻿@model HovedOppgave.Models.CalibrationViews
 
-@{
-    ViewBag.Title = "Import license";
-}
-
 <h2>Importer Sertifikat</h2>
 <br />
 @using (Html.BeginForm("Import", "Kalibrering", FormMethod.Post, new { enctype = "multipart/form-data" }))
