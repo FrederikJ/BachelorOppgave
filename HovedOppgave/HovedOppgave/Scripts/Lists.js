@@ -302,15 +302,15 @@ var FillCalibrationTableBoby = function (tbody, startDate, endDate, companyList,
         }
     });
     td = document.createElement("td");
-    jQuery.each(fileList, function(i, file) {
-        if(String(file["FileID"]).match(String(logEvent["FileID"])))
-        {
-            td.textContent = String(file["FileName"]);
-            tr.appendChild(td);
-        }
-    });
-    if(td.textContent == "")
-    {
+    if (fileList != null) {
+        jQuery.each(fileList, function (i, file) {
+            if (String(file["FileID"]).match(String(logEvent["FileID"]))) {
+                td.textContent = String(file["FileName"]);
+                tr.appendChild(td);
+            }
+        });
+    }
+    else {
         td.textContent = "Eksisterer ikke fil";
         tr.appendChild(td)
     }
