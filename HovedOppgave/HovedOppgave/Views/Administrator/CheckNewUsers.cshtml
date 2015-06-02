@@ -99,7 +99,7 @@
             window.location.replace("/Account/Manage/" + userId);
         });
 
-        var checkBody = function(tbody) {
+        function checkBody(tbody) {
             if(tbody.childElementCount == 0) {
                 message.textContent = "Det er ingen brukere som ikke er sjekket";
                 checkUsersTable.hidden = true;

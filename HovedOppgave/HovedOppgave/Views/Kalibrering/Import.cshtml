@@ -50,7 +50,7 @@
         <input type="text" class="form-control" id="searchBox" />
         <table class="table">
             <thead id="theadFancy"><tr><th>@Html.DisplayName("Name")</th><th>@Html.DisplayName("Velg enhet")</th></tr></thead>
-            <tbody id="tbodyFancy"></tbody>
+            <tbody id="tbody"></tbody>
         </table>
         <button type="submit" id="putIn" class="btn btn-default">Sett inn</button>
     </div>
@@ -122,7 +122,6 @@
                     $("#Company_Name").val(item["Name"]);
                 }
             });
-            $("#searchBox").val() = null;
             tableContainer.hidden = false;
             checkBoxGroupeVal = null;
             $.fancybox.close()

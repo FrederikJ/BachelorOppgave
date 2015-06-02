@@ -112,7 +112,7 @@ var CalibrationViewsDetails = function (logevent, eventType, device, company, ro
         dd = document.createElement("dd");
         if (device["DeviceID"] != 0) {
             var a = document.createElement("a");
-            a.href = "/DeviceViews/DeviceDetIndex" + device["DeviceID"];
+            a.href = "/DeviceViews/DeviceDetIndex/" + device["DeviceID"];
             a.textContent = device["Name"];
             dd.appendChild(a);
         }
